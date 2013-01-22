@@ -1,0 +1,40 @@
+/*
+     serenity
+     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     
+     This program is free software: you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation, either version 3 of the License, or
+     (at your option) any later version.
+     
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+     
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#ifndef serenity_list_h
+#define serenity_list_h
+#include "string.h"
+#define d_foreach(l,n,k)\
+	for((l)->current=(l)->head;(((n)=(k *)(l)->current));(l)->current=(l)->current->next)
+#define d_list_node_head struct s_list_node head
+typedef size_t t_list_value;
+enum e_list_insert_kind {
+    e_list_insert_head,
+    e_list_insert_tail
+} e_list_insert_kind;
+typedef struct s_list_node {
+	struct s_list_node *next, *back;
+} s_list_node;
+typedef struct s_list {
+	struct s_list_node *head, *tail, *current;
+	t_list_value fill;
+} s_list;
+extern void f_list_init(struct s_list **list);
+extern void f_list_append(struct s_list *list, struct s_list_node *node, enum e_list_insert_kind kind);
+extern void f_list_insert(struct s_list *list, struct s_list_node *node, struct s_list_node *left);
+extern struct s_list_node *f_list_delete(struct s_list *list, struct s_list_node *node);
+#endif
