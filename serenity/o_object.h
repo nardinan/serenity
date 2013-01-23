@@ -26,8 +26,10 @@
 typedef struct o_object {
     const char *kind;
 	size_t size, references;
+	t_hash_value hash;
 	struct {
 		unsigned int supplied:1;
+		unsigned int hashed:1;
 	} s_flags;
 	struct {
 		void (*m_delete)(struct o_object *);

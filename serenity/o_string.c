@@ -96,12 +96,16 @@ int p_string_compare(struct o_object *object, struct o_object *other) {
 t_hash_value p_string_hash(struct o_object *object) {
 	struct o_string *object_ = (struct o_string *)object;
 	char *pointer = object_->content;
-	t_hash_value result = 5381;
-	int character;
-	/* djb2 hash function */
-	while ((character = *pointer++))
-		result = ((result << 5) + result) + character;
-	return result;
+	if (!object->s_flags.hashed) {
+		object->hash = 5381;
+		/* djb2 hash function */
+		while (*pointer) {
+			object->hash = ((object->hash<<5)+object->hash)+*pointer;
+			pointer++;
+		}
+		object->s_flags.hashed = d_true;
+	}
+	return object->hash;
 }
 
 char *p_string_string(struct o_object *object, char *data, size_t size) {

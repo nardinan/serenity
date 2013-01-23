@@ -28,6 +28,7 @@ d_object(o_string) {
 	} s_flags;
 	char *content;
 	size_t size;
+	void (*m_content)(struct o_string *, const char *format, ...);
 	void (*m_trim)(struct o_string *);
 	void (*m_append)(struct o_string *, struct o_string *);
 } o_string;

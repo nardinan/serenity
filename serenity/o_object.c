@@ -32,6 +32,7 @@ struct o_object *f_object_new(const char *kind, size_t size, struct o_object *su
 		result->s_flags.supplied = d_false;
 	else
 		d_die(d_error_malloc);
+	result->s_flags.hashed = d_false;
 	result->kind = kind;
 	result->size = size;
 	p_object_hooking(result);
@@ -64,7 +65,14 @@ int p_object_compare(struct o_object *object, struct o_object *other) {
 }
 
 t_hash_value p_object_hash(struct o_object *object) {
-	return (t_hash_value)object;
+	if (!object->s_flags.hashed) {
+		object->hash = (t_hash_value)object;
+		object->hash = ((object->hash>>16)^object->hash)*0x45d9f3b;
+		object->hash = ((object->hash>>16)^object->hash)*0x45d9f3b;
+		object->hash = ((object->hash>>16)^object->hash);
+		object->s_flags.hashed = d_true;
+	}
+	return object->hash;
 }
 
 char *p_object_string(struct o_object *object, char *data, size_t size) {
