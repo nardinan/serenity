@@ -20,13 +20,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "types.h"
 #include "logs.h"
 #define d_strlen(a) ((a)?strlen(a):0)
 #define d_space_character(a) (((a)==' ')||((a)=='\t'))
 #define d_final_character(a) (((a)=='\0')||((a)=='\n'))
+#define d_string_arguent_size 24
 typedef char *(* t_string_formatter)(char *, size_t, char *, va_list);
 extern char *f_string_append(char **string, char *element);
 extern char *f_string_trim(char *string);
-extern char *f_string_format(char *buffer, size_t size, char symbols[], t_string_formatter functions[], char *format, ...);
+extern char *f_string_format(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, ...);
+extern char *p_string_format(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, va_list parameters);
+extern char *p_string_format_skip(char *buffer, char *symbols);
 #endif

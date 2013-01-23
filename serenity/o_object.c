@@ -16,6 +16,13 @@
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "o_object.h"
+void p_object_hooking(struct o_object *object) {
+	object->s_delegate.m_compare = p_object_compare;
+	object->s_delegate.m_hash = p_object_hash;
+	object->s_delegate.m_string = p_object_string;
+	object->s_delegate.m_clone = p_object_clone;
+}
+
 struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied) {
 	struct o_object *result = supplied;
 	if (result) {
@@ -27,11 +34,7 @@ struct o_object *f_object_new(const char *kind, size_t size, struct o_object *su
 		d_die(d_error_malloc);
 	result->kind = kind;
 	result->size = size;
-	/* initialize with default methods */
-	result->s_delegate.m_compare = p_object_compare;
-	result->s_delegate.m_hash = p_object_hash;
-	result->s_delegate.m_string = p_object_string;
-	result->s_delegate.m_clone = p_object_clone;
+	p_object_hooking(result);
 	return result;
 }
 
@@ -64,16 +67,18 @@ t_hash_value p_object_hash(struct o_object *object) {
 	return (t_hash_value)object;
 }
 
-char *p_object_string(struct o_object *object, char *data, int size) {
-	snprintf(data, size, "<%s>", object->kind);
-	return data;
+char *p_object_string(struct o_object *object, char *data, size_t size) {
+	size_t written;
+	written = snprintf(data, size, "<%s>", object->kind);
+	return (data+written);
 }
 
 struct o_object *p_object_clone(struct o_object *object) {
 	struct o_object *result;
-	if ((result = f_object_new(object->kind, object->size, NULL)))
-		result->s_delegate = object->s_delegate;
-	else
+	if ((result = f_object_new(object->kind, object->size, NULL))) {
+		memcpy(result, object, object->size);
+		result->references = 0;
+	} else
 		d_die(d_error_malloc);
 	return result;
 }

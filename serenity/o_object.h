@@ -20,6 +20,9 @@
 #include "../ground/ground.h"
 #define d_object(n) typedef struct n
 #define d_object_head struct o_object head
+#define d_retain(o,k) (k *)f_object_retain((struct o_object *)o)
+#define d_release(o) f_object_release((struct o_object *)o)
+#define d_clone(o,k) (k *)o->head.s_delegate.m_clone((struct o_object *)o)
 typedef struct o_object {
     const char *kind;
 	size_t size, references;
@@ -30,16 +33,17 @@ typedef struct o_object {
 		void (*m_delete)(struct o_object *);
 		int (*m_compare)(struct o_object *, struct o_object *);
 		t_hash_value (*m_hash)(struct o_object *);
-		char *(*m_string)(struct o_object *, char *, int);
+		char *(*m_string)(struct o_object *, char *, size_t);
 		struct o_object *(*m_clone)(struct o_object *);
 	} s_delegate;
 } o_object;
+extern void p_object_hooking(struct o_object *object);
 extern struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied);
 extern struct o_object *f_object_retain(struct o_object *object);
 extern void f_object_release(struct o_object *object);
 extern void p_object_delete(struct o_object *object);
 extern int p_object_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_object_hash(struct o_object *object);
-extern char *p_object_string(struct o_object *object, char *data, int size);
+extern char *p_object_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_object_clone(struct o_object *object);
 #endif

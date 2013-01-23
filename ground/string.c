@@ -46,12 +46,18 @@ char *f_string_trim(char *string) {
     return string;
 }
 
-char *f_string_format(char *buffer, size_t size, char symbols[], t_string_formatter functions[], char *format, ...) {
+char *f_string_format(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, ...) {
 	va_list parameters;
-	char *target = buffer, *pointer = format, *next;
-	size_t dimension, remaining = (size-1), lower;
-	unsigned int index;
 	va_start(parameters, format);
+	p_string_format(buffer, size, symbols, functions, format, parameters);
+	va_end(parameters);
+	return buffer;
+}
+
+char *p_string_format(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, va_list parameters) {
+	char *target = buffer, *pointer = format, *next, *last, *tail, argument[d_string_arguent_size];
+	size_t dimension, remaining = (size-1), lower, written;
+	unsigned int index;
 	while ((next = strchr(pointer, '%'))) {
 		if ((dimension = (next-pointer)) > 0)
 			if ((lower = (dimension>remaining)?remaining:dimension)) {
@@ -61,19 +67,23 @@ char *f_string_format(char *buffer, size_t size, char symbols[], t_string_format
 			}
 		if ((pointer = (next+1))) {
 			index = 0;
-			while (symbols[index] != '^') {
-				if (symbols[index] == *pointer) {
-					next = functions[index](target, remaining, pointer, parameters);
+			if ((last = p_string_format_skip(pointer, symbols))) {
+				memset(argument, '\0', d_string_arguent_size);
+				*argument = '%';
+				memcpy((argument+1), pointer, (last-pointer));
+				if ((tail = strchr(symbols, *(last-1))) == NULL) {
+					written = vsnprintf(target, remaining, argument, parameters);
+					remaining -= written;
+					target += written;
+				} else {
+					next = functions[(tail-symbols)](target, remaining, argument, parameters);
 					remaining -= (next-target);
 					target = next;
-					break;
-				} else
-					index++;
+				}
+				pointer = last;
 			}
-			pointer++;
 		}
 	}
-	va_end(parameters);
 	if ((dimension = strlen(pointer)) > 0)
 		if ((lower = (dimension>remaining)?remaining:dimension)) {
 			remaining -= lower;
@@ -82,4 +92,29 @@ char *f_string_format(char *buffer, size_t size, char symbols[], t_string_format
 		}
 	*target = '\0';
 	return buffer;
+}
+
+char *p_string_format_skip(char *buffer, char *symbols) {
+	int error = d_false;
+	while (strchr("#0-+ '", *buffer))
+		buffer++;
+	while (isdigit(*buffer))
+		buffer++;
+	if (*buffer == '.') {
+		buffer++;
+		if (isdigit(*buffer))
+			while (isdigit(*buffer))
+				buffer++;
+		else
+			error = d_true;
+	}
+	if (!error) {
+		while (strchr("hljztLq", *buffer))
+			buffer++;
+		if ((strchr("diouXxfFeEgGaAcsb%", *buffer)) || (strchr(symbols, *buffer)))
+			buffer++;
+		else
+			error = d_true;
+	}
+	return (error)?NULL:buffer;
 }
