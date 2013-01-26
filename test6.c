@@ -18,19 +18,18 @@
 #include "o_string.h"
 int main (int argc, char *argv[]) {
 	struct o_string *string[5];
-	string[0] = d_string("ciao a tutti");
-	string[1] = f_string_new_format(NULL, d_false, 125, "  object kind: %^ (content %@)[here we append:]", string[0], string[0]);
+	string[0] = d_string("hello world");
+	string[1] = f_string_new_format(NULL, d_false, 128, "  object kind: %^ (content %@)[here we append:]", string[0], string[0]);
 	string[1]->m_trim(string[1]);
 	string[2] = d_retain(string[1], struct o_string);
 	string[3] = d_clone(string[2], struct o_string);
 	string[1]->m_append(string[1], string[0]);
 	string[4] = f_string_new_format(NULL, d_false, 256, "  object description: %s (%@)", "nothing", string[1]);
 	string[4]->m_trim(string[4]);
-	printf("%s\n", string[4]->content);
+	printf("string[0]: %s\nstring[1]: %s\nstring[2]: %s\nstring[3]: %s\nstring[4]: %s\n", string[0]->content, string[1]->content, string[2]->content, string[3]->content, string[4]->content);
 	d_release(string[0]);
 	d_release(string[1]);
 	d_release(string[2]);
-	printf("duplicated object content: %s\n", string[3]->content);
 	d_release(string[3]);
 	d_release(string[4]);
 }

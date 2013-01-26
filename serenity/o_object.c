@@ -67,9 +67,6 @@ int p_object_compare(struct o_object *object, struct o_object *other) {
 t_hash_value p_object_hash(struct o_object *object) {
 	if (!object->s_flags.hashed) {
 		object->hash = (t_hash_value)object;
-		object->hash = ((object->hash>>16)^object->hash)*0x45d9f3b;
-		object->hash = ((object->hash>>16)^object->hash)*0x45d9f3b;
-		object->hash = ((object->hash>>16)^object->hash);
 		object->s_flags.hashed = d_true;
 	}
 	return object->hash;

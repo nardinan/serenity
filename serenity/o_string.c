@@ -25,6 +25,7 @@ void p_string_hooking(struct o_string *object) {
 	object->head.s_delegate.m_clone = p_string_clone;
 	object->m_trim = p_string_trim;
 	object->m_append = p_string_append;
+	object->m_character = p_string_character;
 }
 
 struct o_string *f_string_new(struct o_string *supplied, int constant, size_t size, const char *content) {
@@ -34,7 +35,7 @@ struct o_string *f_string_new(struct o_string *supplied, int constant, size_t si
 			result->content = (char *)content;
 		else if (content)
 			f_string_append(&(result->content), (char *)content);
-		result->size = size;
+		result->size = d_strlen(result->content);
 		p_string_hooking(result);
 	} else
 		d_die(d_error_malloc);
@@ -55,7 +56,7 @@ struct o_string *f_string_new_format(struct o_string *supplied, int constant, si
 			result->content = p_string_format((char *)format, size, symbols, functions, (char *)format, parameters);
 		else if ((result->content = (char *) malloc(size)))
 			result->content = p_string_format(result->content, size, symbols, functions, (char *)format, parameters);
-		result->size = size;
+		result->size = d_strlen(result->content);
 		p_string_hooking(result);
 	} else
 		d_die(d_error_malloc);
@@ -79,23 +80,23 @@ char *p_string_format_object_content(char *buffer, size_t size, char *format, va
 }
 
 void p_string_delete(struct o_object *object) {
-	struct o_string *object_ = (struct o_string *)object;
-	if ((!object_->s_flags.constant) && (object_->content))
-		free(object_->content);
+	struct o_string *local_object = (struct o_string *)object;
+	if ((!local_object->s_flags.constant) && (local_object->content))
+		free(local_object->content);
 }
 
 int p_string_compare(struct o_object *object, struct o_object *other) {
-	struct o_string *object_ = (struct o_string *)object, *other_ = (struct o_string *)other;
+	struct o_string *local_object = (struct o_string *)object, *local_other = (struct o_string *)other;
 	int result;
-	if ((result = ((int)object_->size-(int)other_->size)) == 0)
-		if ((object_->content) && (other_->content))
-			result = strcmp(object_->content, other_->content);
+	if ((result = ((int)local_object->size-(int)local_other->size)) == 0)
+		if ((local_object->content) && (local_other->content))
+			result = strcmp(local_object->content, local_other->content);
 	return result;
 }
 
 t_hash_value p_string_hash(struct o_object *object) {
-	struct o_string *object_ = (struct o_string *)object;
-	char *pointer = object_->content;
+	struct o_string *local_object = (struct o_string *)object;
+	char *pointer = local_object->content;
 	if (!object->s_flags.hashed) {
 		object->hash = 5381;
 		/* djb2 hash function */
@@ -109,31 +110,45 @@ t_hash_value p_string_hash(struct o_object *object) {
 }
 
 char *p_string_string(struct o_object *object, char *data, size_t size) {
- 	struct o_string *object_ = (struct o_string *)object;
+ 	struct o_string *local_object = (struct o_string *)object;
 	size_t written;
-	if (object_->content)
-		written = snprintf(data, size, "%s", object_->content);
+	if (local_object->content)
+		written = snprintf(data, size, "%s", local_object->content);
 	else
 		written = snprintf(data, size, "<null>");
 	return (data+written);
 }
 
 struct o_object *p_string_clone(struct o_object *object) {
-	struct o_string *result = (struct o_string *)p_object_clone(object), *object_ = (struct o_string *)object;
-	if (!object_->s_flags.constant) {
+	struct o_string *result = (struct o_string *)p_object_clone(object), *local_object = (struct o_string *)object;
+	if (!local_object->s_flags.constant) {
 		result->content = NULL;
-		f_string_append(&result->content, object_->content);
+		f_string_append(&result->content, local_object->content);
 	}
 	return (struct o_object *)result;
 }
 
 void p_string_trim(struct o_string *object) {
-	if (object->content)
+	if (object->content) {
 		f_string_trim(object->content);
+		object->size = d_strlen(object->content);
+	}
 }
 
 void p_string_append(struct o_string *object, struct o_string *other) {
 	if (!object->s_flags.constant)
-		if (other->content)
+		if (other->content) {
 			f_string_append(&(object->content), other->content);
+			object->size += other->size;
+		}
+}
+
+char p_string_character(struct o_string *object, size_t position) {
+	size_t local_position;
+	char result = '\0';
+	if ((object->content) && (object->size > 0)) {
+		local_position = (position%object->size);
+		result = object->content[local_position];
+	}
+	return result;
 }

@@ -28,9 +28,9 @@ d_object(o_string) {
 	} s_flags;
 	char *content;
 	size_t size;
-	void (*m_content)(struct o_string *, const char *format, ...);
 	void (*m_trim)(struct o_string *);
 	void (*m_append)(struct o_string *, struct o_string *);
+	char (*m_character)(struct o_string *, size_t);
 } o_string;
 extern void p_string_hooking(struct o_string *object);
 extern struct o_string *f_string_new(struct o_string *supplied, int constant, size_t size, const char *content);
@@ -44,4 +44,5 @@ extern char *p_string_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_string_clone(struct o_object *object);
 extern void p_string_trim(struct o_string *object);
 extern void p_string_append(struct o_string *object, struct o_string *other);
+extern char p_string_character(struct o_string *object, size_t position);
 #endif
