@@ -18,23 +18,27 @@
 #ifndef serenity_o_string_h
 #define serenity_o_string_h
 #include "o_object.h"
+#include "o_array.h"
 #define d_string_buffer_size 256
-#define d_string(c) f_string_new(NULL,d_true,d_strlen(c),(c))
+#define d_string(c) f_string_new_constant(NULL,(c))
 extern const char v_string_kind[];
+d_exception_declare(constant);
 d_object(o_string) {
 	d_object_head;
 	struct {
 		unsigned int constant:1;
 	} s_flags;
 	char *content;
-	size_t size;
+	size_t size, length;
 	void (*m_trim)(struct o_string *);
 	void (*m_append)(struct o_string *, struct o_string *);
 	char (*m_character)(struct o_string *, size_t);
+	struct o_string *(*m_substring)(struct o_string *, size_t, size_t);
+	struct o_array *(*m_split)(struct o_string *, char character);
 } o_string;
 extern void p_string_hooking(struct o_string *object);
-extern struct o_string *f_string_new(struct o_string *supplied, int constant, size_t size, const char *content);
-extern struct o_string *f_string_new_format(struct o_string *supplied, int constant, size_t size, const char *format, ...);
+extern struct o_string *f_string_new(struct o_string *supplied, size_t size, const char *format, ...);
+extern struct o_string *f_string_new_constant(struct o_string *supplied, const char *content);
 extern char *p_string_format_object_kind(char *buffer, size_t size, char *format, va_list parameters);
 extern char *p_string_format_object_content(char *buffer, size_t size, char *format, va_list parameters);
 extern void p_string_delete(struct o_object *object);
@@ -45,4 +49,6 @@ extern struct o_object *p_string_clone(struct o_object *object);
 extern void p_string_trim(struct o_string *object);
 extern void p_string_append(struct o_string *object, struct o_string *other);
 extern char p_string_character(struct o_string *object, size_t position);
+extern struct o_string *p_string_substring(struct o_string *object, size_t begin, size_t length);
+extern struct o_array *p_string_split(struct o_string *object, char character);
 #endif

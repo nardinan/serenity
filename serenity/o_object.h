@@ -23,7 +23,8 @@
 #define d_retain(o,k) (k *)f_object_retain((struct o_object *)o)
 #define d_release(o) f_object_release((struct o_object *)o)
 #define d_clone(o,k) (k *)o->head.s_delegate.m_clone((struct o_object *)o)
-#define d_compare(a,b) ((a)&&(b))?(a)->s_delegate.m_compare((a),(b)):(((!a)&&(b))?-1:(((a)&&(!b))?1:0))
+#define d_compare(a,b)\
+	((a)&&(b))?(a)->s_delegate.m_compare((a),(b)):(((!a)&&(b))?-1:(((a)&&(!b))?1:0))
 typedef struct o_object {
     const char *kind;
 	size_t size, references;

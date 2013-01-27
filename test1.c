@@ -17,11 +17,12 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include "hash.h"
+#include "string.h"
 int main (int argc, char *argv[]) {
     char *test = NULL;
-    test = f_string_trim(f_string_append(&test, "asd"));
-    test = f_string_append(&test, "senza senso");
-    printf("'%s'\n", test);
+	size_t size = 0;
+    test = f_string_trim(f_string_append(&test, "asd", &size));
+    test = f_string_append(&test, "senza senso", &size);
+    printf("'%s' (allocated size: %lu)\n", test, size);
     free(test);
 }

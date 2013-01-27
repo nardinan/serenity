@@ -18,27 +18,29 @@
 #include "o_string.h"
 #include "o_array.h"
 int main (int argc, char *argv[]) {
-	struct o_string *string[5], *result;
-	struct o_array *array;
-	string[0] = d_string("hello world");
-	string[1] = d_string("hello to everybody");
-	string[2] = d_string("nothing to do here");
-	string[3] = d_string("what have you done now");
-	string[4] = d_string("aloah");
-	array = f_array_new(NULL, 4);
-	array->m_insert(array, (struct o_object *)string[0], 0);
-	array->m_insert(array, (struct o_object *)string[1], 1);
-	array->m_insert(array, (struct o_object *)string[2], 2);
-	array->m_insert(array, (struct o_object *)string[3], 3);
-	d_release(string[0]);
-	d_release(string[1]);
-	d_release(string[2]);
-	d_release(string[3]);
-	array->m_insert(array, (struct o_object *)string[4], 2);
-	d_release(string[4]);
-	printf("in the array we have %zd elements\n", array->size);
-	result = f_string_new_format(NULL, d_false, 512, "content: %@\n", array);
-	printf("%s", result->content);
+	struct o_string *string, *result;
+	struct o_array *array, *another;
+	size_t index;
+	string = d_string("hello,C,bye,,godbye,salut");
+	array = string->m_split(string, ',');
+	for (index = 0; index < array->size; index++) {
+		result = (struct o_string *)array->m_obtain(array, index);
+		if (result)
+			printf("\t%s\n", result->content);
+		else
+			printf("\t<null>\n");
+	}
+	printf("in the array we have %zd elements and %zd spaces\n", array->filled, array->size);
+	another = d_clone(array, struct o_array);
 	d_release(result);
 	d_release(array);
+	printf("checking for clone:\n");
+	for (index = 0; index < another->size; index++) {
+		result = (struct o_string *)another->m_obtain(another, index);
+		if (result)
+			printf("\t%s\n", result->content);
+		else
+			printf("\t<null>\n");
+	}
+	d_release(another);
 }

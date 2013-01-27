@@ -35,8 +35,7 @@ struct o_array *f_array_new(struct o_array *supplied, size_t size) {
 			p_array_hooking(result);
 		} else
 			d_die(d_error_malloc);
-	} else
-		d_die(d_error_malloc);
+	}
 	return result;
 }
 

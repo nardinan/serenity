@@ -16,17 +16,15 @@
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "string.h"
-char *f_string_append(char **string, char *element) {
-    size_t total = (d_strlen(*string)+d_strlen(element)+1);
-    char *result;
-    if ((result = (char *) malloc(total))) {
-        snprintf(result, total, "%s%s", ((*string)?*string:""), element);
-        result[total] = '\0';
-        if (*string)
-            free(*string);
-        *string = result;
-    } else
-		d_die(d_error_malloc);
+char *f_string_append(char **string, char *suffix, size_t *space) {
+	size_t size_string = d_strlen(*string), size_element = d_strlen(suffix), total;
+	if ((total = size_string+size_element+1) >= *space) {
+		if ((*string = (char *) realloc(*string, total)))
+			*space = total;
+		else
+			d_die(d_error_malloc);
+	}
+	memcpy((*string)+size_string, suffix, size_element+1);
     return *string;
 }
 

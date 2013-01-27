@@ -40,16 +40,19 @@ struct o_object *f_object_new(const char *kind, size_t size, struct o_object *su
 }
 
 struct o_object *f_object_retain(struct o_object *object) {
-	object->references++;
+	if (object)
+		object->references++;
 	return object;
 }
 
 void f_object_release(struct o_object *object) {
-	if (object->references == 0) {
-		p_object_delete(object);
-		object = NULL;
-	} else
-		object->references--;
+	if (object) {
+		if (object->references == 0) {
+			p_object_delete(object);
+			object = NULL;
+		} else
+			object->references--;
+	}
 }
 
 void p_object_delete(struct o_object *object) {
@@ -83,7 +86,6 @@ struct o_object *p_object_clone(struct o_object *object) {
 	if ((result = f_object_new(object->kind, object->size, NULL))) {
 		memcpy(result, object, object->size);
 		result->references = 0;
-	} else
-		d_die(d_error_malloc);
+	}
 	return result;
 }

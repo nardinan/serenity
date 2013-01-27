@@ -17,16 +17,25 @@
  */
 #include "o_string.h"
 int main (int argc, char *argv[]) {
-	struct o_string *string[5];
+	size_t index;
+	struct o_string *string[5], *result;
 	string[0] = d_string("hello world");
-	string[1] = f_string_new_format(NULL, d_false, 128, "  object kind: %^ (content %@)[here we append:]", string[0], string[0]);
+	printf("character: %c\n", string[0]->m_character(string[0], 3));
+	string[0]->m_trim(string[0]);
+	string[1] = f_string_new(NULL, 128, "  object kind: %^ (content %@)[here we append:]", string[0], string[0]);
 	string[1]->m_trim(string[1]);
 	string[2] = d_retain(string[1], struct o_string);
 	string[3] = d_clone(string[2], struct o_string);
 	string[1]->m_append(string[1], string[0]);
-	string[4] = f_string_new_format(NULL, d_false, 256, "  object description: %s (%@)", "nothing", string[1]);
+	string[4] = f_string_new(NULL, 256, "  object description: %s (%@)", "nothing", string[1]);
 	string[4]->m_trim(string[4]);
 	printf("string[0]: %s\nstring[1]: %s\nstring[2]: %s\nstring[3]: %s\nstring[4]: %s\n", string[0]->content, string[1]->content, string[2]->content, string[3]->content, string[4]->content);
+	for (index = 0; index < 1024; index++) {
+		result = string[4]->m_substring(string[4], index, 10);
+		if (result)
+			printf("%s\n", result->content);
+		d_release(result);
+	}
 	d_release(string[0]);
 	d_release(string[1]);
 	d_release(string[2]);

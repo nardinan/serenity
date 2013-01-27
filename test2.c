@@ -34,23 +34,31 @@ t_hash_value calculate (void *a) {
 
 int main (int argc, char *argv[]) {
     struct s_hash_table *hash = NULL;
-	char *key = NULL, *value = NULL, *src;
+	char *key = NULL, *value = NULL, *src = NULL;
+	size_t key_size = 0, key_value = 0;
 	f_hash_init(&hash, compare, calculate);
-	f_hash_insert(hash, f_string_append(&key, "key1"), f_string_append(&value, "value1"), s_true, NULL);
+	f_hash_insert(hash, f_string_append(&key, "key1", &key_size), f_string_append(&value, "value1", &key_value), s_true, NULL);
 	key = value = NULL;
-	f_hash_insert(hash, f_string_append(&key, "key2"), f_string_append(&value, "value2"), s_true, NULL);
+	key_size = key_value = 0;
+	f_hash_insert(hash, f_string_append(&key, "key2", &key_size), f_string_append(&value, "value2", &key_value), s_true, NULL);
 	key = value = NULL;
-	f_hash_insert(hash, f_string_append(&key, "key3"), f_string_append(&value, "value3"), s_true, NULL);
+	key_size = key_value = 0;
+	f_hash_insert(hash, f_string_append(&key, "key3", &key_size), f_string_append(&value, "value3", &key_value), s_true, NULL);
 	key = value = NULL;
-	f_hash_insert(hash, f_string_append(&key, "key4"), f_string_append(&value, "value4"), s_true, NULL);
+	key_size = key_value = 0;
+	f_hash_insert(hash, f_string_append(&key, "key4", &key_size), f_string_append(&value, "value4", &key_value), s_true, NULL);
 	key = value = NULL;
-	f_hash_insert(hash, f_string_append(&key, "key5"), f_string_append(&value, "value5"), s_true, NULL);
+	key_size = key_value = 0;
+	f_hash_insert(hash, f_string_append(&key, "key5", &key_size), f_string_append(&value, "value5", &key_value), s_true, NULL);
 	key = value = NULL;
-	f_hash_insert(hash, f_string_append(&key, "key6"), f_string_append(&value, "value6"), s_true, NULL);
+	key_size = key_value = 0;
+	f_hash_insert(hash, f_string_append(&key, "key6", &key_size), f_string_append(&value, "value6", &key_value), s_true, NULL);
 	key = value = NULL;
-	f_hash_insert(hash, f_string_append(&key, "key7"), f_string_append(&value, "value7"), s_true, NULL);
+	key_size = key_value = 0;
+	f_hash_insert(hash, f_string_append(&key, "key7", &key_size), f_string_append(&value, "value7", &key_value), s_true, NULL);
 	key = value = NULL;
-	printf("there are %d elements in the hash table\n", hash->fill);
-	printf("value is: %s\n", f_hash_get(hash, f_string_append(&src, "key7")));
+	key_size = key_value = 0;
+	printf("there are %lld elements in the hash table\n", hash->fill);
+	printf("value is: %s\n", f_hash_get(hash, f_string_append(&src, "key7", &key_value)));
 	return 0;
 }

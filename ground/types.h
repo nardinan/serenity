@@ -25,4 +25,6 @@ typedef struct s_bool {
 extern const struct s_bool s_true, s_false;
 #define d_is_equal(b,o) ((b).flag==(o).flag)
 #define d_is_true(b) ((b).flag)
+#define d_min(a,b) (((a)>(b))?(b):(a));
+#define d_max(a,b) (((a)<(b))?(b):(a));
 #endif
