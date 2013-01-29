@@ -1,6 +1,6 @@
 /*
 	 serenity
-	 Copyright (C) 2012 Andrea Nardinocchi (nardinocchi@psychogames.net)
+	 Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
 	 
 	 This program is free software: you can redistribute it and/or modify
 	 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@
 }
 #define d_string_constant(c)\
 {\
-	d_object_constant(v_string_kind,sizeof(struct o_string),d_string_hooking_constant),\
+	d_object_constant(v_string_kind,sizeof(struct o_string),\
+						d_string_hooking_constant),\
 	{\
 		d_true\
 	},\
@@ -60,11 +61,17 @@ typedef struct o_string {
 	void (*m_truncate)(struct o_string *, size_t);
 } o_string;
 extern void p_string_hooking(struct o_string *object);
-extern struct o_string *f_string_new(struct o_string *supplied, size_t size, const char *format, ...);
-extern struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const char *format, va_list parameters);
-extern struct o_string *f_string_new_constant(struct o_string *supplied, const char *content);
-extern char *p_string_format_object_kind(char *buffer, size_t size, char *format, va_list parameters);
-extern char *p_string_format_object_content(char *buffer, size_t size, char *format, va_list parameters);
+extern struct o_string *f_string_new(struct o_string *supplied, size_t size,
+									 const char *format, ...);
+extern struct o_string *f_string_new_args(struct o_string *supplied,
+										  size_t size, const char *format,
+										  va_list parameters);
+extern struct o_string *f_string_new_constant(struct o_string *supplied,
+											  const char *content);
+extern char *p_string_format_object_kind(char *buffer, size_t size,
+										 char *format, va_list parameters);
+extern char *p_string_format_object_content(char *buffer, size_t size,
+											char *format, va_list parameters);
 extern void p_string_delete(struct o_object *object);
 extern int p_string_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_string_hash(struct o_object *object);
@@ -73,7 +80,8 @@ extern struct o_object *p_string_clone(struct o_object *object);
 extern void p_string_trim(struct o_string *object);
 extern void p_string_append(struct o_string *object, struct o_string *other);
 extern char p_string_character(struct o_string *object, size_t position);
-extern struct o_string *p_string_substring(struct o_string *object, size_t begin, size_t length);
+extern struct o_string *p_string_substring(struct o_string *object,
+										   size_t begin, size_t length);
 extern struct o_array *p_string_split(struct o_string *object, char character);
 extern void p_string_truncate(struct o_string *object, size_t length);
 #endif

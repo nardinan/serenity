@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ extern void p_array_delete(struct o_object *object);
 extern int p_array_compare(struct o_object *object, struct o_object *other);
 extern char *p_array_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_array_clone(struct o_object *object);
-extern size_t p_array_insert(struct o_array *object, struct o_object *value, size_t position);
+extern size_t p_array_insert(struct o_array *object, struct o_object *value,
+							 size_t position);
 extern struct o_object *p_array_obtain(struct o_array *object, size_t position);
 #endif

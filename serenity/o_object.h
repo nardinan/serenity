@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2012 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -19,10 +19,13 @@
 #define serenity_object_h
 #include "o_exceptions.h"
 #define d_object_head struct o_object head
-#define d_compare(a,b) (((a)&&(b))?((struct o_object *)(a))->s_delegate.m_compare((a),(b)):(int)((a)-(b)))
+#define d_compare(a,b)\
+	(((a)&&(b))?((struct o_object *)(a))->s_delegate.m_compare((a),(b)):\
+				(int)((a)-(b)))
 #define d_retain(a,k) (k*)f_object_retain((struct o_object *)a)
 #define d_release(a) f_object_release((struct o_object *)a)
-#define d_clone(a,k) (k*)((struct o_object *)(a))->s_delegate.m_clone((struct o_object *)a)
+#define d_clone(a,k)\
+	(k*)((struct o_object *)(a))->s_delegate.m_clone((struct o_object *)a)
 #define d_object_constant(k,s,m)\
 {\
 	d_list_node_constant,\
@@ -56,7 +59,8 @@ typedef struct o_object {
 	} s_delegate;
 } o_object;
 extern void p_object_hooking(struct o_object *object);
-extern struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied);
+extern struct o_object *f_object_new(const char *kind, size_t size,
+									 struct o_object *supplied);
 extern struct o_object *f_object_retain(struct o_object *object);
 extern void f_object_release(struct o_object *object);
 extern void p_object_delete(struct o_object *object);

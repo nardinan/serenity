@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ void p_pool_hooking(struct o_pool *object) {
 
 struct o_pool *f_pool_new(struct o_pool *supplied) {
 	struct o_pool *result;
-	if ((result = (struct o_pool *)f_object_new(v_pool_kind, sizeof(struct o_pool), (struct o_object *)supplied)))
+	if ((result = (struct o_pool *)f_object_new(v_pool_kind,
+												sizeof(struct o_pool),
+												(struct o_object *)supplied)))
 		f_list_init(&result->pool);
 	p_pool_hooking(result);
 	return result;
@@ -59,19 +61,24 @@ char *p_pool_string(struct o_object *object, char *data, size_t size) {
 }
 
 struct o_object *p_pool_clone(struct o_object *object) {
-	struct o_pool *result = (struct o_pool *)p_object_clone(object), *local_object = (struct o_pool *)object;
+	struct o_pool *result = (struct o_pool *)p_object_clone(object),
+					*local_object = (struct o_pool *)object;
 	struct o_object *value;
 	if (local_object->pool) {
 		f_list_init(&result->pool);
 		d_foreach(local_object->pool, value, struct o_object)
-			f_list_append(result->pool, (struct s_list_node *)d_retain(value, struct o_object), e_list_insert_head);
+			f_list_append(result->pool,
+						  (struct s_list_node *)d_retain(value,
+														 struct o_object),
+						  e_list_insert_head);
 	}
 	return (struct o_object *)result;
 }
 
 struct o_object *p_pool_insert(struct o_pool *object, struct o_object *value) {
 	if (object->pool) {
-		f_list_append(object->pool, (struct s_list_node *)value, e_list_insert_head);
+		f_list_append(object->pool, (struct s_list_node *)value,
+					  e_list_insert_head);
 		value->s_flags.pooled = d_true;
 	}
 	return value;

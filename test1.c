@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2012 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 int main (int argc, char *argv[]) {
     char *test = NULL;
 	size_t size = 0;
-    test = f_string_trim(f_string_append(&test, "asd", &size));
-    test = f_string_append(&test, "senza senso", &size);
+    test = f_string_trim(f_string_append(&test, "whut", &size));
+    test = f_string_append(&test, "nothing", &size);
     printf("'%s' (allocated size: %lu)\n", test, size);
     free(test);
 }

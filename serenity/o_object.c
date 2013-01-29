@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2012 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@ void p_object_hooking(struct o_object *object) {
 	object->s_delegate.m_clone = p_object_clone;
 }
 
-struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied) {
+struct o_object *f_object_new(const char *kind, size_t size,
+							  struct o_object *supplied) {
 	struct o_object *result = supplied;
 	if (result) {
 		memset(result, 0, size);
@@ -77,7 +78,8 @@ t_hash_value p_object_hash(struct o_object *object) {
 
 char *p_object_string(struct o_object *object, char *data, size_t size) {
 	size_t written;
-	written = snprintf(data, size, "<%s size: %zu>", object->kind, object->size);
+	written = snprintf(data, size, "<%s size: %zu>", object->kind,
+					   object->size);
 	return (data+written);
 }
 

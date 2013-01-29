@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2012 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -44,10 +44,14 @@ typedef struct s_hash_table {
 } s_hash_table;
 extern void p_hash_allocate(struct s_hash_table *table, t_hash_value dimension);
 extern void p_hash_resize(struct s_hash_table *table, t_hash_value dimension);
-extern struct s_hash_bucket *p_hash_lookup(struct s_hash_table *table, void *key, t_hash_value hash);
-extern void f_hash_init(struct s_hash_table **table, t_hash_compare *compare, t_hash_calculate *calculate);
+extern struct s_hash_bucket *p_hash_lookup(struct s_hash_table *table,
+										   void *key, t_hash_value hash);
+extern void f_hash_init(struct s_hash_table **table, t_hash_compare *compare,
+						t_hash_calculate *calculate);
 extern void f_hash_destroy(struct s_hash_table **table);
-extern int f_hash_insert(struct s_hash_table *table, void *key, void *value, struct s_bool update, struct s_hash_bucket *current);
+extern int f_hash_insert(struct s_hash_table *table, void *key, void *value,
+						 struct s_bool update, struct s_hash_bucket *current);
 extern void *f_hash_get(struct s_hash_table *table, void *key);
-extern int f_hash_delete(struct s_hash_table *table, void *key, struct s_hash_bucket *current);
+extern int f_hash_delete(struct s_hash_table *table, void *key,
+						 struct s_hash_bucket *current);
 #endif

@@ -1,6 +1,6 @@
 /*
 	 serenity
-	 Copyright (C) 2012 Andrea Nardinocchi (nardinocchi@psychogames.net)
+	 Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
 	 
 	 This program is free software: you can redistribute it and/or modify
 	 it under the terms of the GNU General Public License as published by
@@ -31,7 +31,8 @@ void p_string_hooking(struct o_string *object) {
 	object->m_truncate = p_string_truncate;
 }
 
-struct o_string *f_string_new(struct o_string *supplied, size_t size, const char *format, ...) {
+struct o_string *f_string_new(struct o_string *supplied, size_t size,
+							  const char *format, ...) {
 	struct o_string *result;
 	va_list parameters;
 	va_start(parameters, format);
@@ -40,19 +41,26 @@ struct o_string *f_string_new(struct o_string *supplied, size_t size, const char
 	return result;
 }
 
-struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const char *format, va_list parameters) {
+struct o_string *f_string_new_args(struct o_string *supplied, size_t size,
+								   const char *format, va_list parameters) {
 	char *symbols = "@^";
 	t_string_formatter functions[] = {
 		p_string_format_object_content,
 		p_string_format_object_kind,
 	};
 	struct o_string *result;
-	if ((result = (struct o_string *)f_object_new(v_string_kind, sizeof(struct o_string), (struct o_object *)supplied))) {
+	if ((result = (struct o_string *)
+		 f_object_new(v_string_kind, sizeof(struct o_string),
+					  (struct o_object *)supplied))) {
 		result->size = size;
 		result->s_flags.constant = d_false;
 		if ((result->content = (char *) calloc(1, result->size))) {
 			if (format) {
-				result->content = f_string_format_args(result->content, result->size, symbols, functions, (char *)format, parameters);
+				result->content = f_string_format_args(result->content,
+													   result->size, symbols,
+													   functions,
+													   (char *)format,
+													   parameters);
 				result->length = d_strlen(result->content);
 			}
 		} else
@@ -62,9 +70,12 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const
 	return result;
 }
 
-struct o_string *f_string_new_constant(struct o_string *supplied, const char *content) {
+struct o_string *f_string_new_constant(struct o_string *supplied,
+									   const char *content) {
 	struct o_string *result;
-	if ((result = (struct o_string *)f_object_new(v_string_kind, sizeof(struct o_string), (struct o_object *)supplied))) {
+	if ((result = (struct o_string *)
+		 f_object_new(v_string_kind, sizeof(struct o_string),
+					  (struct o_object *)supplied))) {
 		result->s_flags.constant = d_true;
 		if (content) {
 			result->content = (char *)content;
@@ -75,7 +86,8 @@ struct o_string *f_string_new_constant(struct o_string *supplied, const char *co
 	return result;
 }
 
-char *p_string_format_object_kind(char *buffer, size_t size, char *format, va_list parameters) {
+char *p_string_format_object_kind(char *buffer, size_t size, char *format,
+								  va_list parameters) {
 	struct o_object *object;
 	size_t written = 0;
 	if ((object = va_arg(parameters, struct o_object *)))
@@ -83,7 +95,8 @@ char *p_string_format_object_kind(char *buffer, size_t size, char *format, va_li
 	return (buffer+written);
 }
 
-char *p_string_format_object_content(char *buffer, size_t size, char *format, va_list parameters) {
+char *p_string_format_object_content(char *buffer, size_t size, char *format,
+									 va_list parameters) {
 	struct o_object *object;
 	char *pointer = buffer;
 	if ((object = va_arg(parameters, struct o_object *)))
@@ -98,7 +111,8 @@ void p_string_delete(struct o_object *object) {
 }
 
 int p_string_compare(struct o_object *object, struct o_object *other) {
-	struct o_string *local_object = (struct o_string *)object, *local_other = (struct o_string *)other;
+	struct o_string *local_object = (struct o_string *)object,
+					*local_other = (struct o_string *)other;
 	int result;
 	if ((result = ((int)local_object->length-(int)local_other->length)) == 0)
 		result = d_strcmp(local_object->content, local_other->content);
@@ -131,7 +145,8 @@ char *p_string_string(struct o_object *object, char *data, size_t size) {
 }
 
 struct o_object *p_string_clone(struct o_object *object) {
-	struct o_string *result = (struct o_string *)p_object_clone(object), *local_object = (struct o_string *)object;
+	struct o_string *result = (struct o_string *)p_object_clone(object),
+					*local_object = (struct o_string *)object;
 	if (!local_object->s_flags.constant) {
 		if ((result->content = (char *) calloc(1, local_object->size)))
 			memcpy(result->content, local_object->content, local_object->size);
@@ -148,7 +163,8 @@ void p_string_trim(struct o_string *object) {
 			object->length = d_strlen(object->content);
 		}
 	} else
-		d_throw(v_exception_constant, "operation not permitted with a constant");
+		d_throw(v_exception_constant,
+				"operation not permitted with a constant");
 }
 
 void p_string_append(struct o_string *object, struct o_string *other) {
@@ -158,7 +174,8 @@ void p_string_append(struct o_string *object, struct o_string *other) {
 			object->length += other->length;
 		}
 	} else
-		d_throw(v_exception_constant, "operation not permitted with a constant");
+		d_throw(v_exception_constant,
+				"operation not permitted with a constant");
 }
 
 char p_string_character(struct o_string *object, size_t position) {
@@ -168,14 +185,16 @@ char p_string_character(struct o_string *object, size_t position) {
 	return result;
 }
 
-struct o_string *p_string_substring(struct o_string *object, size_t begin, size_t length) {
+struct o_string *p_string_substring(struct o_string *object, size_t begin,
+									size_t length) {
 	size_t size_begin, size_length, characters;
 	struct o_string *result = NULL;
 	if (object->content) {
 		size_begin = d_min(begin, object->length);
 		if ((characters = object->length-size_begin) > 0) {
 			size_length = d_min(length, characters);
-			result = f_string_new(NULL, (size_length+1), object->content+size_begin);
+			result = f_string_new(NULL, (size_length+1),
+								  object->content+size_begin);
 		}
 	}
 	return result;
@@ -194,10 +213,17 @@ struct o_array *p_string_split(struct o_string *object, char character) {
 		pointer = object->content;
 		while ((next = strchr(pointer, character))) {
 			if ((next-pointer) > 0)
-				result->m_insert(result, (struct o_object *)p_string_substring(object, (pointer-object->content), (next-pointer)), index++);
+				result->m_insert(result, (struct o_object *)
+								 p_string_substring(object,
+													(pointer-object->content),
+													(next-pointer)), index++);
 			pointer = next+1;
 		}
-		result->m_insert(result, (struct o_object *)p_string_substring(object, (pointer-object->content), (object->length-(pointer-object->content))), index);
+		result->m_insert(result, (struct o_object *)
+						 p_string_substring(object, (pointer-object->content),
+											(object->length-
+											 (pointer-object->content))),
+						 index);
 	}
 	return result;
 }

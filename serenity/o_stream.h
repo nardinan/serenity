@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -24,9 +24,19 @@
 #include "o_object.h"
 #include "o_string.h"
 #include "o_pool.h"
-#define d_stdout(p) f_stream_new(NULL,P((p),d_string(10,"<stdout>"),struct o_string),fileno(stdout))
-#define d_stderr(p) f_stream_new(NULL,P((p),d_string(10,"<stderr>"),struct o_string),fileno(stderr))
-#define d_stdin(p) f_stream_new(NULL,P((p),d_string(10,"<stdin>"),struct o_string),fileno(stdin))
+#define d_append_flags (O_WRONLY|O_CREAT|O_APPEND)
+#define d_truncate_flags (O_WRONLY|O_CREAT|O_TRUNC)
+#define d_read_flags (O_RDONLY)
+#define d_write_read_flags (O_RDWR|O_CREAT)
+#define d_stdout(p)\
+	f_stream_new(NULL,P((p),d_string(10,"<stdout>"),struct o_string),\
+				fileno(stdout))
+#define d_stderr(p)\
+	f_stream_new(NULL,P((p),d_string(10,"<stderr>"),struct o_string),\
+				fileno(stderr))
+#define d_stdin(p)\
+	f_stream_new(NULL,P((p),d_string(10,"<stdin>"),struct o_string),\
+				fileno(stdin))
 extern const char v_stream_kind[];
 enum e_stream_seek {
 	e_stream_seek_begin,
@@ -48,15 +58,22 @@ typedef struct o_stream {
 	void (*m_blocking)(struct o_stream *, int);
 } o_stream;
 extern void p_stream_hooking(struct o_stream *object);
-extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string *name, int descriptor);
-extern struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_string *name, struct o_string *action);
+extern struct o_stream *f_stream_new(struct o_stream *supplied,
+									struct o_string *name, int descriptor);
+extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
+										  struct o_string *name,
+										  struct o_string *action);
 extern void p_stream_delete(struct o_object *object);
 extern int p_stream_compare(struct o_object *object, struct o_object *other);
 extern char *p_stream_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_stream_clone(struct o_object *object);
-extern ssize_t p_stream_write(struct o_stream *object, size_t size, struct o_string *string);
-extern ssize_t p_stream_write_all(struct o_stream *object, struct o_string *string);
-extern struct o_string *p_stream_read(struct o_stream *object, size_t size);
-extern off_t p_stream_seek(struct o_stream *object, off_t offset, enum e_stream_seek whence);
+extern ssize_t p_stream_write(struct o_stream *object, size_t size,
+							  struct o_string *string);
+extern ssize_t p_stream_write_all(struct o_stream *object,
+								  struct o_string *string);
+extern struct o_string *p_stream_read(struct o_stream *object,
+									  size_t size);
+extern off_t p_stream_seek(struct o_stream *object, off_t offset,
+						   enum e_stream_seek whence);
 extern void p_stream_blocking(struct o_stream *object, int blocking);
 #endif

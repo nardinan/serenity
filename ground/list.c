@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ void f_list_destroy(struct s_list **list) {
 	*list = NULL;
 }
 
-void f_list_append(struct s_list *list, struct s_list_node *node, enum e_list_insert_kind kind) {
+void f_list_append(struct s_list *list, struct s_list_node *node,
+				   enum e_list_insert_kind kind) {
 	switch (kind) {
 		case e_list_insert_head:
 			if (list->head)
@@ -44,7 +45,8 @@ void f_list_append(struct s_list *list, struct s_list_node *node, enum e_list_in
 	list->fill++;
 }
 
-void f_list_insert(struct s_list *list, struct s_list_node *node, struct s_list_node *left) {
+void f_list_insert(struct s_list *list, struct s_list_node *node,
+				   struct s_list_node *left) {
 	if (left) {
 		if (left->next) {
 			node->next = left->next;
@@ -58,7 +60,8 @@ void f_list_insert(struct s_list *list, struct s_list_node *node, struct s_list_
 	list->fill++;
 }
 
-struct s_list_node *f_list_delete(struct s_list *list, struct s_list_node *node) {
+struct s_list_node *f_list_delete(struct s_list *list,
+								  struct s_list_node *node) {
 	if (node->next)
 		node->next->back = node->back;
 	else

@@ -1,6 +1,6 @@
 /*
      Serenity - a basic library.
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -24,10 +24,13 @@ const char v_log_level_description[][d_log_description_size] = {
 	"high"
 };
 
-void p_log_write(FILE *stream, enum e_log_level level, const char *file, const char *function, unsigned int line, const char *format, ...) {
+void p_log_write(FILE *stream, enum e_log_level level, const char *file,
+				 const char *function, unsigned int line,
+				 const char *format, ...) {
 	va_list arguments;
 	if (level <= v_log_level) {
-		fprintf(stream, "%s - [%s::%s() (%d)] ", v_log_level_description[level], file, function, line);
+		fprintf(stream, "%s - [%s::%s() (%d)] ",
+				v_log_level_description[level], file, function, line);
 		va_start(arguments, format);
 		vfprintf(stream, format, arguments);
 		va_end(arguments);

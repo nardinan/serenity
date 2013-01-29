@@ -134,16 +134,16 @@
 			children = (
 				CBB4CEFF16B69699009E80D2 /* o_exceptions.c */,
 				CBB4CEFD16B6968E009E80D2 /* o_exceptions.h */,
-				CBA267F01680ED25008F05E1 /* o_object.c */,
 				CBA267F11680ED25008F05E1 /* o_object.h */,
-				CBB4CF0716B72A35009E80D2 /* o_pool.c */,
+				CBA267F01680ED25008F05E1 /* o_object.c */,
 				CBB4CF0616B72A2E009E80D2 /* o_pool.h */,
-				CB33867A16ADFD6D0081FA3B /* o_string.c */,
+				CBB4CF0716B72A35009E80D2 /* o_pool.c */,
 				CB33867816ADFD640081FA3B /* o_string.h */,
-				CBFB781116B2E321000DED8B /* o_array.c */,
+				CB33867A16ADFD6D0081FA3B /* o_string.c */,
 				CBFB780E16B2E027000DED8B /* o_array.h */,
-				CB29E2D816B5DBC1003C37AF /* o_stream.c */,
+				CBFB781116B2E321000DED8B /* o_array.c */,
 				CB29E2D716B5DBB8003C37AF /* o_stream.h */,
+				CB29E2D816B5DBC1003C37AF /* o_stream.c */,
 			);
 			path = serenity;
 			sourceTree = "<group>";

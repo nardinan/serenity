@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -22,15 +22,20 @@ int main (int argc, char *argv[]) {
 	struct o_pool *pool = f_pool_new(NULL);
 	struct o_stream *out = d_stdout(pool), *in = d_stdin(pool);
 	struct o_string *readed = NULL;
-	out->m_write_all(out, P(pool, d_string(128, "hello! from stream %@ what's your name?", out), struct o_string));
+	out->m_write_all(out, P(pool, d_string(128, "hello! from stream %@"
+										   " .. and what's your name?", out),
+							struct o_string));
 	readed = in->m_read(in, 64);
 	if (readed) {
 		if (readed->m_character(readed, readed->length-1) == '\n')
 			readed->m_truncate(readed, (readed->length-1));
-		out->m_write_all(out, P(pool, d_string(128, "hi %@!\n", readed), struct o_string));
+		out->m_write_all(out, P(pool, d_string(128, "hi %@!\n", readed),
+								struct o_string));
 		d_release(readed);
 	}
-	pool->m_clean(pool, d_true); /* with d_true remove _every_ pointer in the pool */
+	pool->m_clean(pool, d_true); /* d_true remove every pointer from the pool */
 	d_release(pool);
+	d_release(out);
+	d_release(in);
 	return 0;
 }

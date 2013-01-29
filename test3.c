@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ int main (int argc, char *argv[]) {
 	struct s_person *current = NULL;
 	struct s_list_node *element = f_person_allocate("silvio", "berlusconi");
 	f_list_init(&list);
-	f_list_append(list, f_person_allocate("mario", "monti"), e_list_insert_head);
+	f_list_append(list, f_person_allocate("mario", "monti"),
+				  e_list_insert_head);
 	f_list_append(list, element, e_list_insert_head);
 	f_list_insert(list, f_person_allocate("mario", "rossi"), element);
 	printf("elements in the list: %zu\n", list->fill);

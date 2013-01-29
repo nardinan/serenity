@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ int main (int argc, char *argv[]) {
 	struct o_string *result;
 	struct o_array *array, *another;
 	size_t index;
-	struct o_string string = d_string_constant("hello,salut,what,c,,we,have,here");
+	struct o_string string = d_string_constant("hello,salut,what,c,,we,have");
 	array = string.m_split(&string, ',');
 	for (index = 0; index < array->size; index++) {
 		result = (struct o_string *)array->m_obtain(array, index);
@@ -30,7 +30,8 @@ int main (int argc, char *argv[]) {
 		else
 			printf("\t<null>\n");
 	}
-	printf("in the array we have %zd elements and %zd spaces\n", array->filled, array->size);
+	printf("in the array we have %zd elements and %zd spaces\n", array->filled,
+		   array->size);
 	another = d_clone(array, struct o_array);
 	d_release(result);
 	d_release(array);

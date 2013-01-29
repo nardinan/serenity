@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ extern struct o_pool *f_pool_new(struct o_pool *supplied);
 extern void p_pool_delete(struct o_object *object);
 extern char *p_pool_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_pool_clone(struct o_object *object);
-extern struct o_object *p_pool_insert(struct o_pool *object, struct o_object *value);
+extern struct o_object *p_pool_insert(struct o_pool *object,
+									  struct o_object *value);
 extern void p_pool_clean(struct o_pool *object, int bypass);
 #endif

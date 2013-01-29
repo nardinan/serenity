@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -30,9 +30,12 @@ void p_stream_hooking(struct o_stream *object) {
 	object->m_blocking = p_stream_blocking;
 }
 
-extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string *name, int descriptor) {
+extern struct o_stream *f_stream_new(struct o_stream *supplied,
+									 struct o_string *name, int descriptor) {
 	struct o_stream *result;
-	if ((result = (struct o_stream *)f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {
+	if ((result = (struct o_stream *)
+		 f_object_new(v_stream_kind, sizeof(struct o_stream),
+					  (struct o_object *)supplied))) {
 		result->descriptor = descriptor;
 		result->s_flags.supplied = d_true;
 		result->s_flags.opened = d_true;
@@ -43,30 +46,35 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string 
 	return result;
 }
 
-extern struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_string *name, struct o_string *action) {
+extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
+										  struct o_string *name,
+										  struct o_string *action) {
 	struct o_stream *result;
-	if ((result = (struct o_stream *)f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {
+	if ((result = (struct o_stream *)
+		 f_object_new(v_stream_kind, sizeof(struct o_stream),
+					  (struct o_object *)supplied))) {
 		result->name = d_retain(name, struct o_string);
 		result->flags = -1;
 		switch (action->m_character(action, 0)) {
 			case 'r':
 				if (action->m_character(action, 1) == 'w')
-					result->flags = O_RDWR|O_CREAT;
+					result->flags = d_write_read_flags;
 				else
-					result->flags = O_RDONLY;
+					result->flags = d_read_flags;
 				break;
 			case 'w':
 				if (action->m_character(action, 1) == 'a')
-					result->flags = O_WRONLY|O_CREAT|O_APPEND;
+					result->flags = d_append_flags;
 				else
-					result->flags = O_WRONLY|O_CREAT|O_TRUNC;
+					result->flags = d_truncate_flags;
 				break;
 		}
 		result->s_flags.supplied = d_false;
 		result->s_flags.opened = d_false;
 		p_stream_hooking(result);
 		if (result->flags != -1) {
-			if ((result->descriptor = open(result->name->content, result->flags)) > -1)
+			if ((result->descriptor = open(result->name->content,
+										   result->flags)) > -1)
 				result->s_flags.opened = d_true;
 			else
 				d_throw(v_exception_unreachable, "unable to open the file");
@@ -84,13 +92,17 @@ void p_stream_delete(struct o_object *object) {
 }
 
 int p_stream_compare(struct o_object *object, struct o_object *other) {
-	return (int)(((struct o_stream *)object)->descriptor-((struct o_stream *)other)->descriptor);
+	struct o_stream *local_object = (struct o_stream *)object,
+					*local_other = (struct o_stream *)other;
+	return (int)local_object->descriptor-local_other->descriptor;
 }
 
 char *p_stream_string(struct o_object *object, char *data, size_t size) {
 	struct o_stream *local_object = (struct o_stream *)object;
 	ssize_t written;
-	written = snprintf(data, size, "<file \"%s\" (%s) flags: ", local_object->name->content, (local_object->s_flags.opened)?"open":"close");
+	written = snprintf(data, size, "<file \"%s\" (%s) flags: ",
+					   local_object->name->content,
+					   (local_object->s_flags.opened)?"open":"close");
 	data += written;
 	if (written < size) {
 		if (local_object->flags != -1) {
@@ -138,19 +150,22 @@ char *p_stream_string(struct o_object *object, char *data, size_t size) {
 }
 
 struct o_object *p_stream_clone(struct o_object *object) {
-	struct o_stream *result = (struct o_stream *)p_object_clone(object), *local_object = (struct o_stream *)object;
+	struct o_stream *result = (struct o_stream *)p_object_clone(object),
+					*local_object = (struct o_stream *)object;
 	if (local_object->s_flags.opened)
 		result->descriptor = dup(local_object->descriptor);
 	return (o_object *)result;
 }
 
-ssize_t p_stream_write(struct o_stream *object, size_t size, struct o_string *string) {
+ssize_t p_stream_write(struct o_stream *object, size_t size,
+					   struct o_string *string) {
 	ssize_t written = 0;
 	if (object->s_flags.opened) {
 		if ((object->flags&O_RDWR) || (object->flags&O_WRONLY))
 			written = write(object->descriptor, string->content, size);
 		else
-			d_throw(v_exception_unsupported, "can't write in a read-only stream");
+			d_throw(v_exception_unsupported,
+					"can't write in a read-only stream");
 	} else
 		d_throw(v_exception_closed, "can't write in a closed stream");
 	return written;
@@ -160,9 +175,11 @@ ssize_t p_stream_write_all(struct o_stream *object, struct o_string *string) {
 	ssize_t written = 0;
 	if (object->s_flags.opened) {
 		if ((object->flags&O_RDWR) || (object->flags&O_WRONLY))
-			written = write(object->descriptor, string->content, string->length);
+			written = write(object->descriptor, string->content,
+							string->length);
 		else
-			d_throw(v_exception_unsupported, "can't write in a read-only stream");
+			d_throw(v_exception_unsupported,
+					"can't write in a read-only stream");
 	} else
 		d_throw(v_exception_closed, "can't write in a closed stream");
 	return written;
@@ -183,13 +200,15 @@ struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 				}
 			}
 		} else
-			d_throw(v_exception_unsupported, "can't read from a write-only stream");
+			d_throw(v_exception_unsupported,
+					"can't read from a write-only stream");
 	} else
 		d_throw(v_exception_closed, "can't read from a closed stream");
 	return result;
 }
 
-off_t p_stream_seek(struct o_stream *object, off_t offset, enum e_stream_seek whence) {
+off_t p_stream_seek(struct o_stream *object, off_t offset,
+					enum e_stream_seek whence) {
 	int local_whence = SEEK_SET;
 	off_t result = 0;
 	if (object->s_flags.opened) {
@@ -208,7 +227,8 @@ off_t p_stream_seek(struct o_stream *object, off_t offset, enum e_stream_seek wh
 		}
 		result = lseek(object->descriptor, offset, local_whence);
 	} else
-		d_throw(v_exception_closed, "can't reposition cursor of a closed stream");
+		d_throw(v_exception_closed,
+				"can't reposition cursor of a closed stream");
 	return result;
 }
 
