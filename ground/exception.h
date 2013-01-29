@@ -60,10 +60,8 @@
 			fprintf(s,"%s:%s() @ %d {%s} %s\n",o->file,o->function,o->line,o->kind,o->description);\
 		fprintf(s,"\t%s:%s() @ %d\n",d_clean_file(__FILE__),__FUNCTION__,__LINE__);\
 	}while(0)			
-#define d_exception_declare(k)\
-	extern const struct s_exception v_exception_##k
-#define d_exception_define(k,i,m)\
-	const struct s_exception v_exception_##k = {m,"undefined","undefine","undefined",0,0,i}
+#define d_exception_declare(k) extern const struct s_exception v_exception_##k
+#define d_exception_define(k,i,m) const struct s_exception v_exception_##k = {m,"undefined","undefine","undefined",0,0,i}
 typedef struct s_exception {
     char kind[d_exception_kind_size], file[d_exception_file_size], function[d_exception_function_size], description[d_exception_description_size];
 	unsigned int line, level;

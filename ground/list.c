@@ -17,11 +17,13 @@
 */
 #include "list.h"
 void f_list_init(struct s_list **list) {
-	if ((*list = (struct s_list *) malloc(sizeof(struct s_list)))) {
-		(*list)->head = (*list)->tail = NULL;
-		(*list)->fill = 0;
-	} else
+	if (!(*list = (struct s_list *) calloc(1, sizeof(struct s_list))))
 		d_die(d_error_malloc);
+}
+
+void f_list_destroy(struct s_list **list) {
+	free((*list));
+	*list = NULL;
 }
 
 void f_list_append(struct s_list *list, struct s_list_node *node, enum e_list_insert_kind kind) {

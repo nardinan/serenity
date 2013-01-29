@@ -17,7 +17,6 @@
  */
 #include "o_string.h"
 const char v_string_kind[] = "string";
-d_exception_define(constant, 1, "constant value exception");
 void p_string_hooking(struct o_string *object) {
 	object->head.s_delegate.m_delete = p_string_delete;
 	object->head.s_delegate.m_compare = p_string_compare;
@@ -29,23 +28,31 @@ void p_string_hooking(struct o_string *object) {
 	object->m_character = p_string_character;
 	object->m_substring = p_string_substring;
 	object->m_split = p_string_split;
+	object->m_truncate = p_string_truncate;
 }
 
 struct o_string *f_string_new(struct o_string *supplied, size_t size, const char *format, ...) {
+	struct o_string *result;
+	va_list parameters;
+	va_start(parameters, format);
+	result = f_string_new_args(supplied, size, format, parameters);
+	va_end(parameters);
+	return result;
+}
+
+struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const char *format, va_list parameters) {
 	char *symbols = "@^";
 	t_string_formatter functions[] = {
 		p_string_format_object_content,
 		p_string_format_object_kind,
 	};
 	struct o_string *result;
-	va_list parameters;
 	if ((result = (struct o_string *)f_object_new(v_string_kind, sizeof(struct o_string), (struct o_object *)supplied))) {
 		result->size = size;
 		result->s_flags.constant = d_false;
-		va_start(parameters, format);
 		if ((result->content = (char *) calloc(1, result->size))) {
 			if (format) {
-				result->content = p_string_format(result->content, result->size, symbols, functions, (char *)format, parameters);
+				result->content = f_string_format_args(result->content, result->size, symbols, functions, (char *)format, parameters);
 				result->length = d_strlen(result->content);
 			}
 		} else
@@ -156,7 +163,7 @@ void p_string_append(struct o_string *object, struct o_string *other) {
 
 char p_string_character(struct o_string *object, size_t position) {
 	char result = 0;
-	if (object->length > 0)
+	if (object->content)
 		result = object->content[(position%object->length)];
 	return result;
 }
@@ -193,4 +200,11 @@ struct o_array *p_string_split(struct o_string *object, char character) {
 		result->m_insert(result, (struct o_object *)p_string_substring(object, (pointer-object->content), (object->length-(pointer-object->content))), index);
 	}
 	return result;
+}
+
+void p_string_truncate(struct o_string *object, size_t length) {
+	if (object->content) {
+		object->content[(length%object->length)] = '\0';
+		object->length = length;
+	}
 }

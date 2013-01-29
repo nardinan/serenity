@@ -17,21 +17,35 @@
  */
 #ifndef serenity_object_h
 #define serenity_object_h
-#include "../ground/ground.h"
-#define d_object(n) typedef struct n
+#include "o_exceptions.h"
 #define d_object_head struct o_object head
-#define d_retain(o,k) (k *)f_object_retain((struct o_object *)o)
-#define d_release(o) f_object_release((struct o_object *)o)
-#define d_clone(o,k) (k *)o->head.s_delegate.m_clone((struct o_object *)o)
-#define d_compare(a,b)\
-	((a)&&(b))?(a)->s_delegate.m_compare((a),(b)):(((!a)&&(b))?-1:(((a)&&(!b))?1:0))
+#define d_compare(a,b) (((a)&&(b))?((struct o_object *)(a))->s_delegate.m_compare((a),(b)):(int)((a)-(b)))
+#define d_retain(a,k) (k*)f_object_retain((struct o_object *)a)
+#define d_release(a) f_object_release((struct o_object *)a)
+#define d_clone(a,k) (k*)((struct o_object *)(a))->s_delegate.m_clone((struct o_object *)a)
+#define d_object_constant(k,s,m)\
+{\
+	d_list_node_constant,\
+	k,\
+	s,\
+	0,\
+	0,\
+	{\
+		d_true,\
+		d_false,\
+		d_false\
+	},\
+	m\
+}	
 typedef struct o_object {
+	d_list_node_head;
     const char *kind;
 	size_t size, references;
 	t_hash_value hash;
 	struct {
 		unsigned int supplied:1;
 		unsigned int hashed:1;
+		unsigned int pooled:1;
 	} s_flags;
 	struct {
 		void (*m_delete)(struct o_object *);

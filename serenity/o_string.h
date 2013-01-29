@@ -20,10 +20,32 @@
 #include "o_object.h"
 #include "o_array.h"
 #define d_string_buffer_size 256
-#define d_string(c) f_string_new_constant(NULL,(c))
+#define d_string_hooking_constant \
+{\
+	p_string_delete,\
+	p_string_compare,\
+	p_string_hash,\
+	p_string_string,\
+	p_string_clone\
+}
+#define d_string_constant(c)\
+{\
+	d_object_constant(v_string_kind,sizeof(struct o_string),d_string_hooking_constant),\
+	{\
+		d_true\
+	},\
+	c,\
+	0,\
+	d_strlen(c),\
+	p_string_trim,\
+	p_string_append,\
+	p_string_character,\
+	p_string_substring,\
+	p_string_split\
+}
+#define d_string(s,c...) f_string_new(NULL,(s),##c)
 extern const char v_string_kind[];
-d_exception_declare(constant);
-d_object(o_string) {
+typedef struct o_string {
 	d_object_head;
 	struct {
 		unsigned int constant:1;
@@ -35,9 +57,11 @@ d_object(o_string) {
 	char (*m_character)(struct o_string *, size_t);
 	struct o_string *(*m_substring)(struct o_string *, size_t, size_t);
 	struct o_array *(*m_split)(struct o_string *, char character);
+	void (*m_truncate)(struct o_string *, size_t);
 } o_string;
 extern void p_string_hooking(struct o_string *object);
 extern struct o_string *f_string_new(struct o_string *supplied, size_t size, const char *format, ...);
+extern struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const char *format, va_list parameters);
 extern struct o_string *f_string_new_constant(struct o_string *supplied, const char *content);
 extern char *p_string_format_object_kind(char *buffer, size_t size, char *format, va_list parameters);
 extern char *p_string_format_object_content(char *buffer, size_t size, char *format, va_list parameters);
@@ -51,4 +75,5 @@ extern void p_string_append(struct o_string *object, struct o_string *other);
 extern char p_string_character(struct o_string *object, size_t position);
 extern struct o_string *p_string_substring(struct o_string *object, size_t begin, size_t length);
 extern struct o_array *p_string_split(struct o_string *object, char character);
+extern void p_string_truncate(struct o_string *object, size_t length);
 #endif

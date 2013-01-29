@@ -33,6 +33,7 @@ struct o_object *f_object_new(const char *kind, size_t size, struct o_object *su
 	else
 		d_die(d_error_malloc);
 	result->s_flags.hashed = d_false;
+	result->s_flags.pooled = d_false;
 	result->kind = kind;
 	result->size = size;
 	p_object_hooking(result);
@@ -47,20 +48,19 @@ struct o_object *f_object_retain(struct o_object *object) {
 
 void f_object_release(struct o_object *object) {
 	if (object) {
-		if (object->references == 0) {
+		if ((object->references == 0) && (!object->s_flags.pooled)) {
+			if (object->s_delegate.m_delete)
+				object->s_delegate.m_delete(object);
 			p_object_delete(object);
-			object = NULL;
 		} else
 			object->references--;
 	}
 }
 
 void p_object_delete(struct o_object *object) {
-	if (object->s_delegate.m_delete)
-		object->s_delegate.m_delete(object);
-	memset(object, 0, object->size);
 	if (object->s_flags.supplied == d_false)
 		free(object);
+	memset(object, 0, object->size);
 }
 
 int p_object_compare(struct o_object *object, struct o_object *other) {
@@ -77,7 +77,7 @@ t_hash_value p_object_hash(struct o_object *object) {
 
 char *p_object_string(struct o_object *object, char *data, size_t size) {
 	size_t written;
-	written = snprintf(data, size, "<%s>", object->kind);
+	written = snprintf(data, size, "<%s size: %zu>", object->kind, object->size);
 	return (data+written);
 }
 

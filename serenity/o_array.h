@@ -19,7 +19,7 @@
 #define serenity_o_hash_h
 #include "o_object.h"
 extern const char v_array_kind[];
-d_object(o_array) {
+typedef struct o_array {
 	d_object_head;
 	struct o_object **content;
 	size_t size, filled;

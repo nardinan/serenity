@@ -21,18 +21,16 @@
 #include <stdio.h>
 #include <stdarg.h>
 #define d_log_time_size 64
+#define d_log_description_size 32
+#define d_log_level_default e_log_level_low
 #define d_clean_file(s) ((strrchr(s,'/')?:s-1)+1)
-#define d_log(l,f,c...)\
-	p_log_write(stdout,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
-#define d_err(l,f,c...)\
-	p_log_write(stderr,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
+#define d_log(l,f,c...) p_log_write(stdout,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
+#define d_err(l,f,c...) p_log_write(stderr,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
 #define d_die(f,c...)\
 	do{\
 		p_log_write(stderr,e_log_level_ever,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c);\
 		exit(1);\
 	}while(0);
-#define d_log_level_default e_log_level_low
-#define d_log_description_size 32
 enum e_log_level {
 	e_log_level_ever = 0,
 	e_log_level_low,

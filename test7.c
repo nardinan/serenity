@@ -18,11 +18,11 @@
 #include "o_string.h"
 #include "o_array.h"
 int main (int argc, char *argv[]) {
-	struct o_string *string, *result;
+	struct o_string *result;
 	struct o_array *array, *another;
 	size_t index;
-	string = d_string("hello,C,bye,,godbye,salut");
-	array = string->m_split(string, ',');
+	struct o_string string = d_string_constant("hello,salut,what,c,,we,have,here");
+	array = string.m_split(&string, ',');
 	for (index = 0; index < array->size; index++) {
 		result = (struct o_string *)array->m_obtain(array, index);
 		if (result)

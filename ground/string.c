@@ -47,12 +47,12 @@ char *f_string_trim(char *string) {
 char *f_string_format(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, ...) {
 	va_list parameters;
 	va_start(parameters, format);
-	p_string_format(buffer, size, symbols, functions, format, parameters);
+	f_string_format_args(buffer, size, symbols, functions, format, parameters);
 	va_end(parameters);
 	return buffer;
 }
 
-char *p_string_format(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, va_list parameters) {
+char *f_string_format_args(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, va_list parameters) {
 	char *target = buffer, *pointer = format, *next, *last, *tail, argument[d_string_arguent_size];
 	size_t dimension, remaining = (size-1), lower, written;
 	unsigned int index;
