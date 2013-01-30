@@ -17,7 +17,6 @@
  */
 #ifndef serenity_o_string_h
 #define serenity_o_string_h
-#include "o_object.h"
 #include "o_array.h"
 #define d_string_buffer_size 256
 #define d_string_hooking_constant \
@@ -36,8 +35,7 @@
 		d_true\
 	},\
 	c,\
-	0,\
-	d_strlen(c),\
+	(d_strlen(c)+1),\
 	p_string_trim,\
 	p_string_append,\
 	p_string_character,\
@@ -45,6 +43,7 @@
 	p_string_split\
 }
 #define d_string(s,c...) f_string_new(NULL,(s),##c)
+#define d_string_pure(c) f_string_new(NULL,d_strlen(c)+1,(c));
 extern const char v_string_kind[];
 typedef struct o_string {
 	d_object_head;
@@ -52,9 +51,10 @@ typedef struct o_string {
 		unsigned int constant:1;
 	} s_flags;
 	char *content;
-	size_t size, length;
+	size_t size;
 	void (*m_trim)(struct o_string *);
 	void (*m_append)(struct o_string *, struct o_string *);
+	size_t (*m_length)(struct o_string *);
 	char (*m_character)(struct o_string *, size_t);
 	struct o_string *(*m_substring)(struct o_string *, size_t, size_t);
 	struct o_array *(*m_split)(struct o_string *, char character);
@@ -79,6 +79,7 @@ extern char *p_string_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_string_clone(struct o_object *object);
 extern void p_string_trim(struct o_string *object);
 extern void p_string_append(struct o_string *object, struct o_string *other);
+extern size_t p_string_length(struct o_string *object);
 extern char p_string_character(struct o_string *object, size_t position);
 extern struct o_string *p_string_substring(struct o_string *object,
 										   size_t begin, size_t length);

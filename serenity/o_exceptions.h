@@ -23,4 +23,6 @@ d_exception_declare(constant);
 d_exception_declare(malformed);
 d_exception_declare(unreachable);
 d_exception_declare(closed);
+d_exception_declare(null);
+d_exception_declare(bound);
 #endif

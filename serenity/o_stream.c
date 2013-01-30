@@ -24,7 +24,8 @@ void p_stream_hooking(struct o_stream *object) {
 	object->head.s_delegate.m_string = p_stream_string;
 	object->head.s_delegate.m_clone = p_stream_clone;
 	object->m_write = p_stream_write;
-	object->m_write_all = p_stream_write_all;
+	object->m_write_binary = p_stream_write_binary;
+	object->m_write_string = p_stream_write_string;
 	object->m_read = p_stream_read;
 	object->m_seek = p_stream_seek;
 	object->m_blocking = p_stream_blocking;
@@ -171,18 +172,14 @@ ssize_t p_stream_write(struct o_stream *object, size_t size,
 	return written;
 }
 
-ssize_t p_stream_write_all(struct o_stream *object, struct o_string *string) {
-	ssize_t written = 0;
-	if (object->s_flags.opened) {
-		if ((object->flags&O_RDWR) || (object->flags&O_WRONLY))
-			written = write(object->descriptor, string->content,
-							string->length);
-		else
-			d_throw(v_exception_unsupported,
-					"can't write in a read-only stream");
-	} else
-		d_throw(v_exception_closed, "can't write in a closed stream");
-	return written;
+ssize_t p_stream_write_binary(struct o_stream *object,
+							  struct o_string *string) {
+	return p_stream_write(object, string->size, string);
+}
+
+ssize_t p_stream_write_string(struct o_stream *object,
+							  struct o_string *string) {
+	return p_stream_write(object, string->m_length(string), string);
 }
 
 struct o_string *p_stream_read(struct o_stream *object, size_t size) {
@@ -192,9 +189,7 @@ struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 		if ((object->flags&O_RDWR) || (object->flags&O_RDONLY)) {
 			if ((result = f_string_new(NULL, size, NULL))) {
 				readed = read(object->descriptor, result->content, size);
-				if (readed > 0)
-					result->length = readed;
-				else if (readed < 0) {
+				if (readed < 0) {
 					d_release(result);
 					result = NULL;
 				}

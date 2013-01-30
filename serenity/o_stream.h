@@ -21,21 +21,20 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "o_object.h"
 #include "o_string.h"
 #include "o_pool.h"
 #define d_append_flags (O_WRONLY|O_CREAT|O_APPEND)
 #define d_truncate_flags (O_WRONLY|O_CREAT|O_TRUNC)
 #define d_read_flags (O_RDONLY)
 #define d_write_read_flags (O_RDWR|O_CREAT)
-#define d_stdout(p)\
-	f_stream_new(NULL,P((p),d_string(10,"<stdout>"),struct o_string),\
+#define d_stdout \
+	f_stream_new(NULL,d_P(d_string(10,"<stdout>"),struct o_string),\
 				fileno(stdout))
-#define d_stderr(p)\
-	f_stream_new(NULL,P((p),d_string(10,"<stderr>"),struct o_string),\
+#define d_stderr \
+	f_stream_new(NULL,d_P(d_string(10,"<stderr>"),struct o_string),\
 				fileno(stderr))
-#define d_stdin(p)\
-	f_stream_new(NULL,P((p),d_string(10,"<stdin>"),struct o_string),\
+#define d_stdin \
+	f_stream_new(NULL,d_P(d_string(10,"<stdin>"),struct o_string),\
 				fileno(stdin))
 extern const char v_stream_kind[];
 enum e_stream_seek {
@@ -52,7 +51,8 @@ typedef struct o_stream {
 		unsigned int opened:1;
 	} s_flags;
 	ssize_t (*m_write)(struct o_stream *, size_t, struct o_string *);
-	ssize_t (*m_write_all)(struct o_stream *, struct o_string *);
+	ssize_t (*m_write_binary)(struct o_stream *, struct o_string *);
+	ssize_t (*m_write_string)(struct o_stream *, struct o_string *);
 	struct o_string *(*m_read)(struct o_stream *, size_t);
 	off_t (*m_seek)(struct o_stream *, off_t, enum e_stream_seek);
 	void (*m_blocking)(struct o_stream *, int);
@@ -69,8 +69,10 @@ extern char *p_stream_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_stream_clone(struct o_object *object);
 extern ssize_t p_stream_write(struct o_stream *object, size_t size,
 							  struct o_string *string);
-extern ssize_t p_stream_write_all(struct o_stream *object,
-								  struct o_string *string);
+extern ssize_t p_stream_write_binary(struct o_stream *object,
+									 struct o_string *string);
+extern ssize_t p_stream_write_string(struct o_stream *object,
+									 struct o_string *string);
 extern struct o_string *p_stream_read(struct o_stream *object,
 									  size_t size);
 extern off_t p_stream_seek(struct o_stream *object, off_t offset,

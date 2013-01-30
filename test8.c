@@ -20,19 +20,23 @@
 #include "o_stream.h"
 int main (int argc, char *argv[]) {
 	struct o_pool *pool = f_pool_new(NULL);
-	struct o_stream *out = d_stdout(pool), *in = d_stdin(pool);
+	struct o_stream *out, *in;
 	struct o_string *readed = NULL;
-	out->m_write_all(out, P(pool, d_string(128, "hello! from stream %@"
-										   " .. and what's your name?", out),
-							struct o_string));
-	readed = in->m_read(in, 64);
-	if (readed) {
-		if (readed->m_character(readed, readed->length-1) == '\n')
-			readed->m_truncate(readed, (readed->length-1));
-		out->m_write_all(out, P(pool, d_string(128, "hi %@!\n", readed),
-								struct o_string));
-		d_release(readed);
-	}
+	d_pool_begin(pool) {
+		out = d_stdout;
+		in = d_stdin;
+		out->m_write_string(out, d_P(d_string(128, "hello! from stream %@"
+										   ".. and what's your name?", out),
+								  struct o_string));
+		readed = in->m_read(in, 64);
+		if (readed) {
+			if (readed->m_character(readed, readed->m_length(readed)-1) == '\n')
+				readed->m_truncate(readed, (readed->m_length(readed)-1));
+			out->m_write_string(out, d_P(d_string(128, "hi %@!\n", readed),
+									struct o_string));
+			d_release(readed);
+		}
+	} d_pool_end;
 	pool->m_clean(pool, d_true); /* d_true remove every pointer from the pool */
 	d_release(pool);
 	d_release(out);

@@ -29,9 +29,9 @@ void p_pool_hooking(struct o_pool *object) {
 
 struct o_pool *f_pool_new(struct o_pool *supplied) {
 	struct o_pool *result;
-	if ((result = (struct o_pool *)f_object_new(v_pool_kind,
-												sizeof(struct o_pool),
-												(struct o_object *)supplied)))
+	if ((result = (struct o_pool *)
+		 f_object_new(v_pool_kind, sizeof(struct o_pool),
+					  (struct o_object *)supplied)))
 		f_list_init(&result->pool);
 	p_pool_hooking(result);
 	return result;
@@ -40,7 +40,7 @@ struct o_pool *f_pool_new(struct o_pool *supplied) {
 void p_pool_delete(struct o_object *object) {
 	struct o_pool *local_object = (struct o_pool *)object;
 	if (local_object->pool)
-		f_list_destroy(&local_object->pool);
+		f_list_destroy(&(local_object->pool));
 }
 
 char *p_pool_string(struct o_object *object, char *data, size_t size) {

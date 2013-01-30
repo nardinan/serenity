@@ -18,8 +18,15 @@
 #ifndef serenity_o_pool_h
 #define serenity_o_pool_h
 #include "o_object.h"
-#define P(p,a,k) (k*)(p)->m_insert((p),(struct o_object *)(a))
-#define A(p,a,k) d_retain(P(p,a,struct o_object),k)
+#define d_pool_begin(p)\
+{\
+	struct o_pool *__d_pool=(p);\
+	do
+#define d_pool_end\
+	while(0);\
+}
+#define d_P(a,k) (k*)__d_pool->m_insert(__d_pool,(struct o_object *)(a))
+#define d_A(a,k) d_retain(P(__d_pool,a,struct o_object),k)
 extern const char v_pool_kind[];
 typedef struct o_pool {
 	d_object_head;

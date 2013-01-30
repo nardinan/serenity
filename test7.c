@@ -22,26 +22,31 @@ int main (int argc, char *argv[]) {
 	struct o_array *array, *another;
 	size_t index;
 	struct o_string string = d_string_constant("hello,salut,what,c,,we,have");
-	array = string.m_split(&string, ',');
-	for (index = 0; index < array->size; index++) {
-		result = (struct o_string *)array->m_obtain(array, index);
-		if (result)
-			printf("\t%s\n", result->content);
-		else
-			printf("\t<null>\n");
-	}
-	printf("in the array we have %zd elements and %zd spaces\n", array->filled,
-		   array->size);
-	another = d_clone(array, struct o_array);
-	d_release(result);
-	d_release(array);
-	printf("checking for clone:\n");
-	for (index = 0; index < another->size; index++) {
-		result = (struct o_string *)another->m_obtain(another, index);
-		if (result)
-			printf("\t%s\n", result->content);
-		else
-			printf("\t<null>\n");
-	}
-	d_release(another);
+	struct s_exception *exc;
+	d_try {
+		array = string.m_split(&string, ',');
+		for (index = 0; index < array->size; index++) {
+			result = (struct o_string *)array->m_obtain(array, index);
+			if (result)
+				printf("\t%s\n", result->content);
+			else
+				printf("\t<null>\n");
+		}
+		printf("in the array we have %zd elements and %zd spaces\n",
+			   array->filled, array->size);
+		another = d_clone(array, struct o_array);
+		d_release(array);
+		printf("checking for clone:\n");
+		for (index = 0; index < another->size; index++) {
+			result = (struct o_string *)another->m_obtain(another, index);
+			if (result)
+				printf("\t%s\n", result->content);
+			else
+				printf("\t<null>\n");
+		}
+		printf("is time to release copy\n");
+		d_release(another);
+	} d_catch(exc) {
+		d_exception_dump(stdout, exc);
+	} d_endtry;
 }

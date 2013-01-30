@@ -59,9 +59,11 @@ void f_object_release(struct o_object *object) {
 }
 
 void p_object_delete(struct o_object *object) {
-	if (object->s_flags.supplied == d_false)
+	if (object->s_flags.supplied == d_false) {
 		free(object);
-	memset(object, 0, object->size);
+		object = NULL;
+	} else
+		memset(object, 0, object->size);
 }
 
 int p_object_compare(struct o_object *object, struct o_object *other) {

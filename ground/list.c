@@ -22,7 +22,8 @@ void f_list_init(struct s_list **list) {
 }
 
 void f_list_destroy(struct s_list **list) {
-	free((*list));
+	if (*list)
+		free(*list);
 	*list = NULL;
 }
 

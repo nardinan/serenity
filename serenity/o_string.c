@@ -25,6 +25,7 @@ void p_string_hooking(struct o_string *object) {
 	object->head.s_delegate.m_clone = p_string_clone;
 	object->m_trim = p_string_trim;
 	object->m_append = p_string_append;
+	object->m_length = p_string_length;
 	object->m_character = p_string_character;
 	object->m_substring = p_string_substring;
 	object->m_split = p_string_split;
@@ -52,19 +53,17 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size,
 	if ((result = (struct o_string *)
 		 f_object_new(v_string_kind, sizeof(struct o_string),
 					  (struct o_object *)supplied))) {
-		result->size = size;
-		result->s_flags.constant = d_false;
-		if ((result->content = (char *) calloc(1, result->size))) {
-			if (format) {
-				result->content = f_string_format_args(result->content,
-													   result->size, symbols,
-													   functions,
-													   (char *)format,
-													   parameters);
-				result->length = d_strlen(result->content);
-			}
-		} else
-			d_die(d_error_malloc);
+		if ((result->size = size)) {
+			result->s_flags.constant = d_false;
+			if ((result->content = (char *) calloc(1, result->size))) {
+				if (format)
+					result->content =
+					f_string_format_args(result->content, result->size,
+										 symbols, functions, (char *)format,
+										 parameters);
+			} else
+				d_die(d_error_malloc);
+		}
 		p_string_hooking(result);
 	}
 	return result;
@@ -79,7 +78,7 @@ struct o_string *f_string_new_constant(struct o_string *supplied,
 		result->s_flags.constant = d_true;
 		if (content) {
 			result->content = (char *)content;
-			result->length = d_strlen(result->content);
+			result->size = (d_strlen(result->content)+1);
 		}
 		p_string_hooking(result);
 	}
@@ -113,10 +112,7 @@ void p_string_delete(struct o_object *object) {
 int p_string_compare(struct o_object *object, struct o_object *other) {
 	struct o_string *local_object = (struct o_string *)object,
 					*local_other = (struct o_string *)other;
-	int result;
-	if ((result = ((int)local_object->length-(int)local_other->length)) == 0)
-		result = d_strcmp(local_object->content, local_other->content);
-	return result;
+	return d_strcmp(local_object->content, local_other->content);
 }
 
 t_hash_value p_string_hash(struct o_object *object) {
@@ -140,7 +136,7 @@ char *p_string_string(struct o_object *object, char *data, size_t size) {
 	if (local_object->content)
 		written = snprintf(data, size, "%s", local_object->content);
 	else
-		written = snprintf(data, size, "(null)");
+		written = snprintf(data, size, "<null>");
 	return (data+written);
 }
 
@@ -158,10 +154,8 @@ struct o_object *p_string_clone(struct o_object *object) {
 
 void p_string_trim(struct o_string *object) {
 	if (!object->s_flags.constant) {
-		if (object->content) {
+		if (object->content)
 			f_string_trim(object->content);
-			object->length = d_strlen(object->content);
-		}
 	} else
 		d_throw(v_exception_constant,
 				"operation not permitted with a constant");
@@ -169,41 +163,45 @@ void p_string_trim(struct o_string *object) {
 
 void p_string_append(struct o_string *object, struct o_string *other) {
 	if (!object->s_flags.constant) {
-		if (other->content) {
+		if (other->content)
 			f_string_append(&object->content, other->content, &object->size);
-			object->length += other->length;
-		}
 	} else
 		d_throw(v_exception_constant,
 				"operation not permitted with a constant");
 }
 
+size_t p_string_length(struct o_string *object) {
+	return d_strlen(object->content);
+}
+
 char p_string_character(struct o_string *object, size_t position) {
 	char result = 0;
-	if (object->content)
-		result = object->content[(position%object->length)];
+	if (object->content) {
+		if (position < object->size)
+			result = object->content[position];
+		else
+			d_throw(v_exception_bound, "pointer out of bound");
+	}
 	return result;
 }
 
 struct o_string *p_string_substring(struct o_string *object, size_t begin,
 									size_t length) {
-	size_t size_begin, size_length, characters;
 	struct o_string *result = NULL;
 	if (object->content) {
-		size_begin = d_min(begin, object->length);
-		if ((characters = object->length-size_begin) > 0) {
-			size_length = d_min(length, characters);
-			result = f_string_new(NULL, (size_length+1),
-								  object->content+size_begin);
-		}
+		if ((begin <= object->size) && ((begin+length) <= object->size))
+			result = f_string_new(NULL, length, object->content+begin);
+		else
+			d_throw(v_exception_bound, "pointer out of bound");
 	}
 	return result;
 }
 
 struct o_array *p_string_split(struct o_string *object, char character) {
-	struct o_array *result = NULL;
+	struct o_array *result;
+	struct o_string *value;
 	char *pointer = object->content, *next;
-	size_t recurrence = 0, index = 0;
+	size_t recurrence = 0, index = 0, length = d_strlen(object->content);
 	while ((next = strchr(pointer, character))) {
 		if ((next-pointer) > 0)
 			recurrence++;
@@ -213,24 +211,28 @@ struct o_array *p_string_split(struct o_string *object, char character) {
 		pointer = object->content;
 		while ((next = strchr(pointer, character))) {
 			if ((next-pointer) > 0)
-				result->m_insert(result, (struct o_object *)
-								 p_string_substring(object,
-													(pointer-object->content),
-													(next-pointer)), index++);
+				if ((value = p_string_substring(object,
+												(pointer-object->content),
+												(next-pointer)+1))) {
+					result->m_insert(result, (struct o_object *)value, index++);
+					d_release(value);
+				}
 			pointer = next+1;
 		}
-		result->m_insert(result, (struct o_object *)
-						 p_string_substring(object, (pointer-object->content),
-											(object->length-
-											 (pointer-object->content))),
-						 index);
+		if ((value = p_string_substring(object, (pointer-object->content),
+										(length-(pointer-object->content)+1)))) {
+			result->m_insert(result, (struct o_object *)value, index);
+			d_release(value);
+		}
 	}
 	return result;
 }
 
 void p_string_truncate(struct o_string *object, size_t length) {
 	if (object->content) {
-		object->content[(length%object->length)] = '\0';
-		object->length = length;
+		if (length < object->size)
+			memset(object->content+length, '\0', object->size-length);
+		else
+			d_throw(v_exception_bound, "pointer out of bound");
 	}
 }
