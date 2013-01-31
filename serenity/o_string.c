@@ -91,7 +91,7 @@ char *p_string_format_object_kind(char *buffer, size_t size, char *format,
 	size_t written = 0;
 	if ((object = va_arg(parameters, struct o_object *)))
 		written = snprintf(buffer, size, "<%s>", object->kind);
-	return (buffer+written);
+	return buffer+((written>size)?size:written);
 }
 
 char *p_string_format_object_content(char *buffer, size_t size, char *format,
@@ -137,7 +137,7 @@ char *p_string_string(struct o_object *object, char *data, size_t size) {
 		written = snprintf(data, size, "%s", local_object->content);
 	else
 		written = snprintf(data, size, "<null>");
-	return (data+written);
+	return data+((written>size)?size:written);
 }
 
 struct o_object *p_string_clone(struct o_object *object) {

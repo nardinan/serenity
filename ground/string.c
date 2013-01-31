@@ -78,6 +78,7 @@ char *f_string_format_args(char *buffer, size_t size, char *symbols,
 				if ((tail = strchr(symbols, *(last-1))) == NULL) {
 					written = vsnprintf(target, remaining, argument,
 										parameters);
+					written = ((written>remaining)?remaining:written);
 					remaining -= written;
 					target += written;
 				} else {

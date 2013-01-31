@@ -104,6 +104,7 @@ char *p_stream_string(struct o_object *object, char *data, size_t size) {
 	written = snprintf(data, size, "<file \"%s\" (%s) flags: ",
 					   local_object->name->content,
 					   (local_object->s_flags.opened)?"open":"close");
+	written = ((written>size)?size:written);
 	data += written;
 	if (written < size) {
 		if (local_object->flags != -1) {

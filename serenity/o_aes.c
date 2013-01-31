@@ -477,7 +477,7 @@ t_hash_value p_aes_hash(struct o_object *object) {
 
 char *p_aes_string(struct o_object *object, char *data, size_t size) {
 	struct o_aes *local_object = (struct o_aes *)object;
-	size_t written, local_written;
+	size_t written, local_written, local_size;
 	int index, const_n, const_b;
 	switch(local_object->block) {
 		case e_aes_block_128:
@@ -493,11 +493,16 @@ char *p_aes_string(struct o_object *object, char *data, size_t size) {
 			const_b = 256;
 	}
 	written = snprintf(data, size, "<aes block size: %d key: ", const_b);
+	written = ((written>size)?size:written);
+	local_size = size-written;
 	data += written;
 	for (index = 0; (index < const_n) && ((written+1) < size); index++,
-		 written += local_written, data += local_written)
-		local_written = snprintf(data, (size-written), "%02x",
+		 written += local_written, data += local_written,
+		 local_size -= local_written) {
+		local_written = snprintf(data, local_size, "%02x",
 								 local_object->expanded_key[index]);
+		local_written = ((local_written>local_size)?local_size:local_written);
+	}
 	if (written < size) {
 		*data = '>';
 		data++;

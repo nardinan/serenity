@@ -22,7 +22,7 @@ char *f_formatter_length(char *buffer, size_t size, char *template,
 	size_t written = 0;
 	value = va_arg(parameters, char*);
 	written = snprintf(buffer, size, "%lu", d_strlen(value));
-	return (buffer+written);
+	return buffer+((written>size)?size:written);
 }
 
 int main (int argc, char *argv[]) {

@@ -82,7 +82,7 @@ char *p_object_string(struct o_object *object, char *data, size_t size) {
 	size_t written;
 	written = snprintf(data, size, "<%s size: %zu>", object->kind,
 					   object->size);
-	return (data+written);
+	return data+((written>size)?size:written);
 }
 
 struct o_object *p_object_clone(struct o_object *object) {

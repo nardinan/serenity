@@ -49,9 +49,14 @@ int main (int argc, char *argv[]) {
 							  "adipisici elit, sed eiusmod tempor incidunt ut "
 							  "labore et dolore magna aliqua. Ut enim ad minim "
 							  "veniam, quis nostrud");
-		printf("size of input before m_crypt: %zd\n", input->size);
+		out->m_write_string(out, d_P(d_string(512, "size of input before "
+											  "m_crypt: %zd\n", input->size),
+									 struct o_string));
 		output = aes->m_crypt(aes, input, d_true);
-		printf("size of input after m_crypt (padded): %zd\n", input->size);
+		out->m_write_string(out, d_P(d_string(512, "size of input after "
+											  "m_crypt (padded): %zd\n",
+											  input->size),
+									 struct o_string));
 		output = aes->m_decrypt(aes, input, d_true);
 		out->m_write_string(out, input);
 		pool->m_clean(pool, d_true);
