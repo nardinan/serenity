@@ -442,71 +442,86 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 }
 
 int p_aes_compare(struct o_object *object, struct o_object *other) {
-	struct o_aes *local_object = (struct o_aes *)object,
-					*local_other = (struct o_aes *)other;
-	int result;
-	if ((result = memcmp(local_object->expanded_key, local_other->expanded_key,
-						 d_aes_expanded_key_size)) == 0)
-		result = (local_object->block - local_other->block);
+	struct o_aes *local_object, *local_other;
+	int result = p_object_compare(object, other);
+	if ((d_object_kind(object, v_aes_kind)) &&
+		(d_object_kind(other, v_aes_kind))) {
+		local_object = (struct o_aes *)object;
+		local_other = (struct o_aes *)other;
+		if ((result = memcmp(local_object->expanded_key,
+							 local_other->expanded_key,
+							 d_aes_expanded_key_size)) == 0)
+			result = (local_object->block - local_other->block);
+	}
 	return result;
 }
 
 t_hash_value p_aes_hash(struct o_object *object) {
-	struct o_aes *local_object = (struct o_aes *)object;
+	struct o_aes *local_object;
 	size_t const_n, index;
-	if (!object->s_flags.hashed) {
-		switch(local_object->block) {
-			case e_aes_block_128:
-				const_n = 16;
-				break;
-			case e_aes_block_192:
-				const_n = 24;
-				break;
-			case e_aes_block_256:
-				const_n = 32;
+	t_hash_value result = p_object_hash(object);
+	if (d_object_kind(object, v_aes_kind)) {
+		local_object = (struct o_aes *)object;
+		if (!object->s_flags.hashed) {
+			switch(local_object->block) {
+				case e_aes_block_128:
+					const_n = 16;
+					break;
+				case e_aes_block_192:
+					const_n = 24;
+					break;
+				case e_aes_block_256:
+					const_n = 32;
+			}
+			object->hash = 5381;
+			/* djb2 hash function */
+			for (index = 0; index < const_n; index++)
+				object->hash = ((object->hash<<5)+object->hash)+
+				local_object->expanded_key[index];
+			object->s_flags.hashed = d_true;
 		}
-		object->hash = 5381;
-		/* djb2 hash function */
-		for (index = 0; index < const_n; index++)
-			object->hash = ((object->hash<<5)+object->hash)+
-			local_object->expanded_key[index];
-		object->s_flags.hashed = d_true;
-	}
-	return object->hash;
+		result = object->hash;
+	}  else
+		d_throw(v_exception_kind, "object is not an instance of o_aes");
+	return result;
 }
 
 char *p_aes_string(struct o_object *object, char *data, size_t size) {
 	struct o_aes *local_object = (struct o_aes *)object;
 	size_t written, local_written, local_size;
 	int index, const_n, const_b;
-	switch(local_object->block) {
-		case e_aes_block_128:
-			const_n = 16;
-			const_b = 128;
-			break;
-		case e_aes_block_192:
-			const_n = 24;
-			const_b = 192;
-			break;
-		case e_aes_block_256:
-			const_n = 32;
-			const_b = 256;
-	}
-	written = snprintf(data, size, "<aes block size: %d key: ", const_b);
-	written = ((written>size)?size:written);
-	local_size = size-written;
-	data += written;
-	for (index = 0; (index < const_n) && ((written+1) < size); index++,
-		 written += local_written, data += local_written,
-		 local_size -= local_written) {
-		local_written = snprintf(data, local_size, "%02x",
-								 local_object->expanded_key[index]);
-		local_written = ((local_written>local_size)?local_size:local_written);
-	}
-	if (written < size) {
-		*data = '>';
-		data++;
-	}
+	if (d_object_kind(object, v_aes_kind)) {
+		switch(local_object->block) {
+			case e_aes_block_128:
+				const_n = 16;
+				const_b = 128;
+				break;
+			case e_aes_block_192:
+				const_n = 24;
+				const_b = 192;
+				break;
+			case e_aes_block_256:
+				const_n = 32;
+				const_b = 256;
+		}
+		written = snprintf(data, size, "<aes block size: %d key: ", const_b);
+		written = ((written>size)?size:written);
+		local_size = size-written;
+		data += written;
+		for (index = 0; (index < const_n) && ((written+1) < size); index++,
+			 written += local_written, data += local_written,
+			 local_size -= local_written) {
+			local_written = snprintf(data, local_size, "%02x",
+									 local_object->expanded_key[index]);
+			local_written = ((local_written>local_size)?local_size:
+							 local_written);
+		}
+		if (written < size) {
+			*data = '>';
+			data++;
+		}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_aes");
 	return data;
 }
 

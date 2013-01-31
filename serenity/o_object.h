@@ -41,7 +41,11 @@
 		d_false\
 	},\
 	m\
-}	
+}
+#define d_object_kind(o,k)\
+	((o)->kind==(k))
+#define d_object_kind_compare(a,b)\
+	((a)->kind==(b)->kind)
 typedef struct o_object {
 	d_list_node_head;
     const char *kind;

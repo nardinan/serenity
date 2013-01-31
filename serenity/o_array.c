@@ -38,61 +38,79 @@ struct o_array *f_array_new(struct o_array *supplied, size_t size) {
 			p_array_hooking(result);
 		} else
 			d_die(d_error_malloc);
-	}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_array");
 	return result;
 }
 
 void p_array_delete(struct o_object *object) {
-	struct o_array *local_object = (struct o_array *)object;
+	struct o_array *local_object;
 	size_t index;
-	for (index = 0; index < local_object->size; index++) {
-		d_release(local_object->content[index]);
-		local_object->content[index] = NULL;
-	}
-	free(local_object->content);
+	if (d_object_kind(object, v_array_kind)) {
+		local_object = (struct o_array *)object;
+		for (index = 0; index < local_object->size; index++) {
+			d_release(local_object->content[index]);
+			local_object->content[index] = NULL;
+		}
+		free(local_object->content);
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_array");
 }
 
 int p_array_compare(struct o_object *object, struct o_object *other) {
-	struct o_array *local_object = (struct o_array *)object,
-					*local_other = (struct o_array *)other;
-	int result = (int)(local_object->filled-local_other->filled), index;
-	for (index = 0; (result == 0) && (index < local_object->size); index++)
-		result = d_compare(local_object->content[index],
-						   local_other->content[index]);
+	struct o_array *local_object, *local_other;
+	int result = p_object_compare(object, other), index;
+	if ((d_object_kind(object, v_array_kind)) &&
+		(d_object_kind(other, v_array_kind))) {
+		local_object = (struct o_array *)object;
+		local_other = (struct o_array *)other;
+		result = (int)(local_object->filled-local_other->filled);
+		for (index = 0; (result == 0)&&(index < local_object->size); index++)
+			result = d_compare(local_object->content[index],
+							   local_other->content[index]);
+	}
 	return result;
 }
 
 char *p_array_string(struct o_object *object, char *data, size_t size) {
 	char *pointer = data, *next;
-	struct o_array *local_object = (struct o_array *)object;
+	struct o_array *local_object;
 	struct o_object *value;
 	size_t index;
-	for (index = 0; index < local_object->size; index++) {
-		if ((value = local_object->content[index])) {
-			next = value->s_delegate.m_string(local_object->content[index],
-											  pointer, size);
-			if ((size -= (next-pointer)) > 0) {
-				*next = ',';
-				next++;
-				size--;
+	if (d_object_kind(object, v_array_kind)) {
+		local_object = (struct o_array *)object;
+		for (index = 0; index < local_object->size; index++) {
+			if ((value = local_object->content[index])) {
+				next = value->s_delegate.m_string(local_object->content[index],
+												  pointer, size);
+				if ((size -= (next-pointer)) > 0) {
+					*next = ',';
+					next++;
+					size--;
+				}
+				pointer = next;
 			}
-			pointer = next;
 		}
-	}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_array");
 	return pointer;
 }
 
 struct o_object *p_array_clone(struct o_object *object) {
-	struct o_array *result = (struct o_array *)p_object_clone(object),
-					*local_object = (struct o_array *)object;
+	struct o_array *result = NULL, *local_object;
 	size_t index;
-	if (local_object->size > 0)
-		if ((result->content = (struct o_object **)
-			 calloc(1, local_object->size)))
-			for (index = 0; index < local_object->size; index++)
-				if (local_object->content[index])
-					result->content[index] =
-					d_retain(local_object->content[index], struct o_object);
+	if (d_object_kind(object, v_array_kind)) {
+		result = (struct o_array *)p_object_clone(object);
+		local_object = (struct o_array *)object;
+		if (local_object->size > 0)
+			if ((result->content = (struct o_object **)
+				 calloc(1, local_object->size)))
+				for (index = 0; index < local_object->size; index++)
+					if (local_object->content[index])
+						result->content[index] =
+						d_retain(local_object->content[index], struct o_object);
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_array");
 	return (o_object *)result;
 }
 

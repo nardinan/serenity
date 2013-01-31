@@ -25,4 +25,6 @@ d_exception_declare(unreachable);
 d_exception_declare(closed);
 d_exception_declare(null);
 d_exception_declare(bound);
+d_exception_declare(kind);
+d_exception_declare(compare);
 #endif

@@ -104,51 +104,77 @@ char *p_string_format_object_content(char *buffer, size_t size, char *format,
 }
 
 void p_string_delete(struct o_object *object) {
-	struct o_string *local_object = (struct o_string *)object;
-	if ((!local_object->s_flags.constant) && (local_object->content))
-		free(local_object->content);
+	struct o_string *local_object;
+	if (d_object_kind(object, v_string_kind)) {
+		local_object = (struct o_string *)object;
+		if ((!local_object->s_flags.constant) && (local_object->content))
+			free(local_object->content);
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_string");
 }
 
 int p_string_compare(struct o_object *object, struct o_object *other) {
-	struct o_string *local_object = (struct o_string *)object,
-					*local_other = (struct o_string *)other;
-	return d_strcmp(local_object->content, local_other->content);
+	struct o_string *local_object, *local_other;
+	int result = p_object_compare(object, other);
+	if ((d_object_kind(object, v_string_kind)) &&
+		(d_object_kind(other, v_string_kind))) {
+		local_object = (struct o_string *)object,
+		local_other = (struct o_string *)other;
+		result = d_strcmp(local_object->content, local_other->content);
+	}
+	return result;
 }
 
 t_hash_value p_string_hash(struct o_object *object) {
-	struct o_string *local_object = (struct o_string *)object;
-	char *pointer = local_object->content;
-	if (!object->s_flags.hashed) {
-		object->hash = 5381;
-		/* djb2 hash function */
-		while (*pointer) {
-			object->hash = ((object->hash<<5)+object->hash)+*pointer;
-			pointer++;
+	struct o_string *local_object;
+	char *pointer;
+	t_hash_value result = p_object_hash(object);
+	if (d_object_kind(object, v_string_kind)) {
+		local_object = (struct o_string *)object;
+		pointer = local_object->content;
+		if (!object->s_flags.hashed) {
+			object->hash = 5381;
+			/* djb2 hash function */
+			while (*pointer) {
+				object->hash = ((object->hash<<5)+object->hash)+*pointer;
+				pointer++;
+			}
+			object->s_flags.hashed = d_true;
 		}
-		object->s_flags.hashed = d_true;
-	}
-	return object->hash;
+		result = object->hash;
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_string");
+	return result;
 }
 
 char *p_string_string(struct o_object *object, char *data, size_t size) {
- 	struct o_string *local_object = (struct o_string *)object;
-	size_t written;
-	if (local_object->content)
-		written = snprintf(data, size, "%s", local_object->content);
-	else
-		written = snprintf(data, size, "<null>");
+ 	struct o_string *local_object;
+	size_t written = 0;
+	if (d_object_kind(object, v_string_kind)) {
+		local_object = (struct o_string *)object;
+		if (local_object->content)
+			written = snprintf(data, size, "%s", local_object->content);
+		else
+			written = snprintf(data, size, "<null>");
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_string");
 	return data+((written>size)?size:written);
 }
 
 struct o_object *p_string_clone(struct o_object *object) {
-	struct o_string *result = (struct o_string *)p_object_clone(object),
-					*local_object = (struct o_string *)object;
-	if (!local_object->s_flags.constant) {
-		if ((result->content = (char *) calloc(1, local_object->size)))
-			memcpy(result->content, local_object->content, local_object->size);
-		else
-			d_die(d_error_malloc);
-	}
+	struct o_string *result = NULL, *local_object;
+	if (d_object_kind(object, v_string_kind)) {
+		result = (struct o_string *)p_object_clone(object),
+		local_object = (struct o_string *)object;
+		if (!local_object->s_flags.constant) {
+			if ((result->content = (char *) calloc(1, local_object->size)))
+				memcpy(result->content, local_object->content,
+					   local_object->size);
+			else
+				d_die(d_error_malloc);
+		}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_string");
 	return (struct o_object *)result;
 }
 

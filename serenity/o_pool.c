@@ -38,40 +38,52 @@ struct o_pool *f_pool_new(struct o_pool *supplied) {
 }
 
 void p_pool_delete(struct o_object *object) {
-	struct o_pool *local_object = (struct o_pool *)object;
-	if (local_object->pool)
-		f_list_destroy(&(local_object->pool));
+	struct o_pool *local_object;
+	if (d_object_kind(object, v_pool_kind)) {
+		local_object = (struct o_pool *)object;
+		if (local_object->pool)
+			f_list_destroy(&(local_object->pool));
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_pool");
 }
 
 char *p_pool_string(struct o_object *object, char *data, size_t size) {
-	struct o_pool *local_object = (struct o_pool *)object;
+	struct o_pool *local_object;
 	struct o_object *value;
 	char *pointer = data, *next;
-	d_foreach(local_object->pool, value, struct o_object) {
-		next = value->s_delegate.m_string(value, pointer, size);
-		size -= (next-pointer);
-		if ((size > 0) && (((struct s_list_node *)value)->next)) {
-			*next = ',';
-			next++;
-			size--;
+	if (d_object_kind(object, v_pool_kind)) {
+		local_object = (struct o_pool *)object;
+		d_foreach(local_object->pool, value, struct o_object) {
+			next = value->s_delegate.m_string(value, pointer, size);
+			size -= (next-pointer);
+			if ((size > 0) && (((struct s_list_node *)value)->next)) {
+				*next = ',';
+				next++;
+				size--;
+			}
+			pointer = next;
 		}
-		pointer = next;
-	}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_pool");
 	return pointer;
 }
 
 struct o_object *p_pool_clone(struct o_object *object) {
-	struct o_pool *result = (struct o_pool *)p_object_clone(object),
-					*local_object = (struct o_pool *)object;
+	struct o_pool *result = NULL, *local_object;
 	struct o_object *value;
-	if (local_object->pool) {
-		f_list_init(&result->pool);
-		d_foreach(local_object->pool, value, struct o_object)
-			f_list_append(result->pool,
-						  (struct s_list_node *)d_retain(value,
-														 struct o_object),
-						  e_list_insert_head);
-	}
+	if (d_object_kind(object, v_pool_kind)) {
+		result = (struct o_pool *)p_object_clone(object),
+		local_object = (struct o_pool *)object;
+		if (local_object->pool) {
+			f_list_init(&result->pool);
+			d_foreach(local_object->pool, value, struct o_object)
+				f_list_append(result->pool,
+							  (struct s_list_node *)d_retain(value,
+															 struct o_object),
+							  e_list_insert_head);
+		}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_pool");
 	return (struct o_object *)result;
 }
 

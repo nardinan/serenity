@@ -23,3 +23,5 @@ d_exception_define(unreachable, 4, "unreachable data exception");
 d_exception_define(closed,		5, "closed stream exception");
 d_exception_define(null,		6, "null pointer exception");
 d_exception_define(bound,		7, "out of bound exception");
+d_exception_define(kind,		8, "wrong object kind exception");
+d_exception_define(compare,		9, "different objects kind exception");

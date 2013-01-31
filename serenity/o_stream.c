@@ -86,76 +86,95 @@ extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 }
 
 void p_stream_delete(struct o_object *object) {
-	struct o_stream *local_object = (struct o_stream *)object;
-	if ((!local_object->s_flags.supplied) && (local_object->s_flags.opened))
-		close(local_object->descriptor);
-	d_release(local_object->name);
+	struct o_stream *local_object;
+	if (d_object_kind(object, v_stream_kind)) {
+		local_object = (struct o_stream *)object;
+		if ((!local_object->s_flags.supplied) && (local_object->s_flags.opened))
+			close(local_object->descriptor);
+		d_release(local_object->name);
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_stream");
 }
 
 int p_stream_compare(struct o_object *object, struct o_object *other) {
-	struct o_stream *local_object = (struct o_stream *)object,
-					*local_other = (struct o_stream *)other;
-	return (int)local_object->descriptor-local_other->descriptor;
+	struct o_stream *local_object, *local_other;
+	int result = p_object_compare(object, other);
+	if ((d_object_kind(object, v_stream_kind)) &&
+		(d_object_kind(other, v_stream_kind))) {
+		local_object = (struct o_stream *)object;
+		local_other = (struct o_stream *)other;
+		result = (int)(local_object->descriptor-local_other->descriptor);
+	}
+	return result;
 }
 
 char *p_stream_string(struct o_object *object, char *data, size_t size) {
-	struct o_stream *local_object = (struct o_stream *)object;
+	struct o_stream *local_object;
 	ssize_t written;
-	written = snprintf(data, size, "<file \"%s\" (%s) flags: ",
-					   local_object->name->content,
-					   (local_object->s_flags.opened)?"open":"close");
-	written = ((written>size)?size:written);
-	data += written;
-	if (written < size) {
-		if (local_object->flags != -1) {
-			if (local_object->flags&O_RDONLY) {
-				*data= 'r';
-				if ((++written) < size)
-					data++;
-			} else if (local_object->flags&O_RDWR) {
-				*data = 'r';
-				if ((++written) < size) {
-					data++;
-					*data= 'w';
+	if (d_object_kind(object, v_stream_kind)) {
+		local_object = (struct o_stream *)object;
+		written = snprintf(data, size, "<file \"%s\" (%s) flags: ",
+						   local_object->name->content,
+						   (local_object->s_flags.opened)?"open":"close");
+		written = ((written>size)?size:written);
+		data += written;
+		if (written < size) {
+			if (local_object->flags != -1) {
+				if (local_object->flags&O_RDONLY) {
+					*data= 'r';
 					if ((++written) < size)
 						data++;
-				}
-			} else if (local_object->flags&O_WRONLY) {
-				*data= 'w';
-				if ((++written) < size) {
-					data++;
-					if (local_object->flags&O_APPEND) {
-						*data= 'a';
+				} else if (local_object->flags&O_RDWR) {
+					*data = 'r';
+					if ((++written) < size) {
+						data++;
+						*data= 'w';
 						if ((++written) < size)
 							data++;
 					}
+				} else if (local_object->flags&O_WRONLY) {
+					*data= 'w';
+					if ((++written) < size) {
+						data++;
+						if (local_object->flags&O_APPEND) {
+							*data= 'a';
+							if ((++written) < size)
+								data++;
+						}
+					}
+				}
+			} else {
+				*data = 'n';
+				if ((++written) < size) {
+					data++;
+					*data= 'o';
+					if ((++written) < size)
+						data++;
 				}
 			}
-		} else {
-			*data = 'n';
+		}
+		if (written < size) {
+			*data = '>';
 			if ((++written) < size) {
 				data++;
-				*data= 'o';
-				if ((++written) < size)
-					data++;
+				*data= '\0';
 			}
 		}
-	}
-	if (written < size) {
-		*data = '>';
-		if ((++written) < size) {
-			data++;
-			*data= '\0';
-		}
-	}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_stream");
 	return data;
 }
 
 struct o_object *p_stream_clone(struct o_object *object) {
-	struct o_stream *result = (struct o_stream *)p_object_clone(object),
-					*local_object = (struct o_stream *)object;
-	if (local_object->s_flags.opened)
+	struct o_stream *result = NULL, *local_object;
+	if (d_object_kind(object, v_stream_kind)) {
+		result = (struct o_stream *)p_object_clone(object);
+		local_object = (struct o_stream *)object;
+		if (local_object->s_flags.opened)
+			result->descriptor = dup(local_object->descriptor);
 		result->descriptor = dup(local_object->descriptor);
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_array");
 	return (o_object *)result;
 }
 
