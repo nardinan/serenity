@@ -1,20 +1,20 @@
 /*
-     serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
-     
-     This program is free software: you can redistribute it and/or modify
-     it under the terms of the GNU General Public License as published by
-     the Free Software Foundation, either version 3 of the License, or
-     (at your option) any later version.
-     
-     This program is distributed in the hope that it will be useful,
-     but WITHOUT ANY WARRANTY; without even the implied warranty of
-     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     GNU General Public License for more details.
-     
-     You should have received a copy of the GNU General Public License
-     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+	 serenity
+	 Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+	 
+	 This program is free software: you can redistribute it and/or modify
+	 it under the terms of the GNU General Public License as published by
+	 the Free Software Foundation, either version 3 of the License, or
+	 (at your option) any later version.
+	 
+	 This program is distributed in the hope that it will be useful,
+	 but WITHOUT ANY WARRANTY; without even the implied warranty of
+	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	 GNU General Public License for more details.
+	 
+	 You should have received a copy of the GNU General Public License
+	 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #include "o_aes.h"
 #include <unistd.h>
 #include <stdlib.h>
@@ -335,9 +335,10 @@ unsigned int *p_aes_key_core(unsigned char *key, unsigned int index,
 	local_previous = (unsigned int *)&key[index-4];
 	*local_current = *local_previous;
 	*local_current = (v_aes_sbox[((*local_current)>>8)&0xff]|
-	(v_aes_sbox[((*local_current)>>16)&0xff]<<8)|
-	(v_aes_sbox[((*local_current)>>24)&0xff]<<16)|
-	(v_aes_sbox[(*local_current)&0xff]<<24))^v_aes_rcon[matrix];
+					  (v_aes_sbox[((*local_current)>>16)&0xff]<<8)|
+					  (v_aes_sbox[((*local_current)>>24)&0xff]<<16)|
+					  (v_aes_sbox[(*local_current)&0xff]<<24))^
+	v_aes_rcon[matrix];
 	return local_current;
 }
 
@@ -359,9 +360,10 @@ unsigned int *p_aes_key_special_column(unsigned int *previous,
 	local_current = (unsigned int *)&key[index+jump];
 	local_previous_table = (unsigned int *)&key[(index+jump)-(4*const_s)];
 	*local_current = (v_aes_sbox[(*previous)&0xff]|
-	(v_aes_sbox[((*previous)>>8)&0xff]<<8)|
-	(v_aes_sbox[((*previous)>>16)&0xff]<<16)|
-	(v_aes_sbox[((*previous)>>24)&0xff]<<24))^*local_previous_table;
+					  (v_aes_sbox[((*previous)>>8)&0xff]<<8)|
+					  (v_aes_sbox[((*previous)>>16)&0xff]<<16)|
+					  (v_aes_sbox[((*previous)>>24)&0xff]<<24))^
+	*local_previous_table;
 	return local_current;
 }
 
@@ -373,67 +375,69 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 	if ((result = (struct o_aes *)
 		 f_object_new(v_aes_kind, sizeof(struct o_aes),
 					  (struct o_object *)supplied))) {
-		if (key) {
-			result->block = block;
-			switch(result->block) {
-				case e_aes_block_128:
-					const_n = 16;
-					const_b = 176;
-					break;
-				case e_aes_block_192:
-					const_n = 24;
-					const_b = 208;
-					break;
-				case e_aes_block_256:
-					const_n = 32;
-					const_b = 240;
-			}
-			const_s = const_n/4;
-			memcpy(result->expanded_key, key, d_min(size, const_n));
-			for (index = const_n, matrix = 1; index < const_b;
-				 index+=const_n, matrix++) {
-				local_current = p_aes_key_core(result->expanded_key, index,
-											   matrix);
-				local_current = p_aes_key_column(local_current,
-												 result->expanded_key, index,
-												 const_s, 0);
-				local_current = p_aes_key_column(local_current,
-												 result->expanded_key, index,
-												 const_s, 4);
-				local_current = p_aes_key_column(local_current,
-												 result->expanded_key, index,
-												 const_s, 8);
-				local_current = p_aes_key_column(local_current,
-												 result->expanded_key, index,
-												 const_s, 12);
-				if (result->block >= e_aes_block_192) {
-					jump = 16;
-					if (result->block == e_aes_block_256) {
-						local_current =
-						p_aes_key_special_column(local_current,
-												 result->expanded_key, index,
-												 const_s, jump);
-						jump += 4;
-					}
-					local_current = p_aes_key_column(local_current,
-													 result->expanded_key,
-													 index, const_s, jump);
-					jump += 4;
-					local_current = p_aes_key_column(local_current,
-													 result->expanded_key,
-													 index, const_s, jump);
-					jump += 4;
-					if (result->block == e_aes_block_256)
-						local_current = p_aes_key_column(local_current,
-														 result->expanded_key,
-														 index, const_s, jump);
-				}
-			}
-			p_aes_hooking(result);
-		} else
-			d_throw(v_exception_null,
-					"key is undefined or content is a zero-length element");
-	}
+			 if (key) {
+				 result->block = block;
+				 switch(result->block) {
+					 case e_aes_block_128:
+						 const_n = 16;
+						 const_b = 176;
+						 break;
+					 case e_aes_block_192:
+						 const_n = 24;
+						 const_b = 208;
+						 break;
+					 case e_aes_block_256:
+						 const_n = 32;
+						 const_b = 240;
+				 }
+				 const_s = const_n/4;
+				 memcpy(result->expanded_key, key, d_min(size, const_n));
+				 for (index = const_n, matrix = 1; index < const_b;
+					  index+=const_n, matrix++) {
+					 local_current = p_aes_key_core(result->expanded_key, index,
+													matrix);
+					 local_current = p_aes_key_column(local_current,
+													  result->expanded_key,
+													  index, const_s, 0);
+					 local_current = p_aes_key_column(local_current,
+													  result->expanded_key,
+													  index, const_s, 4);
+					 local_current = p_aes_key_column(local_current,
+													  result->expanded_key,
+													  index, const_s, 8);
+					 local_current = p_aes_key_column(local_current,
+													  result->expanded_key,
+													  index, const_s, 12);
+					 if (result->block >= e_aes_block_192) {
+						 jump = 16;
+						 if (result->block == e_aes_block_256) {
+							 local_current =
+							 p_aes_key_special_column(local_current,
+													  result->expanded_key,
+													  index, const_s, jump);
+							 jump += 4;
+						 }
+						 local_current = p_aes_key_column(local_current,
+														  result->expanded_key,
+														  index, const_s, jump);
+						 jump += 4;
+						 local_current = p_aes_key_column(local_current,
+														  result->expanded_key,
+														  index, const_s, jump);
+						 jump += 4;
+						 if (result->block == e_aes_block_256)
+							 local_current =
+							 p_aes_key_column(local_current,
+											  result->expanded_key, index,
+											  const_s, jump);
+					 }
+				 }
+				 p_aes_hooking(result);
+			 } else
+				 d_throw(v_exception_null,
+						 "key is undefined or content is a zero-length "
+						 "element");
+		 }
 	return result;
 }
 
@@ -493,7 +497,7 @@ char *p_aes_string(struct o_object *object, char *data, size_t size) {
 	for (index = 0; (index < const_n) && ((written+1) < size); index++,
 		 written += local_written, data += local_written)
 		local_written = snprintf(data, (size-written), "%02x",
-				 local_object->expanded_key[index]);
+								 local_object->expanded_key[index]);
 	if (written < size) {
 		*data = '>';
 		data++;
@@ -556,7 +560,7 @@ unsigned int p_aes_mix_column_inverse(unsigned int box) {
 }
 
 struct o_string *p_aes_crypt(struct o_aes *object,
-							struct o_string *string, int local) {
+							 struct o_string *string, int local) {
 	size_t index;
 	int const_n, const_a, executions;
 	struct o_string *result;
@@ -621,7 +625,7 @@ struct o_string *p_aes_crypt(struct o_aes *object,
 }
 
 struct o_string *p_aes_decrypt(struct o_aes *object,
-							 struct o_string *string, int local){
+							   struct o_string *string, int local){
 	size_t index;
 	int const_n, const_a, executions;
 	struct o_string *result;

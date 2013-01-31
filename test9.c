@@ -43,8 +43,12 @@ int main (int argc, char *argv[]) {
 	struct o_stream *out;
 	d_pool_begin(pool) {
 		out = d_stdout;
-		out->m_write_string(out, d_P(d_string(512, "%@\n", aes), struct o_string));
-		input = d_string_pure("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud");
+		out->m_write_string(out, d_P(d_string(512, "%@\n", aes),
+									 struct o_string));
+		input = d_string_pure("Lorem ipsum dolor sit amet, consectetur "
+							  "adipisici elit, sed eiusmod tempor incidunt ut "
+							  "labore et dolore magna aliqua. Ut enim ad minim "
+							  "veniam, quis nostrud");
 		printf("size of input before m_crypt: %zd\n", input->size);
 		output = aes->m_crypt(aes, input, d_true);
 		printf("size of input after m_crypt (padded): %zd\n", input->size);
