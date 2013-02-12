@@ -25,7 +25,9 @@
 	p_string_compare,\
 	p_string_hash,\
 	p_string_string,\
-	p_string_clone\
+	p_string_clone,\
+	p_object_trylock,\
+	p_object_unlock,\
 }
 #define d_string_constant(c)\
 {\

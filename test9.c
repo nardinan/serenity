@@ -20,25 +20,9 @@
 #include "o_stream.h"
 #include "o_aes.h"
 int main (int argc, char *argv[]) {
-	unsigned char key[16];
-	key[0] = 0x00;
-	key[1] = 0x01;
-	key[2] = 0x02;
-	key[3] = 0x03;
-	key[4] = 0x04;
-	key[5] = 0x05;
-	key[6] = 0x06;
-	key[7] = 0x07;
-	key[8] = 0x08;
-	key[9] = 0x09;
-	key[10] = 0x0A;
-	key[11] = 0x0B;
-	key[12] = 0x0C;
-	key[13] = 0x0D;
-	key[14] = 0x0E;
-	key[15] = 0x0F;
+	unsigned char key[4] = "ABCD";
 	struct o_pool *pool = f_pool_new(NULL);
-	struct o_aes *aes = f_aes_new(NULL, e_aes_block_128, key, 16);
+	struct o_aes *aes = f_aes_new(NULL, e_aes_block_128, key, 4);
 	struct o_string *input, *output;
 	struct o_stream *out;
 	d_pool_begin(pool) {

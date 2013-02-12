@@ -21,6 +21,8 @@ void p_object_hooking(struct o_object *object) {
 	object->s_delegate.m_hash = p_object_hash;
 	object->s_delegate.m_string = p_object_string;
 	object->s_delegate.m_clone = p_object_clone;
+	object->s_delegate.m_trylock = p_object_trylock;
+	object->s_delegate.m_unlock = p_object_unlock;
 }
 
 struct o_object *f_object_new(const char *kind, size_t size,
@@ -35,6 +37,10 @@ struct o_object *f_object_new(const char *kind, size_t size,
 		d_die(d_error_malloc);
 	result->s_flags.hashed = d_false;
 	result->s_flags.pooled = d_false;
+	if (pthread_mutex_init(&(result->mutex), NULL) == 0)
+		result->s_flags.mutexed = d_true;
+	else
+		result->s_flags.mutexed = d_false;
 	result->kind = kind;
 	result->size = size;
 	p_object_hooking(result);
@@ -59,7 +65,9 @@ void f_object_release(struct o_object *object) {
 }
 
 void p_object_delete(struct o_object *object) {
-	if (object->s_flags.supplied == d_false) {
+	if (object->s_flags.mutexed)
+		pthread_mutex_destroy(&(object->mutex));
+	if (!object->s_flags.supplied) {
 		free(object);
 		object = NULL;
 	} else
@@ -89,7 +97,24 @@ struct o_object *p_object_clone(struct o_object *object) {
 	struct o_object *result;
 	if ((result = f_object_new(object->kind, object->size, NULL))) {
 		memcpy(result, object, object->size);
+		if (pthread_mutex_init(&(result->mutex), NULL) == 0)
+			result->s_flags.mutexed = d_true;
+		else
+			result->s_flags.mutexed = d_false;
 		result->references = 0;
 	}
 	return result;
+}
+
+int p_object_trylock(struct o_object *object) {
+	int locked = d_false;
+	if (object->s_flags.mutexed)
+		if (pthread_mutex_trylock(&(object->mutex)) == 0)
+			locked = d_true;
+	return locked;
+}
+
+void p_object_unlock(struct o_object *object) {
+	if (object->s_flags.mutexed)
+		pthread_mutex_unlock(&(object->mutex));
 }

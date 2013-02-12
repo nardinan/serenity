@@ -17,6 +17,7 @@
  */
 #ifndef serenity_object_h
 #define serenity_object_h
+#include <pthread.h>
 #include "o_exceptions.h"
 #define d_object_head struct o_object head
 #define d_compare(a,b)\
@@ -35,8 +36,10 @@
 	s,\
 	0,\
 	0,\
+	0,\
 	{\
 		d_true,\
+		d_false,\
 		d_false,\
 		d_false\
 	},\
@@ -46,15 +49,18 @@
 	((o)->kind==(k))
 #define d_object_kind_compare(a,b)\
 	((a)->kind==(b)->kind)
+#define d_object_trylock(a)\
+	((a)->s_delegate.m_trylock(a))
+#define d_object_unlock(a)\
+	((a)->s_delegate.m_unlock(a))
 typedef struct o_object {
 	d_list_node_head;
     const char *kind;
 	size_t size, references;
 	t_hash_value hash;
+	pthread_mutex_t mutex;
 	struct {
-		unsigned int supplied:1;
-		unsigned int hashed:1;
-		unsigned int pooled:1;
+		unsigned int supplied:1, hashed:1, pooled:1, mutexed:1;
 	} s_flags;
 	struct {
 		void (*m_delete)(struct o_object *);
@@ -62,6 +68,8 @@ typedef struct o_object {
 		t_hash_value (*m_hash)(struct o_object *);
 		char *(*m_string)(struct o_object *, char *, size_t);
 		struct o_object *(*m_clone)(struct o_object *);
+		int (*m_trylock)(struct o_object *);
+		void (*m_unlock)(struct o_object *);
 	} s_delegate;
 } o_object;
 extern void p_object_hooking(struct o_object *object);
@@ -74,4 +82,6 @@ extern int p_object_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_object_hash(struct o_object *object);
 extern char *p_object_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_object_clone(struct o_object *object);
+extern int p_object_trylock(struct o_object *object);
+extern void p_object_unlock(struct o_object *object);
 #endif
