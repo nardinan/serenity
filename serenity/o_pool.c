@@ -97,9 +97,11 @@ struct o_object *p_pool_insert(struct o_pool *object, struct o_object *value) {
 }
 
 void p_pool_clean(struct o_pool *object, int bypass) {
-	struct o_object *value;
-	if (object->pool)
-		d_foreach(object->pool, value, struct o_object) {
+	struct o_object *value, *next;
+	if (object->pool) {
+		value = (struct o_object *)object->pool->head;
+		while (value) {
+			next = (struct o_object *)value->head.next;
 			if ((bypass) || (value->references == 0)) {
 				f_list_delete(object->pool, (struct s_list_node *)value);
 				if (value->s_delegate.m_delete)
@@ -107,5 +109,7 @@ void p_pool_clean(struct o_pool *object, int bypass) {
 				p_object_delete(value);
 			} else
 				value->references--;
+			value = next;
 		}
+	}
 }
