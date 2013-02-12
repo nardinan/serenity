@@ -17,7 +17,7 @@
  */
 #ifndef serenity_o_aes_h
 #define serenity_o_aes_h
-#include "o_string.h"
+#include "../o_string.h"
 #define d_aes_expanded_key_size 256 /* sizeof(unsigned int)*(4*(15+1)) */
 extern const char v_aes_kind[];
 extern unsigned int v_aes_rcon[], v_aes_sbox[], v_aes_sbox_inv[], v_aes_mul_2[],
