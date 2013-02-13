@@ -22,6 +22,7 @@ void p_object_hooking(struct o_object *object) {
 	object->s_delegate.m_string = p_object_string;
 	object->s_delegate.m_clone = p_object_clone;
 	object->s_delegate.m_trylock = p_object_trylock;
+	object->s_delegate.m_lock = p_object_lock;
 	object->s_delegate.m_unlock = p_object_unlock;
 }
 
@@ -112,6 +113,11 @@ int p_object_trylock(struct o_object *object) {
 		if (pthread_mutex_trylock(&(object->mutex)) == 0)
 			locked = d_true;
 	return locked;
+}
+
+void p_object_lock(struct o_object *object) {
+	if (object->s_flags.mutexed)
+		pthread_mutex_lock(&(object->mutex));
 }
 
 void p_object_unlock(struct o_object *object) {

@@ -51,6 +51,8 @@
 	((a)->kind==(b)->kind)
 #define d_object_trylock(a)\
 	((a)->s_delegate.m_trylock(a))
+#define d_object_lock(a)\
+	((a)->s_delegate.m_lock(a))
 #define d_object_unlock(a)\
 	((a)->s_delegate.m_unlock(a))
 typedef struct o_object {
@@ -69,6 +71,7 @@ typedef struct o_object {
 		char *(*m_string)(struct o_object *, char *, size_t);
 		struct o_object *(*m_clone)(struct o_object *);
 		int (*m_trylock)(struct o_object *);
+		void (*m_lock)(struct o_object *);
 		void (*m_unlock)(struct o_object *);
 	} s_delegate;
 } o_object;
@@ -83,5 +86,6 @@ extern t_hash_value p_object_hash(struct o_object *object);
 extern char *p_object_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_object_clone(struct o_object *object);
 extern int p_object_trylock(struct o_object *object);
+extern void p_object_lock(struct o_object *object);
 extern void p_object_unlock(struct o_object *object);
 #endif
