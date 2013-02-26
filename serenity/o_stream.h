@@ -28,13 +28,13 @@
 #define d_read_flags (O_RDONLY)
 #define d_write_read_flags (O_RDWR|O_CREAT)
 #define d_stdout \
-	f_stream_new(NULL,d_P(d_string(10,"<stdout>"),struct o_string),\
+	f_stream_new(NULL,d_P(d_string(9,"<stdout>"),struct o_string),\
 				fileno(stdout))
 #define d_stderr \
-	f_stream_new(NULL,d_P(d_string(10,"<stderr>"),struct o_string),\
+	f_stream_new(NULL,d_P(d_string(9,"<stderr>"),struct o_string),\
 				fileno(stderr))
 #define d_stdin \
-	f_stream_new(NULL,d_P(d_string(10,"<stdin>"),struct o_string),\
+	f_stream_new(NULL,d_P(d_string(8,"<stdin>"),struct o_string),\
 				fileno(stdin))
 extern const char v_stream_kind[];
 enum e_stream_seek {

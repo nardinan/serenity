@@ -246,7 +246,8 @@ struct o_array *p_string_split(struct o_string *object, char character) {
 			pointer = next+1;
 		}
 		if ((value = p_string_substring(object, (pointer-object->content),
-										(length-(pointer-object->content)+1)))) {
+										(length-(pointer-object->content)+1))))
+		{
 			result->m_insert(result, (struct o_object *)value, index);
 			d_release(value);
 		}
