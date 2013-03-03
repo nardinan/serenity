@@ -53,8 +53,7 @@ extern struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 extern int p_aes_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_aes_hash(struct o_object *object);
 extern char *p_aes_string(struct o_object *object, char *data, size_t size);
-extern struct o_string *p_aes_padding(struct o_aes *object,
-									  struct o_string *string, int local,
+extern struct o_string *p_aes_padding(struct o_string *string, int local,
 									  size_t const_n);
 extern unsigned int p_aes_mix_column(unsigned int box);
 extern unsigned int p_aes_mix_column_inverse(unsigned int box);

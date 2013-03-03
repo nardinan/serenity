@@ -375,69 +375,68 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 	if ((result = (struct o_aes *)
 		 f_object_new(v_aes_kind, sizeof(struct o_aes),
 					  (struct o_object *)supplied))) {
-			 if (key) {
-				 result->block = block;
-				 switch(result->block) {
-					 case e_aes_block_128:
-						 const_n = 16;
-						 const_b = 176;
-						 break;
-					 case e_aes_block_192:
-						 const_n = 24;
-						 const_b = 208;
-						 break;
-					 case e_aes_block_256:
-						 const_n = 32;
-						 const_b = 240;
-				 }
-				 const_s = const_n/4;
-				 memcpy(result->expanded_key, key, d_min(size, const_n));
-				 for (index = const_n, matrix = 1; index < const_b;
-					  index+=const_n, matrix++) {
-					 local_current = p_aes_key_core(result->expanded_key, index,
-													matrix);
-					 local_current = p_aes_key_column(local_current,
-													  result->expanded_key,
-													  index, const_s, 0);
-					 local_current = p_aes_key_column(local_current,
-													  result->expanded_key,
-													  index, const_s, 4);
-					 local_current = p_aes_key_column(local_current,
-													  result->expanded_key,
-													  index, const_s, 8);
-					 local_current = p_aes_key_column(local_current,
-													  result->expanded_key,
-													  index, const_s, 12);
-					 if (result->block >= e_aes_block_192) {
-						 jump = 16;
-						 if (result->block == e_aes_block_256) {
-							 local_current =
-							 p_aes_key_special_column(local_current,
-													  result->expanded_key,
-													  index, const_s, jump);
-							 jump += 4;
-						 }
-						 local_current = p_aes_key_column(local_current,
-														  result->expanded_key,
-														  index, const_s, jump);
-						 jump += 4;
-						 local_current = p_aes_key_column(local_current,
-														  result->expanded_key,
-														  index, const_s, jump);
-						 jump += 4;
-						 if (result->block == e_aes_block_256)
-							 local_current =
-							 p_aes_key_column(local_current,
-											  result->expanded_key, index,
-											  const_s, jump);
-					 }
-				 }
-				 p_aes_hooking(result);
-			 } else
-				 d_throw(v_exception_null,
-						 "key is undefined or content is a zero-length "
-						 "element");
-		 }
+		if (key) {
+			result->block = block;
+			switch(result->block) {
+				case e_aes_block_128:
+					const_n = 16;
+					const_b = 176;
+					break;
+				case e_aes_block_192:
+					const_n = 24;
+					const_b = 208;
+					break;
+				case e_aes_block_256:
+					const_n = 32;
+					const_b = 240;
+			}
+			const_s = const_n/4;
+			memcpy(result->expanded_key, key, d_min(size, const_n));
+			for (index = const_n, matrix = 1; index < const_b;
+				 index+=const_n, matrix++) {
+				local_current = p_aes_key_core(result->expanded_key, index,
+											   matrix);
+				local_current = p_aes_key_column(local_current,
+												 result->expanded_key,
+												 index, const_s, 0);
+				local_current = p_aes_key_column(local_current,
+												 result->expanded_key,
+												 index, const_s, 4);
+				local_current = p_aes_key_column(local_current,
+												 result->expanded_key,
+												 index, const_s, 8);
+				local_current = p_aes_key_column(local_current,
+												 result->expanded_key,
+												 index, const_s, 12);
+				if (result->block >= e_aes_block_192) {
+					jump = 16;
+					if (result->block == e_aes_block_256) {
+						local_current =
+						p_aes_key_special_column(local_current,
+												 result->expanded_key,
+												 index, const_s, jump);
+						jump += 4;
+					}
+					local_current = p_aes_key_column(local_current,
+													 result->expanded_key,
+													 index, const_s, jump);
+					jump += 4;
+					local_current = p_aes_key_column(local_current,
+													 result->expanded_key,
+													 index, const_s, jump);
+					jump += 4;
+					if (result->block == e_aes_block_256)
+						local_current =
+						p_aes_key_column(local_current,
+										 result->expanded_key, index,
+										 const_s, jump);
+				}
+			}
+			p_aes_hooking(result);
+		} else
+			d_throw(v_exception_null,
+					"key is undefined or content is a zero-length element");
+	}
 	return result;
 }
 
@@ -525,11 +524,12 @@ char *p_aes_string(struct o_object *object, char *data, size_t size) {
 	return data;
 }
 
-struct o_string *p_aes_padding(struct o_aes *object, struct o_string *string,
-							   int local, size_t const_n) {
+struct o_string *p_aes_padding(struct o_string *string, int local,
+							   size_t const_n) {
 	size_t padder, size = string->size;
 	struct o_string *result = string;
 	padder = (size%const_n);
+	printf("padding: %d\n", padder);
 	size += (const_n-padder);
 	if (local) {
 		if (padder != 0) {
@@ -598,7 +598,7 @@ struct o_string *p_aes_crypt(struct o_aes *object,
 			const_n = 32;
 			const_a = 14;
 	}
-	result = p_aes_padding(object, string, local, 16);
+	result = p_aes_padding(string, local, 16);
 	for (index = 0; index < result->size; index+=16) {
 		pointer[0] = (unsigned int *)&result->content[index];
 		pointer[1] = (unsigned int *)&result->content[index+4];
@@ -663,7 +663,7 @@ struct o_string *p_aes_decrypt(struct o_aes *object,
 			const_n = 32;
 			const_a = 14;
 	}
-	result = p_aes_padding(object, string, local, 16);
+	result = p_aes_padding(string, local, 16);
 	for (index = 0; index < result->size; index+=16) {
 		pointer[0] = (unsigned int *)&result->content[index];
 		pointer[1] = (unsigned int *)&result->content[index+4];
