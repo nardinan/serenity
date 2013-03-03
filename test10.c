@@ -33,15 +33,6 @@ int main (int argc, char *argv[]) {
 							  "adipisici elit, sed eiusmod tempor incidunt ut "
 							  "labore et dolore magna aliqua. Ut enim ad minim "
 							  "veniam, quis nostrud");
-		/*input = f_string_new(NULL, 8, NULL);
-		input->content[0] = 0;
-		input->content[1] = 1;
-		input->content[2] = 0;
-		input->content[3] = 2;
-		input->content[4] = 0;
-		input->content[5] = 3;
-		input->content[6] = 0;
-		input->content[7] = 4;*/
 		out->m_write_string(out, d_P(d_string(512, "size of input before "
 											  "m_crypt: %zd\n", input->size),
 									 struct o_string));
@@ -51,7 +42,8 @@ int main (int argc, char *argv[]) {
 											  input->size),
 									 struct o_string));
 		output = idea->m_decrypt(idea, input, d_true);
-		out->m_write_string(out, d_P(d_string(12, "output: "), struct o_string));
+		out->m_write_string(out, d_P(d_string(12, "output: "),
+									 struct o_string));
 		out->m_write_string(out, input);
 		pool->m_clean(pool, d_true);
 		d_release(out);
