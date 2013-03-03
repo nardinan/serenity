@@ -79,7 +79,7 @@ char *p_array_string(struct o_object *object, char *data, size_t size) {
 	size_t index;
 	if (d_object_kind(object, v_array_kind)) {
 		local_object = (struct o_array *)object;
-		for (index = 0; index < local_object->size; index++) {
+		for (index = 0; index < local_object->size; index++)
 			if ((value = local_object->content[index])) {
 				next = value->s_delegate.m_string(local_object->content[index],
 												  pointer, size);
@@ -90,7 +90,6 @@ char *p_array_string(struct o_object *object, char *data, size_t size) {
 				}
 				pointer = next;
 			}
-		}
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_array");
 	return pointer;

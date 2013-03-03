@@ -48,4 +48,5 @@ int main (int argc, char *argv[]) {
 		d_release(aes);
 	} d_pool_end;
 	d_release(pool);
+	return 0;
 }
