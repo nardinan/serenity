@@ -529,7 +529,6 @@ struct o_string *p_aes_padding(struct o_string *string, int local,
 	size_t padder, size = string->size;
 	struct o_string *result = string;
 	padder = (size%const_n);
-	printf("padding: %d\n", padder);
 	size += (const_n-padder);
 	if (local) {
 		if (padder != 0) {
