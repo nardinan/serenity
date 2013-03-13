@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -33,6 +33,10 @@
 		(a)[0]^=(b)[0];\
 		(a)[1]^=(b)[1];\
 	}while(0)
+#define p_mul p_idea_inverse_multiplication
+#define p_shi p_idea_key_shift_left
+#define p_neg p_idea_negative
+#define p_cop d_idea_couple_bytes_copy
 enum e_idea_key {
 	e_idea_encrypt=0,
 	e_idea_decrypt=1

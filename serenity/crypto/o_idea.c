@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -77,7 +77,6 @@ void p_idea_negative(unsigned char *value, unsigned char *result) {
 	result[0] = ((solution>>8)&0xff);
 }
 
-
 struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 						  size_t size) {
 	struct o_idea *result;
@@ -101,42 +100,42 @@ struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 				memcpy(&(result->expanded_key[e_idea_encrypt][jump]),
 					   padded_key, (d_idea_expanded_key_bytes/2));
 				index = d_idea_expanded_key_size;
-				p_idea_inverse_multiplication(&(result->expanded_key[e_idea_encrypt][6]),
-											  &(result->expanded_key[e_idea_decrypt][index-2]));
-				p_idea_negative(&(result->expanded_key[e_idea_encrypt][4]),
-								&(result->expanded_key[e_idea_decrypt][index-4]));
-				p_idea_negative(&(result->expanded_key[e_idea_encrypt][2]),
-								&(result->expanded_key[e_idea_decrypt][index-6]));
-				p_idea_inverse_multiplication(&(result->expanded_key[e_idea_encrypt][0]),
-											  &(result->expanded_key[e_idea_decrypt][index-8]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][6]),
+					  &(result->expanded_key[e_idea_decrypt][index-2]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][4]),
+					  &(result->expanded_key[e_idea_decrypt][index-4]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][2]),
+					  &(result->expanded_key[e_idea_decrypt][index-6]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][0]),
+					  &(result->expanded_key[e_idea_decrypt][index-8]));
 				index -= 8;
 				for (step = 7, jump = 8; step > 0; step--, index -= 12,
 					 jump += 12) {
-					d_idea_couple_bytes_copy(&(result->expanded_key[e_idea_decrypt][index-2]),
-												&(result->expanded_key[e_idea_encrypt][jump+2]));
-					d_idea_couple_bytes_copy(&(result->expanded_key[e_idea_decrypt][index-4]),
-											 &(result->expanded_key[e_idea_encrypt][jump]));
-					p_idea_inverse_multiplication(&(result->expanded_key[e_idea_encrypt][jump+10]),
-												  &(result->expanded_key[e_idea_decrypt][index-6]));
-					p_idea_negative(&(result->expanded_key[e_idea_encrypt][jump+6]),
-									&(result->expanded_key[e_idea_decrypt][index-8]));
-					p_idea_negative(&(result->expanded_key[e_idea_encrypt][jump+8]),
-									&(result->expanded_key[e_idea_decrypt][index-10]));
-					p_idea_inverse_multiplication(&(result->expanded_key[e_idea_encrypt][jump+4]),
-												  &(result->expanded_key[e_idea_decrypt][index-12]));
+					p_cop(&(result->expanded_key[e_idea_decrypt][index-2]),
+						  &(result->expanded_key[e_idea_encrypt][jump+2]));
+					p_cop(&(result->expanded_key[e_idea_decrypt][index-4]),
+						  &(result->expanded_key[e_idea_encrypt][jump]));
+					p_mul(&(result->expanded_key[e_idea_encrypt][jump+10]),
+						  &(result->expanded_key[e_idea_decrypt][index-6]));
+					p_neg(&(result->expanded_key[e_idea_encrypt][jump+6]),
+						  &(result->expanded_key[e_idea_decrypt][index-8]));
+					p_neg(&(result->expanded_key[e_idea_encrypt][jump+8]),
+						  &(result->expanded_key[e_idea_decrypt][index-10]));
+					p_mul(&(result->expanded_key[e_idea_encrypt][jump+4]),
+						  &(result->expanded_key[e_idea_decrypt][index-12]));
 				}
-				d_idea_couple_bytes_copy(&(result->expanded_key[e_idea_decrypt][index-2]),
-										 &(result->expanded_key[e_idea_encrypt][jump+2]));
-				d_idea_couple_bytes_copy(&(result->expanded_key[e_idea_decrypt][index-4]),
-										 &(result->expanded_key[e_idea_encrypt][jump]));
-				p_idea_inverse_multiplication(&(result->expanded_key[e_idea_encrypt][jump+10]),
-											  &(result->expanded_key[e_idea_decrypt][index-6]));
-				p_idea_negative(&(result->expanded_key[e_idea_encrypt][jump+8]),
-								&(result->expanded_key[e_idea_decrypt][index-8]));
-				p_idea_negative(&(result->expanded_key[e_idea_encrypt][jump+6]),
-								&(result->expanded_key[e_idea_decrypt][index-10]));
-				p_idea_inverse_multiplication(&(result->expanded_key[e_idea_encrypt][jump+4]),
-											  &(result->expanded_key[e_idea_decrypt][index-12]));
+				p_cop(&(result->expanded_key[e_idea_decrypt][index-2]),
+					  &(result->expanded_key[e_idea_encrypt][jump+2]));
+				p_cop(&(result->expanded_key[e_idea_decrypt][index-4]),
+					  &(result->expanded_key[e_idea_encrypt][jump]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][jump+10]),
+					  &(result->expanded_key[e_idea_decrypt][index-6]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][jump+8]),
+					  &(result->expanded_key[e_idea_decrypt][index-8]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][jump+6]),
+					  &(result->expanded_key[e_idea_decrypt][index-10]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][jump+4]),
+					  &(result->expanded_key[e_idea_decrypt][index-12]));
 			} else
 				d_die(d_error_malloc);
 			p_idea_hooking(result);
@@ -269,9 +268,7 @@ struct o_string *p_idea_execute(struct o_string *string, int local,
 			space[copy][1] = (unsigned char *)result->content[index+(copy*2)+1];
 		}
 		for (executions = 0, key = 0; executions < 8; executions++, key += 12) {
-			p_idea_multiplication(space[0],
-								  &(expanded_key[key]),
-								  space[0]);
+			p_idea_multiplication(space[0], &(expanded_key[key]), space[0]);
 			p_idea_sum(space[1], &(expanded_key[key+2]), space[1]);
 			p_idea_sum(space[2], &(expanded_key[key+4]), space[2]);
 			p_idea_multiplication(space[3], &(expanded_key[key+6]), space[3]);
@@ -298,13 +295,11 @@ struct o_string *p_idea_execute(struct o_string *string, int local,
 							  (unsigned char *)&(result->content[index+6]));
 	}
 	return result;
-	
 }
 
 struct o_string *p_idea_crypt(struct o_idea *object, struct o_string *string,
 							  int local) {
 	return p_idea_execute(string, local, object->expanded_key[e_idea_encrypt]);
-	
 }
 
 struct o_string *p_idea_decrypt(struct o_idea *object, struct o_string *string,
