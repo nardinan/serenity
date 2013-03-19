@@ -43,6 +43,30 @@ struct o_array *f_array_new(struct o_array *supplied, size_t size) {
 	return result;
 }
 
+struct o_array *f_array_new_list(struct o_array *supplied, size_t size, ...) {
+	va_list arguments;
+	struct o_array *result;
+	struct o_object *value;
+	if ((result = (struct o_array *)
+		 f_object_new(v_array_kind, sizeof(struct o_array),
+					  (struct o_object *)supplied))) {
+		 if ((result->content = (struct o_object **)
+			  calloc(size, sizeof(struct o_object *)))) {
+			 result->size = size;
+			 va_start(arguments, size);
+			 while ((result->filled < result->size) &&
+					(value = va_arg(arguments, struct o_object *)))
+				 result->content[result->filled++] = d_retain(value,
+															  struct o_object);
+			 va_end(arguments);
+			 p_array_hooking(result);
+		 } else
+			 d_die(d_error_malloc);
+	 } else
+		 d_throw(v_exception_kind, "object is not an instance of o_array");
+	return result;
+}
+
 void p_array_delete(struct o_object *object) {
 	struct o_array *local_object;
 	size_t index;
@@ -101,13 +125,15 @@ struct o_object *p_array_clone(struct o_object *object) {
 	if (d_object_kind(object, v_array_kind)) {
 		result = (struct o_array *)p_object_clone(object);
 		local_object = (struct o_array *)object;
-		if (local_object->size > 0)
+		if (local_object->size > 0) {
+			result->filled = local_object->filled;
 			if ((result->content = (struct o_object **)
 				 calloc(1, local_object->size)))
 				for (index = 0; index < local_object->size; index++)
 					if (local_object->content[index])
 						result->content[index] =
 						d_retain(local_object->content[index], struct o_object);
+		}
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_array");
 	return (o_object *)result;
@@ -115,24 +141,26 @@ struct o_object *p_array_clone(struct o_object *object) {
 
 size_t p_array_insert(struct o_array *object, struct o_object *value,
 					  size_t position) {
-	size_t local_position = (position%object->size);
-	if (object->content[local_position]) {
-		d_release(object->content[local_position]);
-		object->filled--;
-	}
-	if (value) {
-		object->content[local_position] = d_retain(value, struct o_object);
-		object->filled++;
-	}
-	return local_position;
+	if (position < object->size) {
+		if (object->content[position]) {
+			d_release(object->content[position]);
+			object->filled--;
+		}
+		if (value) {
+			object->content[position] = d_retain(value, struct o_object);
+			object->filled++;
+		} else
+			object->content[position] = NULL;
+	} else
+		d_throw(v_exception_bound, "index is over the array's size");
+	return position;
 }
 
 struct o_object *p_array_obtain(struct o_array *object, size_t position) {
-	size_t local_position;
 	struct o_object *result = NULL;
-	if (object->size > 0) {
-		local_position = (position%object->size);
-		result = object->content[local_position];
-	}
+	if (position < object->size)
+		result = object->content[position];
+	else
+		d_throw(v_exception_bound, "index is over the array's size");
 	return result;
 }

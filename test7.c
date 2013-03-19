@@ -17,12 +17,14 @@
 */
 #include "o_string.h"
 #include "o_array.h"
+#include "o_pool.h"
 int main (int argc, char *argv[]) {
 	struct o_string *result;
-	struct o_array *array, *another;
+	struct o_array *array, *another, *fill;
 	size_t index;
 	struct o_string string = d_string_constant("hello,salut,what,c,,we,have");
 	struct s_exception *exc;
+	struct o_pool *pool =  f_pool_new(NULL);
 	d_try {
 		array = string.m_split(&string, ',');
 		for (index = 0; index < array->size; index++) {
@@ -46,6 +48,21 @@ int main (int argc, char *argv[]) {
 		}
 		printf("is time to release copy\n");
 		d_release(another);
+		printf("creating an array from a list\n");
+		d_pool_begin(pool) {
+			fill = f_array_new_list(NULL, 3,
+									d_P(d_string_pure("hello"),
+										struct o_string),
+									d_P(d_string_pure("salut"),
+										struct o_string),
+									d_P(d_string_pure("what"),
+										struct o_string));
+			for (index = 0; index < fill->size; index++) {
+				result = (struct o_string *)another->m_obtain(another, index);
+				printf("> %s\n", result->content);
+			}
+			d_release(fill);
+		} d_pool_end;
 	} d_catch(exc) {
 		d_exception_dump(stdout, exc);
 	} d_endtry;

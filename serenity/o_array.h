@@ -28,6 +28,8 @@ typedef struct o_array {
 } o_array;
 extern void p_array_hooking(struct o_array *object);
 extern struct o_array *f_array_new(struct o_array *supplied, size_t size);
+extern struct o_array *f_array_new_list(struct o_array *supplied,
+										size_t size, ...);
 extern void p_array_delete(struct o_object *object);
 extern int p_array_compare(struct o_object *object, struct o_object *other);
 extern char *p_array_string(struct o_object *object, char *data, size_t size);
