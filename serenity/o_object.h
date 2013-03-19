@@ -42,19 +42,16 @@
 		d_false,\
 		d_false,\
 		d_false\
-	},\
-	m\
+	},{\
+		m\
+	}\
 }
-#define d_object_kind(o,k)\
-	((o)->kind==(k))
-#define d_object_kind_compare(a,b)\
-	((a)->kind==(b)->kind)
-#define d_object_trylock(a)\
-	((a)->s_delegate.m_trylock(a))
-#define d_object_lock(a)\
-	((a)->s_delegate.m_lock(a))
-#define d_object_unlock(a)\
-	((a)->s_delegate.m_unlock(a))
+#define d_object_kind(o,k) ((o)->kind==(k))
+#define d_object_kind_compare(a,b) ((a)->kind==(b)->kind)
+#define d_object_trylock(a) ((a)->s_delegate.m_trylock(a))
+#define d_object_lock(a) ((a)->s_delegate.m_lock(a))
+#define d_object_unlock(a) ((a)->s_delegate.m_unlock(a))
+#define d_O(c) ((struct o_object *)(c))
 typedef struct o_object {
 	d_list_node_head;
     const char *kind;

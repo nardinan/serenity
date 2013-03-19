@@ -28,7 +28,7 @@
 	p_string_clone,\
 	p_object_trylock,\
 	p_object_lock,\
-	p_object_unlock,\
+	p_object_unlock\
 }
 #define d_string_constant(c)\
 {\
@@ -37,16 +37,18 @@
 	{\
 		d_true\
 	},\
-	c,\
+	(c),\
 	(d_strlen(c)+1),\
 	p_string_trim,\
 	p_string_append,\
+	p_string_length,\
 	p_string_character,\
 	p_string_substring,\
-	p_string_split\
+	p_string_split,\
+	p_string_truncate\
 }
 #define d_string(s,c...) f_string_new(NULL,(s),##c)
-#define d_string_pure(c) f_string_new(NULL,d_strlen(c)+1,(c));
+#define d_string_pure(c) f_string_new(NULL,d_strlen(c)+1,(c))
 extern const char v_string_kind[];
 typedef struct o_string {
 	d_object_head;
