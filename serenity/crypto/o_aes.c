@@ -443,15 +443,12 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 int p_aes_compare(struct o_object *object, struct o_object *other) {
 	struct o_aes *local_object, *local_other;
 	int result = p_object_compare(object, other);
-	if ((d_object_kind(object, v_aes_kind)) &&
-		(d_object_kind(other, v_aes_kind))) {
-		local_object = (struct o_aes *)object;
-		local_other = (struct o_aes *)other;
+	if ((local_object = d_object_kind(object, aes)) &&
+		(local_other = d_object_kind(other, aes)))
 		if ((result = memcmp(local_object->expanded_key,
 							 local_other->expanded_key,
 							 d_aes_expanded_key_size)) == 0)
 			result = (local_object->block - local_other->block);
-	}
 	return result;
 }
 
@@ -459,8 +456,7 @@ t_hash_value p_aes_hash(struct o_object *object) {
 	struct o_aes *local_object;
 	size_t const_n, index;
 	t_hash_value result = p_object_hash(object);
-	if (d_object_kind(object, v_aes_kind)) {
-		local_object = (struct o_aes *)object;
+	if ((local_object = d_object_kind(object, aes))) {
 		if (!object->s_flags.hashed) {
 			switch(local_object->block) {
 				case e_aes_block_128:
@@ -486,10 +482,10 @@ t_hash_value p_aes_hash(struct o_object *object) {
 }
 
 char *p_aes_string(struct o_object *object, char *data, size_t size) {
-	struct o_aes *local_object = (struct o_aes *)object;
+	struct o_aes *local_object;
 	size_t written, local_written, local_size;
 	int index, const_n, const_b;
-	if (d_object_kind(object, v_aes_kind)) {
+	if ((local_object = d_object_kind(object, aes))) {
 		switch(local_object->block) {
 			case e_aes_block_128:
 				const_n = 16;
@@ -532,7 +528,7 @@ struct o_string *p_aes_padding(struct o_string *string, int local,
 	size += (const_n-padder);
 	if (local) {
 		if (padder != 0) {
-			if ((result->content = (char *) realloc(result->content, size))) {
+			if ((result->content = (char *) d_realloc(result->content, size))) {
 				memset((result->content+result->size), '\0',
 					   (size-result->size));
 				result->size = size;

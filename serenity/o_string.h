@@ -19,26 +19,14 @@
 #define serenity_o_string_h
 #include "o_array.h"
 #define d_string_buffer_size 256
-#define d_string_hooking_constant \
-{\
-	p_string_delete,\
-	p_string_compare,\
-	p_string_hash,\
-	p_string_string,\
-	p_string_clone,\
-	p_object_trylock,\
-	p_object_lock,\
-	p_object_unlock\
-}
 #define d_string_constant(c)\
 {\
-	d_object_constant(v_string_kind,sizeof(struct o_string),\
-						d_string_hooking_constant),\
-	{\
+	.head = d_object_constant(v_string_kind,sizeof(struct o_string),string),\
+	.s_flags = {\
 		d_true\
 	},\
-	(c),\
-	(d_strlen(c)+1),\
+	.content = (c),\
+	.size = (d_strlen(c)+1),\
 	p_string_trim,\
 	p_string_append,\
 	p_string_length,\

@@ -17,13 +17,13 @@
 */
 #include "list.h"
 void f_list_init(struct s_list **list) {
-	if (!(*list = (struct s_list *) calloc(1, sizeof(struct s_list))))
+	if (!(*list = (struct s_list *) d_calloc(1, sizeof(struct s_list))))
 		d_die(d_error_malloc);
 }
 
 void f_list_destroy(struct s_list **list) {
 	if (*list)
-		free(*list);
+		d_free(*list);
 	*list = NULL;
 }
 

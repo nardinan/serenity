@@ -24,7 +24,7 @@ typedef struct s_person {
 
 struct s_list_node *f_person_allocate(const char *name, const char *surname) {
 	struct s_person *result;
-	if ((result = (struct s_person *) malloc(sizeof(struct s_person)))) {
+	if ((result = (struct s_person *) d_malloc(sizeof(struct s_person)))) {
 		snprintf(result->name, 12, "%s", name);
 		snprintf(result->surname, 12, "%s", surname);
 	} else
@@ -44,7 +44,7 @@ int main (int argc, char *argv[]) {
 	d_foreach(list, current, struct s_person)
 		printf("%s %s\n", current->name, current->surname);
 	/* delete */
-	free(f_list_delete(list, element));
+	d_free(f_list_delete(list, element));
 	printf("elements in the list (after delete): %zu\n", list->fill);
 	d_foreach(list, current, struct s_person) {
 		printf("%s %s\n", current->name, current->surname);

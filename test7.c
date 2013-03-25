@@ -19,51 +19,57 @@
 #include "o_array.h"
 #include "o_pool.h"
 int main (int argc, char *argv[]) {
-	struct o_string *result;
-	struct o_array *array, *another, *fill;
-	size_t index;
-	struct o_string string = d_string_constant("hello,salut,what,c,,we,have");
 	struct s_exception *exc;
-	struct o_pool *pool =  f_pool_new(NULL);
+	struct o_pool *pool = f_pool_new(NULL);
+	struct o_string string = d_string_constant("hello,salut,what,we,,have"),
+					*singleton;
+	struct o_array *array, *clone;
+	int index;
 	d_try {
 		array = string.m_split(&string, ',');
 		for (index = 0; index < array->size; index++) {
-			result = (struct o_string *)array->m_obtain(array, index);
-			if (result)
-				printf("\t%s\n", result->content);
+			singleton = (struct o_string *)array->m_obtain(array,index);
+			if (singleton)
+				printf("\t%s\n", singleton->content);
 			else
 				printf("\t<null>\n");
 		}
 		printf("in the array we have %zd elements and %zd spaces\n",
 			   array->filled, array->size);
-		another = d_clone(array, struct o_array);
+		clone = d_clone(array, struct o_array);
 		d_release(array);
-		printf("checking for clone:\n");
-		for (index = 0; index < another->size; index++) {
-			result = (struct o_string *)another->m_obtain(another, index);
-			if (result)
-				printf("\t%s\n", result->content);
+		for (index = 0; index < clone->size; index++) {
+			singleton = (struct o_string *)clone->m_obtain(clone, index);
+			if (singleton)
+				printf("\t%s\n", singleton->content);
 			else
 				printf("\t<null>\n");
 		}
-		printf("is time to release copy\n");
-		d_release(another);
+		d_release(clone);
 		printf("creating an array from a list\n");
 		d_pool_begin(pool) {
-			fill = f_array_new_list(NULL, 3,
-									d_P(d_string_pure("hello"),
-										struct o_string),
-									d_P(d_string_pure("salut"),
-										struct o_string),
-									d_P(d_string_pure("what"),
-										struct o_string));
-			for (index = 0; index < fill->size; index++) {
-				result = (struct o_string *)another->m_obtain(another, index);
-				printf("> %s\n", result->content);
+			array = f_array_new_list(NULL, 4,
+									 d_P(d_string_pure("This"),
+										 struct o_string),
+									 d_P(d_string_pure("Is"),
+										 struct o_string),
+									 d_P(d_string_pure("The"),
+										 struct o_string),
+									 d_P(d_string_pure("Time"),
+										 struct o_string));
+			for (index = 0; index < array->size; index++) {
+				singleton = (struct o_string *)array->m_obtain(array, index);
+				if (singleton)
+					printf("\t%s\n", singleton->content);
+				else
+					printf("\t<null>\n");
 			}
-			d_release(fill);
-		} d_pool_end;
+			d_release(array);
+		} d_pool_end_flush;
+		d_release(pool);
 	} d_catch(exc) {
 		d_exception_dump(stdout, exc);
 	} d_endtry;
+	f_memory_flush(e_log_level_ever);
+	return 0;
 }

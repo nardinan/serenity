@@ -39,8 +39,7 @@ struct o_pool *f_pool_new(struct o_pool *supplied) {
 
 void p_pool_delete(struct o_object *object) {
 	struct o_pool *local_object;
-	if (d_object_kind(object, v_pool_kind)) {
-		local_object = (struct o_pool *)object;
+	if ((local_object = d_object_kind(object, pool))) {
 		if (local_object->pool)
 			f_list_destroy(&(local_object->pool));
 	} else
@@ -51,8 +50,7 @@ char *p_pool_string(struct o_object *object, char *data, size_t size) {
 	struct o_pool *local_object;
 	struct o_object *value;
 	char *pointer = data, *next;
-	if (d_object_kind(object, v_pool_kind)) {
-		local_object = (struct o_pool *)object;
+	if ((local_object = d_object_kind(object, pool))) {
 		d_foreach(local_object->pool, value, struct o_object) {
 			next = value->s_delegate.m_string(value, pointer, size);
 			size -= (next-pointer);
@@ -71,9 +69,8 @@ char *p_pool_string(struct o_object *object, char *data, size_t size) {
 struct o_object *p_pool_clone(struct o_object *object) {
 	struct o_pool *result = NULL, *local_object;
 	struct o_object *value;
-	if (d_object_kind(object, v_pool_kind)) {
-		result = (struct o_pool *)p_object_clone(object),
-		local_object = (struct o_pool *)object;
+	if ((local_object = d_object_kind(object, pool))) {
+		result = (struct o_pool *)p_object_clone(object);
 		if (local_object->pool) {
 			f_list_init(&result->pool);
 			d_foreach(local_object->pool, value, struct o_object)

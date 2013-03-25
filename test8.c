@@ -36,10 +36,11 @@ int main (int argc, char *argv[]) {
 									struct o_string));
 			d_release(readed);
 		}
-	} d_pool_end;
+	} d_pool_end_flush;
 	pool->m_clean(pool, d_true); /* d_true remove every pointer from the pool */
 	d_release(pool);
 	d_release(out);
 	d_release(in);
+	f_memory_flush(e_log_level_ever);
 	return 0;
 }

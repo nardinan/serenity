@@ -44,4 +44,6 @@ int main (int argc, char *argv[]) {
 	d_release(string[1]);
 	d_release(string[2]);
 	d_release(string[3]);
+	f_memory_flush(e_log_level_ever);
+	return 0;
 }

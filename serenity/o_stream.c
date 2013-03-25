@@ -87,8 +87,7 @@ extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 
 void p_stream_delete(struct o_object *object) {
 	struct o_stream *local_object;
-	if (d_object_kind(object, v_stream_kind)) {
-		local_object = (struct o_stream *)object;
+	if ((local_object = d_object_kind(object, stream))) {
 		if ((!local_object->s_flags.supplied) && (local_object->s_flags.opened))
 			close(local_object->descriptor);
 		d_release(local_object->name);
@@ -99,20 +98,16 @@ void p_stream_delete(struct o_object *object) {
 int p_stream_compare(struct o_object *object, struct o_object *other) {
 	struct o_stream *local_object, *local_other;
 	int result = p_object_compare(object, other);
-	if ((d_object_kind(object, v_stream_kind)) &&
-		(d_object_kind(other, v_stream_kind))) {
-		local_object = (struct o_stream *)object;
-		local_other = (struct o_stream *)other;
+	if ((local_object = d_object_kind(object, stream)) &&
+		(local_other = d_object_kind(other, stream)))
 		result = (int)(local_object->descriptor-local_other->descriptor);
-	}
 	return result;
 }
 
 char *p_stream_string(struct o_object *object, char *data, size_t size) {
 	struct o_stream *local_object;
 	ssize_t written;
-	if (d_object_kind(object, v_stream_kind)) {
-		local_object = (struct o_stream *)object;
+	if ((local_object = d_object_kind(object, stream))) {
 		written = snprintf(data, size, "<file \"%s\" (%s) flags: ",
 						   local_object->name->content,
 						   (local_object->s_flags.opened)?"open":"close");
@@ -167,9 +162,8 @@ char *p_stream_string(struct o_object *object, char *data, size_t size) {
 
 struct o_object *p_stream_clone(struct o_object *object) {
 	struct o_stream *result = NULL, *local_object;
-	if (d_object_kind(object, v_stream_kind)) {
+	if ((local_object = d_object_kind(object, stream))) {
 		result = (struct o_stream *)p_object_clone(object);
-		local_object = (struct o_stream *)object;
 		if (local_object->s_flags.opened)
 			result->descriptor = dup(local_object->descriptor);
 		result->descriptor = dup(local_object->descriptor);

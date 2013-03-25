@@ -32,16 +32,12 @@ struct o_object *f_object_new(const char *kind, size_t size,
 	if (result) {
 		memset(result, 0, size);
 		result->s_flags.supplied = d_true;
-	} else if ((result = (struct o_object *) calloc(1, size)))
+	} else if ((result = (struct o_object *) d_calloc(1, size)))
 		result->s_flags.supplied = d_false;
 	else
 		d_die(d_error_malloc);
-	result->s_flags.hashed = d_false;
-	result->s_flags.pooled = d_false;
 	if (pthread_mutex_init(&(result->mutex), NULL) == 0)
 		result->s_flags.mutexed = d_true;
-	else
-		result->s_flags.mutexed = d_false;
 	result->kind = kind;
 	result->size = size;
 	p_object_hooking(result);
@@ -69,7 +65,7 @@ void p_object_delete(struct o_object *object) {
 	if (object->s_flags.mutexed)
 		pthread_mutex_destroy(&(object->mutex));
 	if (!object->s_flags.supplied) {
-		free(object);
+		d_free(object);
 		object = NULL;
 	} else
 		memset(object, 0, object->size);
@@ -100,8 +96,6 @@ struct o_object *p_object_clone(struct o_object *object) {
 		memcpy(result, object, object->size);
 		if (pthread_mutex_init(&(result->mutex), NULL) == 0)
 			result->s_flags.mutexed = d_true;
-		else
-			result->s_flags.mutexed = d_false;
 		result->references = 0;
 	}
 	return result;

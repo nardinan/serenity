@@ -20,7 +20,7 @@ char *f_string_append(char **string, char *suffix, size_t *space) {
 	size_t size_string = d_strlen(*string), size_element = d_strlen(suffix),
 			total;
 	if ((total = size_string+size_element+1) >= *space) {
-		if ((*string = (char *) realloc(*string, total)))
+		if ((*string = (char *) d_realloc(*string, total)))
 			*space = total;
 		else
 			d_die(d_error_malloc);
@@ -61,7 +61,6 @@ char *f_string_format_args(char *buffer, size_t size, char *symbols,
 	char *target = buffer, *pointer = format, *next, *last, *tail,
 			argument[d_string_arguent_size];
 	size_t dimension, remaining = (size-1), lower, written;
-	unsigned int index;
 	while ((next = strchr(pointer, '%'))) {
 		if ((dimension = (next-pointer)) > 0)
 			if ((lower = (dimension>remaining)?remaining:dimension)) {
@@ -70,11 +69,9 @@ char *f_string_format_args(char *buffer, size_t size, char *symbols,
 				target += lower;
 			}
 		if ((pointer = (next+1))) {
-			index = 0;
 			if ((last = p_string_format_skip(pointer, symbols))) {
 				memset(argument, '\0', d_string_arguent_size);
-				*argument = '%';
-				memcpy((argument+1), pointer, (last-pointer));
+				memcpy(argument, next, (last-next));
 				if ((tail = strchr(symbols, *(last-1))) == NULL) {
 					written = vsnprintf(target, remaining, argument,
 										parameters);

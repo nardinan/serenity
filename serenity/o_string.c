@@ -55,7 +55,7 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size,
 					  (struct o_object *)supplied))) {
 		if ((result->size = size)) {
 			result->s_flags.constant = d_false;
-			if ((result->content = (char *) calloc(1, result->size))) {
+			if ((result->content = (char *) d_calloc(1, result->size))) {
 				if (format)
 					result->content =
 					f_string_format_args(result->content, result->size,
@@ -105,10 +105,9 @@ char *p_string_format_object_content(char *buffer, size_t size, char *format,
 
 void p_string_delete(struct o_object *object) {
 	struct o_string *local_object;
-	if (d_object_kind(object, v_string_kind)) {
-		local_object = (struct o_string *)object;
+	if ((local_object = d_object_kind(object, string))) {
 		if ((!local_object->s_flags.constant) && (local_object->content))
-			free(local_object->content);
+			d_free(local_object->content);
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_string");
 }
@@ -116,12 +115,9 @@ void p_string_delete(struct o_object *object) {
 int p_string_compare(struct o_object *object, struct o_object *other) {
 	struct o_string *local_object, *local_other;
 	int result = p_object_compare(object, other);
-	if ((d_object_kind(object, v_string_kind)) &&
-		(d_object_kind(other, v_string_kind))) {
-		local_object = (struct o_string *)object,
-		local_other = (struct o_string *)other;
+	if ((local_object = d_object_kind(object, string)) &&
+		(local_other = d_object_kind(other, string)))
 		result = d_strcmp(local_object->content, local_other->content);
-	}
 	return result;
 }
 
@@ -129,8 +125,7 @@ t_hash_value p_string_hash(struct o_object *object) {
 	struct o_string *local_object;
 	char *pointer;
 	t_hash_value result = p_object_hash(object);
-	if (d_object_kind(object, v_string_kind)) {
-		local_object = (struct o_string *)object;
+	if ((local_object = d_object_kind(object, string))) {
 		pointer = local_object->content;
 		if (!object->s_flags.hashed) {
 			object->hash = 5381;
@@ -150,8 +145,7 @@ t_hash_value p_string_hash(struct o_object *object) {
 char *p_string_string(struct o_object *object, char *data, size_t size) {
  	struct o_string *local_object;
 	size_t written = 0;
-	if (d_object_kind(object, v_string_kind)) {
-		local_object = (struct o_string *)object;
+	if ((local_object = d_object_kind(object, string))) {
 		if (local_object->content)
 			written = snprintf(data, size, "%s", local_object->content);
 		else
@@ -163,11 +157,10 @@ char *p_string_string(struct o_object *object, char *data, size_t size) {
 
 struct o_object *p_string_clone(struct o_object *object) {
 	struct o_string *result = NULL, *local_object;
-	if (d_object_kind(object, v_string_kind)) {
-		result = (struct o_string *)p_object_clone(object),
-		local_object = (struct o_string *)object;
+	if ((local_object = d_object_kind(object, string))) {
+		result = (struct o_string *)p_object_clone(object);
 		if (!local_object->s_flags.constant) {
-			if ((result->content = (char *) calloc(1, local_object->size)))
+			if ((result->content = (char *) d_calloc(1, local_object->size)))
 				memcpy(result->content, local_object->content,
 					   local_object->size);
 			else

@@ -87,7 +87,7 @@ struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 					  (struct o_object *)supplied))) {
 		if (key) {
 			if ((padded_key = (unsigned char *)
-				 malloc(d_idea_expanded_key_bytes))) {
+				 d_malloc(d_idea_expanded_key_bytes))) {
 				memset(padded_key, '\0', d_idea_expanded_key_bytes);
 				memcpy(padded_key, key, d_min(size, d_idea_expanded_key_bytes));
 				for (index = 0, jump = 0; index < 6; index++,
@@ -136,6 +136,7 @@ struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 					  &(result->expanded_key[e_idea_decrypt][index-10]));
 				p_mul(&(result->expanded_key[e_idea_encrypt][jump+4]),
 					  &(result->expanded_key[e_idea_decrypt][index-12]));
+				d_free(padded_key);
 			} else
 				d_die(d_error_malloc);
 			p_idea_hooking(result);
@@ -149,17 +150,14 @@ struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 int p_idea_compare(struct o_object *object, struct o_object *other) {
 	struct o_idea *local_object, *local_other;
 	int result = p_object_compare(object, other);
-	if ((d_object_kind(object, v_idea_kind)) &&
-		(d_object_kind(other, v_idea_kind))) {
-		local_object = (struct o_idea *)object;
-		local_other = (struct o_idea *)other;
+	if ((local_object = d_object_kind(object, idea)) &&
+		(local_other = d_object_kind(other, idea)))
 		if ((result = memcmp(local_object->expanded_key[0],
 							 local_other->expanded_key[0],
 							 d_idea_expanded_key_size)) == 0)
 			result = memcmp(local_object->expanded_key[1],
 							local_other->expanded_key[1],
 							d_idea_expanded_key_size);
-	}
 	return result;
 }
 
@@ -167,8 +165,7 @@ t_hash_value p_idea_hash(struct o_object *object) {
 	struct o_idea *local_object;
 	size_t index;
 	t_hash_value result = p_object_hash(object);
-	if (d_object_kind(object, v_idea_kind)) {
-		local_object = (struct o_idea *)object;
+	if ((local_object = d_object_kind(object, idea))) {
 		if (!object->s_flags.hashed) {
 			object->hash = 5381;
 			/* djb2 hash function */
@@ -184,10 +181,10 @@ t_hash_value p_idea_hash(struct o_object *object) {
 }
 
 char *p_idea_string(struct o_object *object, char *data, size_t size) {
-	struct o_idea *local_object = (struct o_idea *)object;
+	struct o_idea *local_object;
 	size_t written, local_written, local_size;
 	int index;
-	if (d_object_kind(object, v_idea_kind)) {
+	if ((local_object = d_object_kind(object, idea))) {
 		written = snprintf(data, size, "<idea keys: ");
 		written = ((written>size)?size:written);
 		local_size = size-written;

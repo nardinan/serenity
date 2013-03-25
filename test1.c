@@ -24,5 +24,6 @@ int main (int argc, char *argv[]) {
     test = f_string_trim(f_string_append(&test, "whut", &size));
     test = f_string_append(&test, "nothing", &size);
     printf("'%s' (allocated size: %lu)\n", test, size);
-    free(test);
+    d_free(test);
+	return 0;
 }

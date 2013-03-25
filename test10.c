@@ -47,8 +47,10 @@ int main (int argc, char *argv[]) {
 		out->m_write_string(out, input);
 		pool->m_clean(pool, d_true);
 		d_release(out);
-		d_release(idea);
-	} d_pool_end;
+		d_release(input);
+	} d_pool_end_flush;
 	d_release(pool);
+	d_release(idea);
+	f_memory_flush(e_log_level_ever);
 	return 0;
 }

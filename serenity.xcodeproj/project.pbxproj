@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CB07021716E2412E00F0F4D0 /* test10.c in Sources */ = {isa = PBXBuildFile; fileRef = CB07021616E2412E00F0F4D0 /* test10.c */; };
 		CB0D0ADA16988D5F00FFC668 /* exception.c in Sources */ = {isa = PBXBuildFile; fileRef = CB0D0AD616988D5F00FFC668 /* exception.c */; };
 		CB0D0ADB16988D5F00FFC668 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = CB0D0AD816988D5F00FFC668 /* log.c */; };
 		CB129F181699A79E003BB3C4 /* types.c in Sources */ = {isa = PBXBuildFile; fileRef = CB129F171699A79E003BB3C4 /* types.c */; };
@@ -19,8 +18,10 @@
 		CBA267F21680ED25008F05E1 /* string.c in Sources */ = {isa = PBXBuildFile; fileRef = CBA267E91680ED25008F05E1 /* string.c */; };
 		CBA267F51680ED25008F05E1 /* o_object.c in Sources */ = {isa = PBXBuildFile; fileRef = CBA267F01680ED25008F05E1 /* o_object.c */; };
 		CBA267FD16811F7B008F05E1 /* hash.c in Sources */ = {isa = PBXBuildFile; fileRef = CBA267FC16811F7B008F05E1 /* hash.c */; };
+		CBB4B2CF16F8650300777EA1 /* memory.c in Sources */ = {isa = PBXBuildFile; fileRef = CBB4B2CE16F8650300777EA1 /* memory.c */; };
 		CBB4CF0016B69699009E80D2 /* o_exceptions.c in Sources */ = {isa = PBXBuildFile; fileRef = CBB4CEFF16B69699009E80D2 /* o_exceptions.c */; };
 		CBB4CF0816B72A35009E80D2 /* o_pool.c in Sources */ = {isa = PBXBuildFile; fileRef = CBB4CF0716B72A35009E80D2 /* o_pool.c */; };
+		CBDDB05616FA1F8900680882 /* test10.c in Sources */ = {isa = PBXBuildFile; fileRef = CB07021616E2412E00F0F4D0 /* test10.c */; };
 		CBFB781216B2E321000DED8B /* o_array.c in Sources */ = {isa = PBXBuildFile; fileRef = CBFB781116B2E321000DED8B /* o_array.c */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,8 @@
 		CBA267FB16811F72008F05E1 /* hash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = hash.h; sourceTree = "<group>"; };
 		CBA267FC16811F7B008F05E1 /* hash.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hash.c; sourceTree = "<group>"; };
 		CBB37F1F16B92616007AD961 /* test9.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test9.c; sourceTree = "<group>"; };
+		CBB4B2CD16F864F900777EA1 /* memory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		CBB4B2CE16F8650300777EA1 /* memory.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = memory.c; sourceTree = "<group>"; };
 		CBB4CEFD16B6968E009E80D2 /* o_exceptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = o_exceptions.h; sourceTree = "<group>"; };
 		CBB4CEFF16B69699009E80D2 /* o_exceptions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = o_exceptions.c; sourceTree = "<group>"; };
 		CBB4CF0216B6DF27009E80D2 /* test8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test8.c; sourceTree = "<group>"; };
@@ -134,9 +137,11 @@
 			children = (
 				CB6D230C168879E20074252C /* types.h */,
 				CB129F171699A79E003BB3C4 /* types.c */,
-				CB0D0AD816988D5F00FFC668 /* log.c */,
 				CB0D0AD916988D5F00FFC668 /* log.h */,
+				CB0D0AD816988D5F00FFC668 /* log.c */,
 				CB129F1F1699C565003BB3C4 /* logs.h */,
+				CBB4B2CD16F864F900777EA1 /* memory.h */,
+				CBB4B2CE16F8650300777EA1 /* memory.c */,
 				CBA267EA1680ED25008F05E1 /* string.h */,
 				CBA267E91680ED25008F05E1 /* string.c */,
 				CBA267FB16811F72008F05E1 /* hash.h */,
@@ -227,6 +232,7 @@
 				CB4F12FD16937CBF00C956CB /* list.c in Sources */,
 				CB0D0ADA16988D5F00FFC668 /* exception.c in Sources */,
 				CB0D0ADB16988D5F00FFC668 /* log.c in Sources */,
+				CBDDB05616FA1F8900680882 /* test10.c in Sources */,
 				CB129F181699A79E003BB3C4 /* types.c in Sources */,
 				CB33867B16ADFD6D0081FA3B /* o_string.c in Sources */,
 				CBFB781216B2E321000DED8B /* o_array.c in Sources */,
@@ -235,7 +241,7 @@
 				CBB4CF0016B69699009E80D2 /* o_exceptions.c in Sources */,
 				CBB4CF0816B72A35009E80D2 /* o_pool.c in Sources */,
 				CB8A929816DFC1AC004D82F2 /* o_idea.c in Sources */,
-				CB07021716E2412E00F0F4D0 /* test10.c in Sources */,
+				CBB4B2CF16F8650300777EA1 /* memory.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

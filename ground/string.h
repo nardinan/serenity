@@ -21,8 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "types.h"
-#include "logs.h"
+#include "memory.h"
 #define d_string_arguent_size 24
 #define d_strlen(a) ((a)?strlen(a):0)
 #define d_strcmp(a,b)\

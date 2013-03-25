@@ -29,29 +29,37 @@
 #define d_release(a) f_object_release((struct o_object *)a)
 #define d_clone(a,k)\
 	(k*)((struct o_object *)(a))->s_delegate.m_clone((struct o_object *)a)
-#define d_object_constant(k,s,m)\
+#define d_object_constant(k,s,hook)\
 {\
 	d_list_node_constant,\
-	k,\
-	s,\
+	.kind = (k),\
+	.size = (s),\
 	0,\
 	0,\
 	0,\
-	{\
+	.s_flags = {\
 		d_true,\
 		d_false,\
 		d_false,\
 		d_false\
-	},{\
-		m\
+	},\
+	.s_delegate = {\
+		p_##hook##_delete,\
+		p_##hook##_compare,\
+		p_##hook##_hash,\
+		p_##hook##_string,\
+		p_##hook##_clone,\
+		p_object_trylock,\
+		p_object_lock,\
+		p_object_unlock\
 	}\
 }
-#define d_object_kind(o,k) ((o)->kind==(k))
+#define d_object_kind(o,k) \
+	((struct o_##k *)(((o)->kind==v_##k##_kind)?(o):NULL))
 #define d_object_kind_compare(a,b) ((a)->kind==(b)->kind)
 #define d_object_trylock(a) ((a)->s_delegate.m_trylock(a))
 #define d_object_lock(a) ((a)->s_delegate.m_lock(a))
 #define d_object_unlock(a) ((a)->s_delegate.m_unlock(a))
-#define d_O(c) ((struct o_object *)(c))
 typedef struct o_object {
 	d_list_node_head;
     const char *kind;

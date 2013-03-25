@@ -20,6 +20,7 @@
 #include "types.h"
 #include "log.h"
 #include "logs.h"
+#include "memory.h"
 #include "string.h"
 #include "hash.h"
 #include "list.h"
