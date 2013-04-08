@@ -22,11 +22,28 @@ int main (int argc, char *argv[]) {
 	struct s_exception *exc;
 	struct o_pool *pool = f_pool_new(NULL);
 	struct o_string string = d_string_constant("hello,salut,what,we,,have"),
-					*singleton;
+					*singleton,
+					*example[2] = {
+						d_string_pure("example 1"),
+						d_string_pure("example 2")
+					};	
 	struct o_array *array, *clone;
 	int index;
 	d_try {
 		array = string.m_split(&string, ',');
+		for (index = 0; index < array->size; index++) {
+			singleton = (struct o_string *)array->m_obtain(array,index);
+			if (singleton)
+				printf("\t%s\n", singleton->content);
+			else
+				printf("\t<null>\n");
+		}
+		printf("in the array we have %zd elements and %zd spaces\n",
+			   array->filled, array->size);
+		array->m_insert(array, (struct o_object *)example[0], 0);
+		array->m_insert(array, (struct o_object *)example[1], 0);
+		d_release(example[0]);
+		d_release(example[1]);
 		for (index = 0; index < array->size; index++) {
 			singleton = (struct o_string *)array->m_obtain(array,index);
 			if (singleton)
@@ -48,7 +65,7 @@ int main (int argc, char *argv[]) {
 		d_release(clone);
 		printf("creating an array from a list\n");
 		d_pool_begin(pool) {
-			array = f_array_new_list(NULL, 4,
+			array = f_array_new_list(NULL, d_array_default_bucket, 4,
 									 d_P(d_string_pure("This"),
 										 struct o_string),
 									 d_P(d_string_pure("Is"),

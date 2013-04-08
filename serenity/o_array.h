@@ -18,17 +18,22 @@
 #ifndef serenity_o_hash_h
 #define serenity_o_hash_h
 #include "o_object.h"
+#define d_array_none -1
+#define d_array_default_bucket 8
 extern const char v_array_kind[];
 typedef struct o_array {
 	d_object_head;
 	struct o_object **content;
-	size_t size, filled;
+	size_t size, filled, bucket;
 	size_t (*m_insert)(struct o_array *, struct o_object *, size_t);
+	int (*m_remove)(struct o_array *, size_t);
 	struct o_object *(*m_obtain)(struct o_array *, size_t);
 } o_array;
 extern void p_array_hooking(struct o_array *object);
 extern struct o_array *f_array_new(struct o_array *supplied, size_t size);
-extern struct o_array *f_array_new_list(struct o_array *supplied,
+extern struct o_array *f_array_new_bucket(struct o_array *supplied,
+										  size_t bucket, size_t size);
+extern struct o_array *f_array_new_list(struct o_array *supplied, size_t bucket,
 										size_t size, ...);
 extern void p_array_delete(struct o_object *object);
 extern int p_array_compare(struct o_object *object, struct o_object *other);
@@ -36,5 +41,6 @@ extern char *p_array_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_array_clone(struct o_object *object);
 extern size_t p_array_insert(struct o_array *object, struct o_object *value,
 							 size_t position);
+extern int p_array_remove(struct o_array *object, size_t position);
 extern struct o_object *p_array_obtain(struct o_array *object, size_t position);
 #endif

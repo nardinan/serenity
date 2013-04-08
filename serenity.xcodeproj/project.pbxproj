@@ -15,13 +15,13 @@
 		CB33867B16ADFD6D0081FA3B /* o_string.c in Sources */ = {isa = PBXBuildFile; fileRef = CB33867A16ADFD6D0081FA3B /* o_string.c */; };
 		CB4F12FD16937CBF00C956CB /* list.c in Sources */ = {isa = PBXBuildFile; fileRef = CB4F12FC16937CBF00C956CB /* list.c */; };
 		CB8A929816DFC1AC004D82F2 /* o_idea.c in Sources */ = {isa = PBXBuildFile; fileRef = CB8A929616DFC1AC004D82F2 /* o_idea.c */; };
+		CB95E179171363ED00C6B297 /* test7.c in Sources */ = {isa = PBXBuildFile; fileRef = CBD5CFEA16B415DE00B9F735 /* test7.c */; };
 		CBA267F21680ED25008F05E1 /* string.c in Sources */ = {isa = PBXBuildFile; fileRef = CBA267E91680ED25008F05E1 /* string.c */; };
 		CBA267F51680ED25008F05E1 /* o_object.c in Sources */ = {isa = PBXBuildFile; fileRef = CBA267F01680ED25008F05E1 /* o_object.c */; };
 		CBA267FD16811F7B008F05E1 /* hash.c in Sources */ = {isa = PBXBuildFile; fileRef = CBA267FC16811F7B008F05E1 /* hash.c */; };
 		CBB4B2CF16F8650300777EA1 /* memory.c in Sources */ = {isa = PBXBuildFile; fileRef = CBB4B2CE16F8650300777EA1 /* memory.c */; };
 		CBB4CF0016B69699009E80D2 /* o_exceptions.c in Sources */ = {isa = PBXBuildFile; fileRef = CBB4CEFF16B69699009E80D2 /* o_exceptions.c */; };
 		CBB4CF0816B72A35009E80D2 /* o_pool.c in Sources */ = {isa = PBXBuildFile; fileRef = CBB4CF0716B72A35009E80D2 /* o_pool.c */; };
-		CBDDB05616FA1F8900680882 /* test10.c in Sources */ = {isa = PBXBuildFile; fileRef = CB07021616E2412E00F0F4D0 /* test10.c */; };
 		CBFB781216B2E321000DED8B /* o_array.c in Sources */ = {isa = PBXBuildFile; fileRef = CBFB781116B2E321000DED8B /* o_array.c */; };
 /* End PBXBuildFile section */
 
@@ -232,8 +232,8 @@
 				CB4F12FD16937CBF00C956CB /* list.c in Sources */,
 				CB0D0ADA16988D5F00FFC668 /* exception.c in Sources */,
 				CB0D0ADB16988D5F00FFC668 /* log.c in Sources */,
-				CBDDB05616FA1F8900680882 /* test10.c in Sources */,
 				CB129F181699A79E003BB3C4 /* types.c in Sources */,
+				CB95E179171363ED00C6B297 /* test7.c in Sources */,
 				CB33867B16ADFD6D0081FA3B /* o_string.c in Sources */,
 				CBFB781216B2E321000DED8B /* o_array.c in Sources */,
 				CB29E2D916B5DBC1003C37AF /* o_stream.c in Sources */,
