@@ -35,7 +35,8 @@
 #define d_calloc(c,s)\
 	p_memory_insert(calloc((c),(s)),__FILE__,__FUNCTION__,__LINE__,0)
 #define d_realloc(p,s)\
-	p_memory_insert(realloc((p),(s)),__FILE__,__FUNCTION__,__LINE__,1)
+		(p_memory_remove(p,d_clean_file(__FILE__),__FUNCTION__,__LINE__),\
+		p_memory_insert(realloc((p),(s)),__FILE__,__FUNCTION__,__LINE__,1))
 #define d_free(p)\
 	do{\
 		p_memory_remove(p,d_clean_file(__FILE__),__FUNCTION__,__LINE__);\
