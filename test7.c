@@ -23,9 +23,10 @@ int main (int argc, char *argv[]) {
 	struct o_pool *pool = f_pool_new(NULL);
 	struct o_string string = d_string_constant("hello,salut,what,we,,have"),
 					*singleton,
-					*example[2] = {
+					*example[] = {
 						d_string_pure("example 1"),
-						d_string_pure("example 2")
+						d_string_pure("example 2"),
+						d_string_pure("example 3")
 					};	
 	struct o_array *array, *clone;
 	int index;
@@ -40,10 +41,18 @@ int main (int argc, char *argv[]) {
 		}
 		printf("in the array we have %zd elements and %zd spaces\n",
 			   array->filled, array->size);
-		array->m_insert(array, (struct o_object *)example[0], 0);
-		array->m_insert(array, (struct o_object *)example[1], 0);
+		array->m_insert(array, (struct o_object *)example[0], array->filled);
+		array->m_insert(array, (struct o_object *)example[1], array->filled);
+		array->m_insert(array, (struct o_object *)example[2], array->filled);
+		/* 
+		 Remember that "->filled" is the number of elements inside the array 
+		 and "->size" is the real size of the array. If you have 3 elements
+		 separated by 2 spaces in a 8 space array, the "->filled" value is
+		 equal to 3 
+		 */
 		d_release(example[0]);
 		d_release(example[1]);
+		d_release(example[2]);
 		for (index = 0; index < array->size; index++) {
 			singleton = (struct o_string *)array->m_obtain(array,index);
 			if (singleton)

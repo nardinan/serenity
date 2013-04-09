@@ -148,16 +148,27 @@ struct o_object *p_array_clone(struct o_object *object) {
 
 size_t p_array_insert(struct o_array *object, struct o_object *value,
 					  size_t position) {
-	if (position < object->size) {
-		if (object->content[position]) {
-			/* do we need to resize the array? */
+	if (position <= object->size) {
+		if (position == object->size) {
+			if ((object->content = (struct o_object **)
+				 d_realloc(object->content, ((object->size+object->bucket)*
+											 sizeof(struct o_object *))))) {
+				memset(&(object->content[object->size]), 0,
+					   (object->bucket*sizeof(struct o_object *)));
+				object->size += object->bucket;
+			} else
+				d_die(d_error_malloc);
+		} else if (object->content[position]) {
 			if (object->content[object->size-1]) {
 				if ((object->content = (struct o_object **)
 					 d_realloc(object->content, ((object->size+object->bucket)*
 												 sizeof(struct o_object *))))) {
+					memset(&(object->content[object->size]), 0,
+						   (object->bucket*sizeof(struct o_object *)));
 					memmove(&(object->content[position+1]),
 							&(object->content[position]),
-							(object->size-position)*sizeof(struct o_object *));
+							((object->size-position)*
+							 sizeof(struct o_object *)));
 					object->size += object->bucket;
 				} else
 					d_die(d_error_malloc);
