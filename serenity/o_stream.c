@@ -49,22 +49,22 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied,
 
 extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 										  struct o_string *name,
-										  struct o_string *action) {
+										  const char *action) {
 	struct o_stream *result;
 	if ((result = (struct o_stream *)
 		 f_object_new(v_stream_kind, sizeof(struct o_stream),
 					  (struct o_object *)supplied))) {
 		result->name = d_retain(name, struct o_string);
 		result->flags = -1;
-		switch (action->m_character(action, 0)) {
+		switch (action[0]) {
 			case 'r':
-				if (action->m_character(action, 1) == 'w')
+				if (action[1] == 'w')
 					result->flags = d_write_read_flags;
 				else
 					result->flags = d_read_flags;
 				break;
 			case 'w':
-				if (action->m_character(action, 1) == 'a')
+				if (action[1] == 'a')
 					result->flags = d_append_flags;
 				else
 					result->flags = d_truncate_flags;
@@ -75,9 +75,9 @@ extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 		p_stream_hooking(result);
 		if (result->flags != -1) {
 			if ((result->descriptor = open(result->name->content,
-										   result->flags)) > -1)
+										   result->flags)) > -1) {
 				result->s_flags.opened = d_true;
-			else
+			} else
 				d_throw(v_exception_unreachable, "unable to open the file");
 		} else
 			d_throw(v_exception_malformed, "malformed action format");
@@ -115,11 +115,11 @@ char *p_stream_string(struct o_object *object, char *data, size_t size) {
 		data += written;
 		if (written < size) {
 			if (local_object->flags != -1) {
-				if (local_object->flags&O_RDONLY) {
+				if ((local_object->flags&O_RDONLY) == O_RDONLY) {
 					*data= 'r';
 					if ((++written) < size)
 						data++;
-				} else if (local_object->flags&O_RDWR) {
+				} else if ((local_object->flags&O_RDWR) == O_RDWR) {
 					*data = 'r';
 					if ((++written) < size) {
 						data++;
@@ -127,11 +127,11 @@ char *p_stream_string(struct o_object *object, char *data, size_t size) {
 						if ((++written) < size)
 							data++;
 					}
-				} else if (local_object->flags&O_WRONLY) {
+				} else if ((local_object->flags&O_WRONLY) == O_WRONLY) {
 					*data= 'w';
 					if ((++written) < size) {
 						data++;
-						if (local_object->flags&O_APPEND) {
+						if ((local_object->flags&O_APPEND) == O_APPEND) {
 							*data= 'a';
 							if ((++written) < size)
 								data++;
@@ -176,7 +176,8 @@ ssize_t p_stream_write(struct o_stream *object, size_t size,
 					   struct o_string *string) {
 	ssize_t written = 0;
 	if (object->s_flags.opened) {
-		if ((object->flags&O_RDWR) || (object->flags&O_WRONLY))
+		if (((object->flags&O_RDWR) == O_RDWR) ||
+			((object->flags&O_WRONLY) == O_WRONLY))
 			written = write(object->descriptor, string->content, size);
 		else
 			d_throw(v_exception_unsupported,
@@ -200,10 +201,11 @@ struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 	struct o_string *result = NULL;
 	ssize_t readed;
 	if (object->s_flags.opened) {
-		if ((object->flags&O_RDWR) || (object->flags&O_RDONLY)) {
+		if (((object->flags&O_RDWR) == O_RDWR) ||
+			((object->flags&O_RDONLY) == O_RDONLY)) {
 			if ((result = f_string_new(NULL, size, NULL))) {
 				readed = read(object->descriptor, result->content, size);
-				if (readed < 0) {
+				if (readed <= 0) {
 					d_release(result);
 					result = NULL;
 				}

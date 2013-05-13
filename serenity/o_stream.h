@@ -62,7 +62,7 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied,
 									struct o_string *name, int descriptor);
 extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 										  struct o_string *name,
-										  struct o_string *action);
+										  const char *action);
 extern void p_stream_delete(struct o_object *object);
 extern int p_stream_compare(struct o_object *object, struct o_object *other);
 extern char *p_stream_string(struct o_object *object, char *data, size_t size);
