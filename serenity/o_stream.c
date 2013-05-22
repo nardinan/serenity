@@ -26,7 +26,9 @@ void p_stream_hooking(struct o_stream *object) {
 	object->m_write = p_stream_write;
 	object->m_write_binary = p_stream_write_binary;
 	object->m_write_string = p_stream_write_string;
+	object->m_write_file = p_stream_write_file;
 	object->m_read = p_stream_read;
+	object->m_size = p_stream_size;
 	object->m_seek = p_stream_seek;
 	object->m_blocking = p_stream_blocking;
 }
@@ -197,6 +199,26 @@ ssize_t p_stream_write_string(struct o_stream *object,
 	return p_stream_write(object, string->m_length(string), string);
 }
 
+ssize_t p_stream_write_file(struct o_stream *object, struct o_stream *source) {
+	struct o_string *output = NULL;
+	ssize_t readed, total;
+	total = source->m_size(source);
+	if ((output = source->m_read(source, total))) {
+		if ((readed = output->size) == total) {
+			object->m_write_binary(object, output);
+			d_release(output);
+		} else {
+			d_release(output);
+			d_throw(v_exception_stream,
+					"size of file and readed bytes from source stream "
+					"are different");
+		}
+	} else
+		d_throw(v_exception_stream,
+				"can't read from the source stream");
+	return total;
+}
+
 struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 	struct o_string *result = NULL;
 	ssize_t readed;
@@ -210,6 +232,21 @@ struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 					result = NULL;
 				}
 			}
+		} else
+			d_throw(v_exception_unsupported,
+					"can't read from a write-only stream");
+	} else
+		d_throw(v_exception_closed, "can't read from a closed stream");
+	return result;
+}
+
+ssize_t p_stream_size(struct o_stream *object) {
+	ssize_t result = 0;
+	if (object->s_flags.opened) {
+		if (((object->flags&O_RDWR) == O_RDWR) ||
+			((object->flags&O_RDONLY) == O_RDONLY)) {
+			result = (ssize_t)object->m_seek(object, 0, e_stream_seek_end);
+			object->m_seek(object, 0, e_stream_seek_begin);
 		} else
 			d_throw(v_exception_unsupported,
 					"can't read from a write-only stream");

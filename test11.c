@@ -22,19 +22,15 @@
 int main(int argc, char *argv[]) {
 	struct o_pool *pool = f_pool_new(NULL);
 	struct o_stream *in_file = NULL, *out_file = NULL, *out_stream;
-	struct o_string *output = NULL;
 	struct s_exception *exception = NULL;
-	size_t readed;
 	d_pool_begin(pool) {
 		out_stream = d_stdout;
 		if (argc == 3) {
 			d_try {
-				out_stream->m_write_string(out_stream, d_P(d_string(512,
-																	"%s -> "
-																	"%s\n",
-																	argv[1],
-																	argv[2]),
-														   struct o_string));
+				out_stream->m_write_string(out_stream,
+										   d_P(d_string(512, "%s -> %s\n",
+														argv[1], argv[2]),
+											   struct o_string));
 				in_file = f_stream_new_file(NULL,
 								   d_P(d_string_pure(argv[1]),
 									   struct o_string), "r");
@@ -44,27 +40,20 @@ int main(int argc, char *argv[]) {
 				out_file = f_stream_new_file(NULL,
 											 d_P(d_string_pure(argv[2]),
 												 struct o_string), "w");
-				while ((output = in_file->m_read(in_file, 512))) {
-					readed = output->size;
-					if (readed > 0)
-						out_file->m_write_binary(out_file, output);
-					d_release(output);
-					if (!readed)
-						break;
-				}
+				out_file->m_write_file(out_file, in_file);
 				d_release(out_file);
 				d_release(in_file);
 			} d_catch(exception) {
 				d_exception_dump(stderr, exception);
 			} d_endtry;
 		} else {
-			out_stream->m_write_string(out_stream, d_P(d_string(512, "%s "
-																"<src> "
-																"<dst>\n",
-															argv[0]),
-												   struct o_string));
+			out_stream->m_write_string(out_stream,
+									   d_P(d_string(512, "%s <src> <dst>\n",
+													argv[0]), struct o_string));
 		}
 	} d_pool_end_flush;
+	d_release(out_stream);
 	d_release(pool);
+	f_memory_flush(e_log_level_ever);
 	return 0;
 }

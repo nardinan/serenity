@@ -16,12 +16,13 @@
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "o_exceptions.h"
-d_exception_define(unsupported, 1, "unsupported operation exception");
-d_exception_define(constant, 	2, "constant value exception");
-d_exception_define(malformed,	3, "malformed input exception");
-d_exception_define(unreachable, 4, "unreachable data exception");
-d_exception_define(closed,		5, "closed stream exception");
-d_exception_define(null,		6, "null pointer exception");
-d_exception_define(bound,		7, "out of bound exception");
-d_exception_define(kind,		8, "wrong object kind exception");
-d_exception_define(compare,		9, "different objects kind exception");
+d_exception_define(unsupported, 1,  "unsupported operation exception");
+d_exception_define(constant, 	2,  "constant value exception");
+d_exception_define(malformed,	3,  "malformed input exception");
+d_exception_define(unreachable, 4,  "unreachable data exception");
+d_exception_define(closed,		5,  "closed stream exception");
+d_exception_define(null,		6,  "null pointer exception");
+d_exception_define(bound,		7,  "out of bound exception");
+d_exception_define(kind,		8,  "wrong object kind exception");
+d_exception_define(compare,		9,  "different objects kind exception");
+d_exception_define(stream,		10, "damaged stream exception");

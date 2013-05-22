@@ -53,7 +53,9 @@ typedef struct o_stream {
 	ssize_t (*m_write)(struct o_stream *, size_t, struct o_string *);
 	ssize_t (*m_write_binary)(struct o_stream *, struct o_string *);
 	ssize_t (*m_write_string)(struct o_stream *, struct o_string *);
+	ssize_t (*m_write_file)(struct o_stream *, struct o_stream *);
 	struct o_string *(*m_read)(struct o_stream *, size_t);
+	ssize_t (*m_size)(struct o_stream *);
 	off_t (*m_seek)(struct o_stream *, off_t, enum e_stream_seek);
 	void (*m_blocking)(struct o_stream *, int);
 } o_stream;
@@ -73,8 +75,11 @@ extern ssize_t p_stream_write_binary(struct o_stream *object,
 									 struct o_string *string);
 extern ssize_t p_stream_write_string(struct o_stream *object,
 									 struct o_string *string);
+extern ssize_t p_stream_write_file(struct o_stream *object,
+								   struct o_stream *source);
 extern struct o_string *p_stream_read(struct o_stream *object,
 									  size_t size);
+extern ssize_t p_stream_size(struct o_stream *object);
 extern off_t p_stream_seek(struct o_stream *object, off_t offset,
 						   enum e_stream_seek whence);
 extern void p_stream_blocking(struct o_stream *object, int blocking);
