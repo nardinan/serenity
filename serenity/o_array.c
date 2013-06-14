@@ -25,7 +25,7 @@ void p_array_hooking(struct o_array *object) {
 	object->head.s_delegate.m_clone = p_array_clone;
 	object->m_insert = p_array_insert;
 	object->m_remove = p_array_remove;
-	object->m_obtain = p_array_obtain;
+	object->m_get = p_array_get;
 }
 
 struct o_array *f_array_new(struct o_array *supplied, size_t size) {
@@ -38,15 +38,14 @@ struct o_array *f_array_new_bucket(struct o_array *supplied, size_t bucket,
 	if ((result = (struct o_array *)
 		 f_object_new(v_array_kind, sizeof(struct o_array),
 					  (struct o_object *)supplied))) {
-			 if ((result->content = (struct o_object **)
-				  d_calloc(size, sizeof(struct o_object *)))) {
-				 result->size = size;
-				 result->bucket = bucket;
-				 p_array_hooking(result);
-			 } else
-				 d_die(d_error_malloc);
-		 } else
-			 d_throw(v_exception_kind, "object is not an instance of o_array");
+		p_array_hooking(result);
+		if ((result->content = (struct o_object **)
+			d_calloc(size, sizeof(struct o_object *)))) {
+			result->size = size;
+			result->bucket = bucket;
+		} else
+			d_die(d_error_malloc);
+	}
 	return result;
 }
 
@@ -58,21 +57,20 @@ struct o_array *f_array_new_list(struct o_array *supplied, size_t bucket,
 	if ((result = (struct o_array *)
 		 f_object_new(v_array_kind, sizeof(struct o_array),
 					  (struct o_object *)supplied))) {
-		 if ((result->content = (struct o_object **)
-			  d_calloc(size, sizeof(struct o_object *)))) {
-			 result->size = size;
-			 result->bucket = bucket;
-			 va_start(arguments, size);
-			 while ((result->filled < result->size) &&
-					(value = va_arg(arguments, struct o_object *)))
-				 result->content[result->filled++] = d_retain(value,
-															  struct o_object);
-			 va_end(arguments);
-			 p_array_hooking(result);
-		 } else
-			 d_die(d_error_malloc);
-	 } else
-		 d_throw(v_exception_kind, "object is not an instance of o_array");
+		p_array_hooking(result);
+		if ((result->content = (struct o_object **)
+			 d_calloc(size, sizeof(struct o_object *)))) {
+			result->size = size;
+			result->bucket = bucket;
+			va_start(arguments, size);
+			while ((result->filled < result->size) &&
+				   (value = va_arg(arguments, struct o_object *)))
+				result->content[result->filled++] = d_retain(value,
+															 struct o_object);
+			va_end(arguments);
+		} else
+			d_die(d_error_malloc);
+	}
 	return result;
 }
 
@@ -103,22 +101,34 @@ int p_array_compare(struct o_object *object, struct o_object *other) {
 }
 
 char *p_array_string(struct o_object *object, char *data, size_t size) {
-	char *pointer = data, *next;
 	struct o_array *local_object;
 	struct o_object *value;
-	size_t index;
+	char *pointer = data, *next;
+	size_t index, written = 0;
 	if ((local_object = d_object_kind(object, array))) {
+		if (written < size) {
+			*pointer = '[';
+			if ((++written) < size)
+				pointer++;
+		}
 		for (index = 0; index < local_object->size; index++)
 			if ((value = local_object->content[index])) {
 				next = value->s_delegate.m_string(local_object->content[index],
-												  pointer, size);
-				if ((size -= (next-pointer)) > 0) {
-					*next = ',';
-					next++;
-					size--;
-				}
+												  pointer, (size-written));
+				written += (next-pointer);
 				pointer = next;
+				if ((written < size) && ((index+1) < local_object->size)) {
+					*pointer = ',';
+					if ((++written) < size)
+						pointer++;
+				}
 			}
+		if (written < size) {
+			*pointer = ']';
+			if ((++written) < size)
+				pointer++;
+		}
+		*pointer = '\0';
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_array");
 	return pointer;
@@ -201,7 +211,7 @@ int p_array_remove(struct o_array *object, size_t position) {
 	return result;
 }
 
-struct o_object *p_array_obtain(struct o_array *object, size_t position) {
+struct o_object *p_array_get(struct o_array *object, size_t position) {
 	struct o_object *result = NULL;
 	if (position < object->size)
 		result = object->content[position];

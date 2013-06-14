@@ -18,6 +18,7 @@
 #include "o_string.h"
 #include "o_array.h"
 #include "o_pool.h"
+#include "o_stream.h"
 int main (int argc, char *argv[]) {
 	struct s_exception *exc;
 	struct o_pool *pool = f_pool_new(NULL);
@@ -27,8 +28,9 @@ int main (int argc, char *argv[]) {
 						d_string_pure("example 1"),
 						d_string_pure("example 2"),
 						d_string_pure("example 3")
-					};	
+					};
 	struct o_array *array, *clone;
+	struct o_stream *out;
 	int index;
 	d_try {
 		array = string.m_split(&string, ',');
@@ -59,7 +61,8 @@ int main (int argc, char *argv[]) {
 				printf("\t%s\n", singleton->content);
 			else
 				printf("\t<null>\n");
-		}
+		}		
+		
 		printf("in the array we have %zd elements and %zd spaces\n",
 			   array->filled, array->size);
 		clone = d_clone(array, struct o_array);
@@ -83,6 +86,10 @@ int main (int argc, char *argv[]) {
 										 struct o_string),
 									 d_P(d_string_pure("Time"),
 										 struct o_string));
+			/* just verifying the "to string" function */
+			out = d_stdout;
+			out->m_write_string(out, d_P(d_string(128, "%@", array), struct o_string));
+			d_release(out);
 			for (index = 0; index < array->size; index++) {
 				singleton = (struct o_string *)array->m_obtain(array, index);
 				if (singleton)

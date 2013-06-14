@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2013 Andrea Nardinocchi (nardinocchi@psychogames.net)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -18,16 +18,31 @@
 #ifndef serenity_o_dictionary_h
 #define serenity_o_dictionary_h
 #include "o_object.h"
+#include "o_array.h"
+#include "hash.h"
 extern const char v_dictionary_kind[];
 typedef struct o_dictionary {
 	d_object_head;
-	/* append here your attributes */
+	struct s_hash_table *table;
 	/* append here your methods */
+	int (*m_insert)(struct o_dictionary *, struct o_object *,
+					struct o_object *);
+	struct o_object *(*m_get)(struct o_dictionary *, struct o_object *);
+	struct o_array *(*m_keys)(struct o_dictionary *);
+	struct o_array *(*m_values)(struct o_dictionary *);
 } o_dictionary;
 extern void p_dictionary_hooking(struct o_dictionary *object);
+extern t_hash_value p_dictionary_hash_hooker(void *key);
+extern int p_dictionary_compare_hooker(void *left, void *right);
+extern struct o_dictionary *f_dictionary_new(struct o_dictionary *supplied);
 extern void p_dictionary_delete(struct o_object *object);
-extern int p_dictionary_compare(struct o_object *object, struct o_object *other);
-extern t_hash_value p_dictionary_hash(struct o_object *object);
-extern char *p_dictionary_string(struct o_object *object, char *data, size_t size);
+extern char *p_dictionary_string(struct o_object *object, char *data,
+								 size_t size);
 extern struct o_object *p_dictionary_clone(struct o_object *object);
+extern int p_dictionary_insert(struct o_dictionary *object,
+							   struct o_object *key, struct o_object *value);
+extern struct o_object *p_dictionary_get(struct o_dictionary *object,
+										 struct o_object *key);
+extern struct o_array *p_dictionary_keys(struct o_dictionary *object);
+extern struct o_array *p_dictionary_values(struct o_dictionary *object);
 #endif

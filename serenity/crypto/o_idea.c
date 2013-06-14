@@ -85,6 +85,7 @@ struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 	if ((result = (struct o_idea *)
 		 f_object_new(v_idea_kind, sizeof(struct o_idea),
 					  (struct o_object *)supplied))) {
+		p_idea_hooking(result);
 		if (key) {
 			if ((padded_key = (unsigned char *)
 				 d_malloc(d_idea_expanded_key_bytes))) {
@@ -139,7 +140,6 @@ struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 				d_free(padded_key);
 			} else
 				d_die(d_error_malloc);
-			p_idea_hooking(result);
 		} else
 			d_throw(v_exception_null,
 					"key is undefined or content is a zero-length element");
@@ -164,7 +164,7 @@ int p_idea_compare(struct o_object *object, struct o_object *other) {
 t_hash_value p_idea_hash(struct o_object *object) {
 	struct o_idea *local_object;
 	size_t index;
-	t_hash_value result = p_object_hash(object);
+	t_hash_value result = 0;
 	if ((local_object = d_object_kind(object, idea))) {
 		if (!object->s_flags.hashed) {
 			object->hash = 5381;

@@ -1,6 +1,6 @@
 /*
      serenity
-     Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
+     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
      
      This program is free software: you can redistribute it and/or modify
      it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ char *f_string_format_args(char *buffer, size_t size, char *symbols,
 						   va_list parameters) {
 	char *target = buffer, *pointer = format, *next, *last, *tail,
 			argument[d_string_arguent_size];
-	size_t dimension, remaining = (size-1), lower, written;
+	size_t dimension, remaining = size, lower, written;
 	while ((next = strchr(pointer, '%'))) {
 		if ((dimension = (next-pointer)) > 0)
 			if ((lower = (dimension>remaining)?remaining:dimension)) {

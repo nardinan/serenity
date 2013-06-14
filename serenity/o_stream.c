@@ -19,14 +19,13 @@
 const char v_stream_kind[] = "stream";
 void p_stream_hooking(struct o_stream *object) {
 	object->head.s_delegate.m_delete = p_stream_delete;
-	object->head.s_delegate.m_compare = p_stream_compare;
+	/* keep default compare function */
 	/* keep default hash function */
 	object->head.s_delegate.m_string = p_stream_string;
 	object->head.s_delegate.m_clone = p_stream_clone;
 	object->m_write = p_stream_write;
-	object->m_write_binary = p_stream_write_binary;
 	object->m_write_string = p_stream_write_string;
-	object->m_write_file = p_stream_write_file;
+	object->m_write_stream = p_stream_write_stream;
 	object->m_read = p_stream_read;
 	object->m_size = p_stream_size;
 	object->m_seek = p_stream_seek;
@@ -51,38 +50,58 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied,
 
 extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 										  struct o_string *name,
-										  const char *action) {
+										  const char *action, int permissions) {
 	struct o_stream *result;
 	if ((result = (struct o_stream *)
 		 f_object_new(v_stream_kind, sizeof(struct o_stream),
 					  (struct o_object *)supplied))) {
+		p_stream_hooking(result);
 		result->name = d_retain(name, struct o_string);
 		result->flags = -1;
 		switch (action[0]) {
 			case 'r':
+				result->flags = d_read_flags;
 				if (action[1] == 'w')
 					result->flags = d_write_read_flags;
-				else
-					result->flags = d_read_flags;
 				break;
 			case 'w':
+				result->flags = d_truncate_flags;
 				if (action[1] == 'a')
-					result->flags = d_append_flags;
-				else
-					result->flags = d_truncate_flags;
+					result->flags = d_append_flags;					
 				break;
 		}
-		result->s_flags.supplied = d_false;
-		result->s_flags.opened = d_false;
-		p_stream_hooking(result);
 		if (result->flags != -1) {
 			if ((result->descriptor = open(result->name->content,
-										   result->flags)) > -1) {
+										   result->flags, permissions)) > -1) {
 				result->s_flags.opened = d_true;
 			} else
 				d_throw(v_exception_unreachable, "unable to open the file");
 		} else
 			d_throw(v_exception_malformed, "malformed action format");
+	}
+	return result;
+}
+
+struct o_stream *f_stream_new_raw(struct o_stream *supplied,
+								  struct o_string *name,
+								  const char *raw, size_t bytes) {
+	struct o_stream *result;
+	FILE *output;
+	if ((result = (struct o_stream *)
+		 f_object_new(v_stream_kind, sizeof(struct o_stream),
+					  (struct o_object *)supplied))) {
+		p_stream_hooking(result);
+		result->name = d_retain(name, struct o_string);
+		result->flags = d_write_read_flags;
+		result->s_flags.temporary = d_true;
+		if ((output = tmpfile())) {
+			result->descriptor = fileno(output);
+			result->s_flags.opened = d_true;
+			write(result->descriptor, raw, bytes);
+			p_stream_seek(result, 0, e_stream_seek_begin);
+		} else
+			d_throw(v_exception_unreachable,
+					"unable to open the temporary file");
 	}
 	return result;
 }
@@ -97,69 +116,60 @@ void p_stream_delete(struct o_object *object) {
 		d_throw(v_exception_kind, "object is not an instance of o_stream");
 }
 
-int p_stream_compare(struct o_object *object, struct o_object *other) {
-	struct o_stream *local_object, *local_other;
-	int result = p_object_compare(object, other);
-	if ((local_object = d_object_kind(object, stream)) &&
-		(local_other = d_object_kind(other, stream)))
-		result = (int)(local_object->descriptor-local_other->descriptor);
-	return result;
-}
-
 char *p_stream_string(struct o_object *object, char *data, size_t size) {
 	struct o_stream *local_object;
+	char *pointer = data;
 	ssize_t written;
 	if ((local_object = d_object_kind(object, stream))) {
-		written = snprintf(data, size, "<file \"%s\" (%s) flags: ",
+		written = snprintf(pointer, size, "<file \"%s\" (%s) flags: ",
 						   local_object->name->content,
 						   (local_object->s_flags.opened)?"open":"close");
 		written = ((written>size)?size:written);
-		data += written;
+		pointer += written;
 		if (written < size) {
 			if (local_object->flags != -1) {
 				if ((local_object->flags&O_RDONLY) == O_RDONLY) {
-					*data= 'r';
+					*pointer = 'r';
 					if ((++written) < size)
-						data++;
+						pointer++;
 				} else if ((local_object->flags&O_RDWR) == O_RDWR) {
-					*data = 'r';
+					*pointer = 'r';
 					if ((++written) < size) {
-						data++;
-						*data= 'w';
+						pointer++;
+						*pointer = 'w';
 						if ((++written) < size)
-							data++;
+							pointer++;
 					}
 				} else if ((local_object->flags&O_WRONLY) == O_WRONLY) {
-					*data= 'w';
+					*pointer = 'w';
 					if ((++written) < size) {
-						data++;
+						pointer++;
 						if ((local_object->flags&O_APPEND) == O_APPEND) {
-							*data= 'a';
+							*pointer = 'a';
 							if ((++written) < size)
-								data++;
+								pointer++;
 						}
 					}
 				}
 			} else {
-				*data = 'n';
+				*pointer = 'n';
 				if ((++written) < size) {
-					data++;
-					*data= 'o';
+					pointer++;
+					*pointer = 'o';
 					if ((++written) < size)
-						data++;
+						pointer++;
 				}
 			}
 		}
 		if (written < size) {
-			*data = '>';
-			if ((++written) < size) {
-				data++;
-				*data= '\0';
-			}
+			*pointer = '>';
+			if ((++written) < size)
+				pointer++;
 		}
+		*pointer = '\0';
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_stream");
-	return data;
+	return pointer;
 }
 
 struct o_object *p_stream_clone(struct o_object *object) {
@@ -174,13 +184,12 @@ struct o_object *p_stream_clone(struct o_object *object) {
 	return (o_object *)result;
 }
 
-ssize_t p_stream_write(struct o_stream *object, size_t size,
-					   struct o_string *string) {
+ssize_t p_stream_write(struct o_stream *object, size_t size, void *source) {
 	ssize_t written = 0;
 	if (object->s_flags.opened) {
 		if (((object->flags&O_RDWR) == O_RDWR) ||
 			((object->flags&O_WRONLY) == O_WRONLY))
-			written = write(object->descriptor, string->content, size);
+			written = write(object->descriptor, source, size);
 		else
 			d_throw(v_exception_unsupported,
 					"can't write in a read-only stream");
@@ -189,23 +198,19 @@ ssize_t p_stream_write(struct o_stream *object, size_t size,
 	return written;
 }
 
-ssize_t p_stream_write_binary(struct o_stream *object,
-							  struct o_string *string) {
-	return p_stream_write(object, string->size, string);
-}
-
 ssize_t p_stream_write_string(struct o_stream *object,
 							  struct o_string *string) {
-	return p_stream_write(object, string->m_length(string), string);
+	return p_stream_write(object, string->m_length(string), string->content);
 }
 
-ssize_t p_stream_write_file(struct o_stream *object, struct o_stream *source) {
+ssize_t p_stream_write_stream(struct o_stream *object,
+							  struct o_stream *source) {
 	struct o_string *output = NULL;
 	ssize_t readed, total;
 	total = source->m_size(source);
 	if ((output = source->m_read(source, total))) {
 		if ((readed = output->size) == total) {
-			object->m_write_binary(object, output);
+			p_stream_write(object, output->size, output->content);
 			d_release(output);
 		} else {
 			d_release(output);

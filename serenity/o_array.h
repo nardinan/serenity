@@ -27,7 +27,7 @@ typedef struct o_array {
 	size_t size, filled, bucket;
 	size_t (*m_insert)(struct o_array *, struct o_object *, size_t);
 	int (*m_remove)(struct o_array *, size_t);
-	struct o_object *(*m_obtain)(struct o_array *, size_t);
+	struct o_object *(*m_get)(struct o_array *, size_t);
 } o_array;
 extern void p_array_hooking(struct o_array *object);
 extern struct o_array *f_array_new(struct o_array *supplied, size_t size);
@@ -42,5 +42,5 @@ extern struct o_object *p_array_clone(struct o_object *object);
 extern size_t p_array_insert(struct o_array *object, struct o_object *value,
 							 size_t position);
 extern int p_array_remove(struct o_array *object, size_t position);
-extern struct o_object *p_array_obtain(struct o_array *object, size_t position);
+extern struct o_object *p_array_get(struct o_array *object, size_t position);
 #endif

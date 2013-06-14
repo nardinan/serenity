@@ -49,11 +49,11 @@ typedef struct o_stream {
 	struct {
 		unsigned int supplied:1;
 		unsigned int opened:1;
+		unsigned int temporary:1;
 	} s_flags;
-	ssize_t (*m_write)(struct o_stream *, size_t, struct o_string *);
-	ssize_t (*m_write_binary)(struct o_stream *, struct o_string *);
+	ssize_t (*m_write)(struct o_stream *, size_t, void *);
 	ssize_t (*m_write_string)(struct o_stream *, struct o_string *);
-	ssize_t (*m_write_file)(struct o_stream *, struct o_stream *);
+	ssize_t (*m_write_stream)(struct o_stream *, struct o_stream *);
 	struct o_string *(*m_read)(struct o_stream *, size_t);
 	ssize_t (*m_size)(struct o_stream *);
 	off_t (*m_seek)(struct o_stream *, off_t, enum e_stream_seek);
@@ -64,19 +64,20 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied,
 									struct o_string *name, int descriptor);
 extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 										  struct o_string *name,
-										  const char *action);
+										  const char *action, int permissions);
+extern struct o_stream *f_stream_new_raw(struct o_stream *supplied,
+										 struct o_string *name,
+										 const char *raw, size_t bytes);
 extern void p_stream_delete(struct o_object *object);
 extern int p_stream_compare(struct o_object *object, struct o_object *other);
 extern char *p_stream_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_stream_clone(struct o_object *object);
 extern ssize_t p_stream_write(struct o_stream *object, size_t size,
-							  struct o_string *string);
-extern ssize_t p_stream_write_binary(struct o_stream *object,
-									 struct o_string *string);
+							  void *source);
 extern ssize_t p_stream_write_string(struct o_stream *object,
 									 struct o_string *string);
-extern ssize_t p_stream_write_file(struct o_stream *object,
-								   struct o_stream *source);
+extern ssize_t p_stream_write_stream(struct o_stream *object,
+									 struct o_stream *source);
 extern struct o_string *p_stream_read(struct o_stream *object,
 									  size_t size);
 extern ssize_t p_stream_size(struct o_stream *object);

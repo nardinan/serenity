@@ -29,8 +29,11 @@
 	while(0);\
 	__d_pool->m_clean(__d_pool,d_true);\
 }
+#define d_pool_end_clean\
+	while(0);\
+	__d_pool->m_clean(__d_pool,d_false);\
+}
 #define d_P(a,k) (k*)__d_pool->m_insert(__d_pool,(struct o_object *)(a))
-#define d_A(a,k) d_retain(P(__d_pool,a,struct o_object),k)
 extern const char v_pool_kind[];
 typedef struct o_pool {
 	d_object_head;

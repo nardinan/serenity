@@ -375,6 +375,7 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 	if ((result = (struct o_aes *)
 		 f_object_new(v_aes_kind, sizeof(struct o_aes),
 					  (struct o_object *)supplied))) {
+		p_aes_hooking(result);
 		if (key) {
 			result->block = block;
 			switch(result->block) {
@@ -432,7 +433,6 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 										 const_s, jump);
 				}
 			}
-			p_aes_hooking(result);
 		} else
 			d_throw(v_exception_null,
 					"key is undefined or content is a zero-length element");
@@ -455,7 +455,7 @@ int p_aes_compare(struct o_object *object, struct o_object *other) {
 t_hash_value p_aes_hash(struct o_object *object) {
 	struct o_aes *local_object;
 	size_t const_n, index;
-	t_hash_value result = p_object_hash(object);
+	t_hash_value result = 0;
 	if ((local_object = d_object_kind(object, aes))) {
 		if (!object->s_flags.hashed) {
 			switch(local_object->block) {

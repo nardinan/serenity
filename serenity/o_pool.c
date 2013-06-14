@@ -16,6 +16,7 @@
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "o_pool.h"
+#include "o_string.h"
 const char v_pool_kind[] = "pool";
 void p_pool_hooking(struct o_pool *object) {
 	object->head.s_delegate.m_delete = p_pool_delete;
@@ -31,9 +32,10 @@ struct o_pool *f_pool_new(struct o_pool *supplied) {
 	struct o_pool *result;
 	if ((result = (struct o_pool *)
 		 f_object_new(v_pool_kind, sizeof(struct o_pool),
-					  (struct o_object *)supplied)))
+					  (struct o_object *)supplied))) {
+		p_pool_hooking(result);
 		f_list_init(&result->pool);
-	p_pool_hooking(result);
+	}
 	return result;
 }
 
@@ -50,17 +52,29 @@ char *p_pool_string(struct o_object *object, char *data, size_t size) {
 	struct o_pool *local_object;
 	struct o_object *value;
 	char *pointer = data, *next;
+	size_t written = 0;
 	if ((local_object = d_object_kind(object, pool))) {
-		d_foreach(local_object->pool, value, struct o_object) {
-			next = value->s_delegate.m_string(value, pointer, size);
-			size -= (next-pointer);
-			if ((size > 0) && (((struct s_list_node *)value)->next)) {
-				*next = ',';
-				next++;
-				size--;
-			}
-			pointer = next;
+		if (written < size) {
+			*pointer = '[';
+			if ((++written) < size)
+				pointer++;
 		}
+		d_foreach(local_object->pool, value, struct o_object) {
+			next = value->s_delegate.m_string(value, pointer, (size-written));
+			written += (next-pointer);
+			pointer = next;
+			if ((written < size) && (((struct s_list_node *)value)->next)) {
+				*pointer = ',';
+				if ((++written) < size)
+					pointer++;
+			}
+		}
+		if (written < size) {
+			*pointer = ']';
+			if ((++written) < size)
+				pointer++;
+		}
+		*pointer = '\0';
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_pool");
 	return pointer;

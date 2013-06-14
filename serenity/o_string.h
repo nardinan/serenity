@@ -1,6 +1,6 @@
 /*
 	 serenity
-	 Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
+	 Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
 	 
 	 This program is free software: you can redistribute it and/or modify
 	 it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@
 }
 #define d_string(s,c...) f_string_new(NULL,(s),##c)
 #define d_string_pure(c) f_string_new(NULL,d_strlen(c)+1,(c))
+#define d_S(s,c...) d_P(d_string((s),##c), struct o_string)
+#define d_SP(s) d_P(d_string_pure(s), struct o_string)
 extern const char v_string_kind[];
 typedef struct o_string {
 	d_object_head;

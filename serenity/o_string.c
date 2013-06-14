@@ -1,6 +1,6 @@
 /*
 	 serenity
-	 Copyright (C) 2012 Andrea Nardinocchi (andrea@nardinan.it)
+	 Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
 	 
 	 This program is free software: you can redistribute it and/or modify
 	 it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size,
 	if ((result = (struct o_string *)
 		 f_object_new(v_string_kind, sizeof(struct o_string),
 					  (struct o_object *)supplied))) {
+		p_string_hooking(result);
 		if ((result->size = size)) {
 			result->s_flags.constant = d_false;
 			if ((result->content = (char *) d_calloc(1, result->size))) {
@@ -64,7 +65,6 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size,
 			} else
 				d_die(d_error_malloc);
 		}
-		p_string_hooking(result);
 	}
 	return result;
 }
@@ -75,12 +75,12 @@ struct o_string *f_string_new_constant(struct o_string *supplied,
 	if ((result = (struct o_string *)
 		 f_object_new(v_string_kind, sizeof(struct o_string),
 					  (struct o_object *)supplied))) {
+		p_string_hooking(result);
 		result->s_flags.constant = d_true;
 		if (content) {
 			result->content = (char *)content;
 			result->size = (d_strlen(result->content)+1);
 		}
-		p_string_hooking(result);
 	}
 	return result;
 }
@@ -124,7 +124,7 @@ int p_string_compare(struct o_object *object, struct o_object *other) {
 t_hash_value p_string_hash(struct o_object *object) {
 	struct o_string *local_object;
 	char *pointer;
-	t_hash_value result = p_object_hash(object);
+	t_hash_value result = 0;
 	if ((local_object = d_object_kind(object, string))) {
 		pointer = local_object->content;
 		if (!object->s_flags.hashed) {
