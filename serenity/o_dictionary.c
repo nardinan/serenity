@@ -39,7 +39,7 @@ extern t_hash_value p_dictionary_hash_hooker(void *key) {
 extern int p_dictionary_compare_hooker(void *left, void *right) {
 	struct o_object *object_left = (struct o_object *)left,
 					*object_right = (struct o_object *)right;
-	return object_left->s_delegate.m_compare(object_left, object_right);
+	return d_compare(object_left, object_right);
 }
 
 struct o_dictionary *f_dictionary_new(struct o_dictionary *supplied) {
