@@ -25,4 +25,5 @@
 #include "hash.h"
 #include "list.h"
 #include "exception.h"
+#include "endian.h"
 #endif

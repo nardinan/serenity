@@ -59,7 +59,8 @@ struct o_filesystem *f_filesystem_new_stream(struct o_filesystem *supplied,
 				while (readed < dimension) {
 					header = ((struct s_filesystem_header*)
 							  (content->content+readed));
-					/* normalize integers for keeping endian */
+					if (f_endian_check() == d_big_endian)
+						d_swap(header->bytes);
 					readed += length;
 					label = d_string_pure(header->name);
 					if ((record = f_stream_new_raw(NULL, label,
@@ -133,6 +134,8 @@ void p_filesystem_store(struct o_filesystem *object,
 					memset(&header, 0, sizeof(struct s_filesystem_header));
 					strncpy(header.name, key->content, d_filesystem_name_size);
 					header.bytes = stream->m_size(stream);
+					if (f_endian_check() == d_big_endian)
+						d_swap(header.bytes);
 					destination->m_write(destination,
 										 sizeof(struct s_filesystem_header),
 										 &header);

@@ -105,8 +105,9 @@ char *p_dictionary_string(struct o_object *object, char *data, size_t size) {
 							pointer++;
 							if ((value =
 								 f_hash_get(local_object->table, key))) {
-								next = value->s_delegate.m_string(value, pointer,
-																  (size-written));
+								next =
+								value->s_delegate.m_string(value, pointer,
+														   (size-written));
 								written += (next-pointer);
 								pointer = next;
 								if (written < size) {
