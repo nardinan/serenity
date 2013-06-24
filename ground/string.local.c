@@ -15,7 +15,7 @@
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "string.h"
+#include "string.local.h"
 char *f_string_append(char **string, char *suffix, size_t *space) {
 	size_t size_string = d_strlen(*string), size_element = d_strlen(suffix),
 			total;

@@ -17,7 +17,7 @@
  */
 #ifndef serenity_hash_h
 #define serenity_hash_h
-#include "string.h"
+#include "string.local.h"
 #define d_hash_segments 8 /* must be a power of two */
 #define d_hash_shift 5
 #define d_hash_numerator 2

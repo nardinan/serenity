@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 			} else
 				wrong = s_true;
 			if (d_is_true(wrong)) {
-				d_printf(out_stream, d_SP("Compress multiple files:\n"));
+				d_printf(out_stream, d_SP("Collapse multiple files:\n"));
 				d_printf(out_stream, d_S(512, "\t%s C <destination.pack> "
 										 "<path#1> <label#1> <path#2> "
 										 "<label#2> ... \n",argv[0]));

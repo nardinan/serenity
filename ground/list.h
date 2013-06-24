@@ -17,7 +17,7 @@
  */
 #ifndef serenity_list_h
 #define serenity_list_h
-#include "string.h"
+#include "string.local.h"
 #define d_foreach(l,n,k)\
 	for((l)->current=(l)->head;(((n)=(k *)(l)->current));\
 		(l)->current=(l)->current->next)

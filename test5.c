@@ -15,7 +15,7 @@
 	 You should have received a copy of the GNU General Public License
 	 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "string.h"
+#include "string.local.h"
 char *f_formatter_length(char *buffer, size_t size, char *template,
 						 va_list parameters) {
 	char *value = NULL;

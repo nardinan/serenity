@@ -19,9 +19,7 @@
 #include "logs.h"
 d_exception_define(generic, 1, "generic exception");
 d_exception_define(arithmetic, 2, "arithmetic exception");
-d_exception_define(unsupported, 3, "unsupported operation exception");
-d_exception_define(range, 4, "index out of range exception");
-d_exception_define(null, 5, "null pointer exception");
+d_exception_define(range, 3, "index out of range exception");
 void check (int l, int r) {
 	if (r < l)
 		d_throw(v_exception_range, "wrong range specified");

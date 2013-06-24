@@ -171,7 +171,8 @@ t_hash_value p_idea_hash(struct o_object *object) {
 			/* djb2 hash function */
 			for (index = 0; index < d_idea_expanded_key_size; index++)
 				object->hash = ((object->hash<<5)+object->hash)+
-				local_object->expanded_key[index];
+				local_object->expanded_key[0][index]+
+				local_object->expanded_key[1][index];
 			object->s_flags.hashed = d_true;
 		}
 		result = object->hash;
@@ -261,8 +262,8 @@ struct o_string *p_idea_execute(struct o_string *string, int local,
 	result = p_aes_padding(string, local, 8);
 	for (index = 0; index < result->size; index+=8) {
 		for (copy = 0; copy < 4; copy++) {
-			space[copy][0] = (unsigned char *)result->content[index+(copy*2)];
-			space[copy][1] = (unsigned char *)result->content[index+(copy*2)+1];
+			space[copy][0] = result->content[index+(copy*2)];
+			space[copy][1] = result->content[index+(copy*2)+1];
 		}
 		for (executions = 0, key = 0; executions < 8; executions++, key += 12) {
 			p_idea_multiplication(space[0], &(expanded_key[key]), space[0]);

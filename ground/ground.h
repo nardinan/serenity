@@ -21,7 +21,7 @@
 #include "log.h"
 #include "logs.h"
 #include "memory.h"
-#include "string.h"
+#include "string.local.h"
 #include "hash.h"
 #include "list.h"
 #include "exception.h"

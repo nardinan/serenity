@@ -17,7 +17,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include "string.h"
+#include "string.local.h"
 int main (int argc, char *argv[]) {
     char *test = NULL;
 	size_t size = 0;
