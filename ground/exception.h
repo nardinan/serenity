@@ -1,19 +1,19 @@
 /*
-     Serenity - a basic library.
-     Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
-     
-     This program is free software: you can redistribute it and/or modify
-     it under the terms of the GNU General Public License as published by
-     the Free Software Foundation, either version 3 of the License, or
-     (at your option) any later version.
-     
-     This program is distributed in the hope that it will be useful,
-     but WITHOUT ANY WARRANTY; without even the implied warranty of
-     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-     GNU General Public License for more details.
-     
-     You should have received a copy of the GNU General Public License
-     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * serenity
+ * Copyright (C) 2013 Andrea Nardinocchi (andrea@nardinan.it)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef serenity_exception_h
 #define serenity_exception_h
@@ -61,15 +61,15 @@
 					o->kind,o->description);\
 		fprintf(s,"\t%s:%s() @ %d\n",d_clean_file(__FILE__),__FUNCTION__,\
 				__LINE__);\
-	}while(0)			
+}while(0)
 #define d_exception_declare(k) extern const struct s_exception v_exception_##k
 #define d_exception_define(k,i,m)\
-	const struct s_exception v_exception_##k = {m,"undefined","undefine",\
-												"undefined",0,0,i}
+const struct s_exception v_exception_##k = {m,"undefined","undefine",\
+"undefined",0,0,i}
 typedef struct s_exception {
-    char kind[d_exception_kind_size], file[d_exception_file_size],
-			function[d_exception_function_size],
-			description[d_exception_description_size];
+	char kind[d_exception_kind_size], file[d_exception_file_size],
+	function[d_exception_function_size],
+	description[d_exception_description_size];
 	unsigned int line, level;
 	int identificator;
 } s_exception;
