@@ -52,30 +52,29 @@
 #define d_raise\
 	do{\
 		if(v_exception_hook)\
-			longjmp(*v_exception_hook,v_exception_raised.identificator);\
+		longjmp(*v_exception_hook,v_exception_raised.identificator);\
 	}while(0)
 #define d_exception_dump(s,o)\
 	do{\
 		if((o->level++)==0)\
-			fprintf(s,"%s:%s() @ %d {%s} %s\n",o->file,o->function,o->line,\
-					o->kind,o->description);\
+		fprintf(s,"%s:%s() @ %d {%s} %s\n",o->file,o->function,o->line,\
+				o->kind,o->description);\
 		fprintf(s,"\t%s:%s() @ %d\n",d_clean_file(__FILE__),__FUNCTION__,\
 				__LINE__);\
-}while(0)
+	}while(0)
 #define d_exception_declare(k) extern const struct s_exception v_exception_##k
 #define d_exception_define(k,i,m)\
-const struct s_exception v_exception_##k = {m,"undefined","undefine",\
-"undefined",0,0,i}
+	const struct s_exception v_exception_##k = {m,"undefined","undefine","undefined",0,0,i}
 typedef struct s_exception {
 	char kind[d_exception_kind_size], file[d_exception_file_size],
-	function[d_exception_function_size],
-	description[d_exception_description_size];
+	     function[d_exception_function_size],
+	     description[d_exception_description_size];
 	unsigned int line, level;
 	int identificator;
 } s_exception;
 extern jmp_buf *v_exception_hook;
 extern struct s_exception v_exception_raised;
 extern void p_exception_fill(struct s_exception exception, const char *message,
-							 const char *file, const char *function,
-							 unsigned int line);
+		const char *file, const char *function,
+		unsigned int line);
 #endif

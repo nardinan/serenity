@@ -15,16 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef serenity_types_h
-#define serenity_types_h
-#define d_true 1
-#define d_false 0
-typedef struct s_bool {
-	unsigned int flag:1;
-} s_bool;
-extern const struct s_bool s_true, s_false;
-#define d_is_equal(b,o) ((b).flag==(o).flag)
-#define d_is_true(b) ((b).flag)
-#define d_min(a,b) (((a)>(b))?(b):(a))
-#define d_max(a,b) (((a)<(b))?(b):(a))
-#endif
+#include "o_exceptions.h"
+d_exception_define(unsupported, 1, "unsupported operation exception");
+d_exception_define(constant, 2, "constant value exception");
+d_exception_define(malformed, 3, "malformed input exception");
+d_exception_define(unreachable, 4, "unreachable data exception");
+d_exception_define(closed, 5, "closed stream exception");
+d_exception_define(null, 6, "null pointer exception");
+d_exception_define(bound, 7, "out of bound exception");
+d_exception_define(kind, 8, "wrong object kind exception");
+d_exception_define(compare, 9, "different objects kind exception");
+d_exception_define(stream, 10, "damaged stream exception");

@@ -1,11 +1,12 @@
 OBJSGRNDLIB = endian.o exception.o hash.o list.o log.o memory.o string.local.o types.o
 CC = gcc
-CFLAGS = -Wall -ansi -c -pedantic
+CFLAGS = -Wall -Wno-variadic-macros -std=c99 -c -pedantic
 LFLAGS = -Wall
-EXEC = serenity_ground.so
+EXEC = libserenity_ground.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
 	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) -shared
+	cp $(EXEC) ../tests/
 
 endian.o: endian.c endian.h types.h
 	$(CC) $(CFLAGS) endian.c

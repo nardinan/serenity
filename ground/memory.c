@@ -18,7 +18,7 @@
 #include "memory.h"
 struct s_pointer *v_memory_root = NULL;
 void *p_memory_insert(void *pointer, const char *file,
-					  const char *function, unsigned int line, int inside) {
+		const char *function, unsigned int line, int inside) {
 	struct s_pointer *node;
 	int founded = d_false;
 	if (inside) {
@@ -31,8 +31,7 @@ void *p_memory_insert(void *pointer, const char *file,
 			node = node->next;
 		}
 	}
-	if ((!founded) &&
-			(node = (struct s_pointer *) malloc(sizeof(struct s_pointer)))) {
+	if ((!founded) && (node = (struct s_pointer *) malloc(sizeof(struct s_pointer)))) {
 		memset(node, 0, sizeof(struct s_pointer));
 		node->pointer = pointer;
 		strncpy(node->file, d_clean_file(file), d_memory_coordinate_size);
@@ -48,7 +47,7 @@ void *p_memory_insert(void *pointer, const char *file,
 }
 
 void p_memory_remove(void *pointer, const char *file,
-					const char *function, unsigned int line) {
+		const char *function, unsigned int line, int suppress) {
 	int result = d_false;
 	struct s_pointer *node = v_memory_root;
 	while (node) {
@@ -65,16 +64,16 @@ void p_memory_remove(void *pointer, const char *file,
 		}
 		node = node->next;
 	}
-	if (result == d_false)
+	if ((result == d_false) && (suppress == d_false))
 		d_log(e_log_level_ever, "double free on %s:%s() (%d)",
-			  file, function, line);
+				file, function, line);
 }
 
 void f_memory_flush(enum e_log_level level) {
 	struct s_pointer *node;
 	while ((node = v_memory_root)) {
 		d_log(level, "pointer %p allocated on %s::%s() (%d) is still there",
-			  node->pointer, node->file, node->function, node->line);
+				node->pointer, node->file, node->function, node->line);
 		d_free(node->pointer);
 	}
 }

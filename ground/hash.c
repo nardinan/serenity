@@ -19,7 +19,7 @@
 void p_hash_allocate(struct s_hash_table *table, t_hash_value dimension) {
 	t_hash_value index;
 	if ((table->table = (s_hash_bucket *)
-		 d_malloc(dimension*sizeof(struct s_hash_bucket)))) {
+				d_malloc(dimension*sizeof(struct s_hash_bucket)))) {
 		for (index = 0; index < dimension; index++) {
 			table->table[index].kind = e_hash_kind_empty;
 			table->table[index].value = NULL;
@@ -43,7 +43,7 @@ void p_hash_resize(struct s_hash_table *table, t_hash_value dimension) {
 }
 
 struct s_hash_bucket *p_hash_lookup(struct s_hash_table *table, void *key,
-									t_hash_value hash) {
+		t_hash_value hash) {
 	t_hash_value index = hash&table->mask, shift = hash;
 	struct s_hash_bucket *item, *backup = NULL;
 	while (d_true) {
@@ -57,7 +57,7 @@ struct s_hash_bucket *p_hash_lookup(struct s_hash_table *table, void *key,
 				item = backup;
 			break;
 		} else if ((item->hash == hash) &&
-				   (table->compare(item->key, key) == 0))
+				(table->compare(item->key, key) == 0))
 			break;
 		index = ((index<<2)+index+shift)+1;
 		shift >>= d_hash_shift;
@@ -66,13 +66,13 @@ struct s_hash_bucket *p_hash_lookup(struct s_hash_table *table, void *key,
 }
 
 void f_hash_init(struct s_hash_table **table, t_hash_compare *compare,
-				 t_hash_calculate *calculate) {
-    if ((*table = (struct s_hash_table *)
-		 d_malloc(sizeof(struct s_hash_table)))) {
-        (*table)->compare = compare;
-        (*table)->calculate = calculate;
-        p_hash_allocate((*table), d_hash_segments);
-    } else
+		t_hash_calculate *calculate) {
+	if ((*table = (struct s_hash_table *)
+				d_malloc(sizeof(struct s_hash_table)))) {
+		(*table)->compare = compare;
+		(*table)->calculate = calculate;
+		p_hash_allocate((*table), d_hash_segments);
+	} else
 		d_die(d_error_malloc);
 }
 
@@ -83,8 +83,8 @@ void f_hash_destroy(struct s_hash_table **table) {
 }
 
 int f_hash_insert(struct s_hash_table *table, void *key, void *value,
-				  struct s_bool update, struct s_hash_bucket *current) {
-    t_hash_value hash = table->calculate(key);
+		struct s_bool update, struct s_hash_bucket *current) {
+	t_hash_value hash = table->calculate(key);
 	struct s_hash_bucket *item = p_hash_lookup(table, key, hash);
 	int result = d_false;
 	if (!item->value) {
@@ -112,7 +112,7 @@ void *f_hash_get(struct s_hash_table *table, void *key) {
 }
 
 int f_hash_delete(struct s_hash_table *table, void *key,
-				  struct s_hash_bucket *current) {
+		struct s_hash_bucket *current) {
 	t_hash_value hash = table->calculate(key);
 	s_hash_bucket *item = p_hash_lookup(table, key, hash);
 	int result = d_false;
