@@ -29,25 +29,18 @@ typedef struct s_filesystem_header {
 typedef struct o_filesystem {
 	d_object_head;
 	struct o_dictionary *files;
-	int (*m_insert)(struct o_filesystem *, struct o_string *,
-			struct o_stream *);
+	int (*m_insert)(struct o_filesystem *, struct o_string *, struct o_stream *);
 	struct o_stream *(*m_get)(struct o_filesystem *, struct o_string *);
 	void (*m_store)(struct o_filesystem *, struct o_stream *);
 } o_filesystem;
 extern void p_filesystem_hooking(struct o_filesystem *object);
 extern struct o_filesystem *f_filesystem_new(struct o_filesystem *supplied);
-extern struct o_filesystem *f_filesystem_new_stream(struct o_filesystem *supplied,
-		struct o_stream *stream);
+extern struct o_filesystem *f_filesystem_new_stream(struct o_filesystem *supplied, struct o_stream *stream);
 extern void p_filesystem_delete(struct o_object *object);
-extern int p_filesystem_compare(struct o_object *object,
-		struct o_object *other);
-extern char *p_filesystem_string(struct o_object *object,
-		char *data, size_t size);
+extern int p_filesystem_compare(struct o_object *object, struct o_object *other);
+extern char *p_filesystem_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_filesystem_clone(struct o_object *object);
-extern int p_filesystem_insert(struct o_filesystem *object,
-		struct o_string *name, struct o_stream *stream);
-extern struct o_stream *p_filesystem_get(struct o_filesystem *object,
-		struct o_string *name);
-extern void p_filesystem_store(struct o_filesystem *object,
-		struct o_stream *destination);
+extern int p_filesystem_insert(struct o_filesystem *object, struct o_string *name, struct o_stream *stream);
+extern struct o_stream *p_filesystem_get(struct o_filesystem *object, struct o_string *name);
+extern void p_filesystem_store(struct o_filesystem *object, struct o_stream *destination);
 #endif

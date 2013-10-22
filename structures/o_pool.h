@@ -27,11 +27,11 @@
 }
 #define d_pool_end_flush\
 	while(0);\
-__d_pool->m_clean(__d_pool,d_true);\
+	__d_pool->m_clean(__d_pool,d_true);\
 }
 #define d_pool_end_clean\
 	while(0);\
-__d_pool->m_clean(__d_pool,d_false);\
+	__d_pool->m_clean(__d_pool,d_false);\
 }
 #define d_P(a,k) (k*)__d_pool->m_insert(__d_pool,(struct o_object *)(a))
 extern const char v_pool_kind[];
@@ -46,7 +46,6 @@ extern struct o_pool *f_pool_new(struct o_pool *supplied);
 extern void p_pool_delete(struct o_object *object);
 extern char *p_pool_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_pool_clone(struct o_object *object);
-extern struct o_object *p_pool_insert(struct o_pool *object,
-		struct o_object *value);
+extern struct o_object *p_pool_insert(struct o_pool *object, struct o_object *value);
 extern void p_pool_clean(struct o_pool *object, int bypass);
 #endif

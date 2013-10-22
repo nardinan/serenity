@@ -328,23 +328,17 @@ void p_aes_hooking(struct o_aes *object) {
 	object->m_decrypt = p_aes_decrypt;
 }
 
-unsigned int *p_aes_key_core(unsigned char *key, unsigned int index,
-		unsigned int matrix) {
+unsigned int *p_aes_key_core(unsigned char *key, unsigned int index, unsigned int matrix) {
 	unsigned int *local_current, *local_previous;
 	local_current = (unsigned int *)&key[index];
 	local_previous = (unsigned int *)&key[index-4];
 	*local_current = *local_previous;
-	*local_current = (v_aes_sbox[((*local_current)>>8)&0xff]|
-			(v_aes_sbox[((*local_current)>>16)&0xff]<<8)|
-			(v_aes_sbox[((*local_current)>>24)&0xff]<<16)|
-			(v_aes_sbox[(*local_current)&0xff]<<24))^
-		v_aes_rcon[matrix];
+	*local_current = (v_aes_sbox[((*local_current)>>8)&0xff]|(v_aes_sbox[((*local_current)>>16)&0xff]<<8)|(v_aes_sbox[((*local_current)>>24)&0xff]<<16)|
+			(v_aes_sbox[(*local_current)&0xff]<<24))^v_aes_rcon[matrix];
 	return local_current;
 }
 
-unsigned int *p_aes_key_column(unsigned int *previous, unsigned char *key,
-		unsigned int index, unsigned int const_s,
-		unsigned int jump) {
+unsigned int *p_aes_key_column(unsigned int *previous, unsigned char *key, unsigned int index, unsigned int const_s, unsigned int jump) {
 	unsigned int *local_current, *local_previous_table;
 	local_current = (unsigned int *)&key[index+jump];
 	local_previous_table = (unsigned int *)&key[(index+jump)-(4*const_s)];
@@ -352,10 +346,7 @@ unsigned int *p_aes_key_column(unsigned int *previous, unsigned char *key,
 	return local_current;
 }
 
-unsigned int *p_aes_key_special_column(unsigned int *previous,
-		unsigned char *key, unsigned int index,
-		unsigned int const_s,
-		unsigned int jump) {
+unsigned int *p_aes_key_special_column(unsigned int *previous, unsigned char *key, unsigned int index, unsigned int const_s, unsigned int jump) {
 	unsigned int *local_current, *local_previous_table;
 	local_current = (unsigned int *)&key[index+jump];
 	local_previous_table = (unsigned int *)&key[(index+jump)-(4*const_s)];
@@ -367,14 +358,11 @@ unsigned int *p_aes_key_special_column(unsigned int *previous,
 	return local_current;
 }
 
-struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
-		unsigned char *key, size_t size) {
+struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block, unsigned char *key, size_t size) {
 	struct o_aes *result;
 	int const_n, const_b, const_s, jump, index, matrix;
 	unsigned int *local_current;
-	if ((result = (struct o_aes *)
-				f_object_new(v_aes_kind, sizeof(struct o_aes),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_aes *) f_object_new(v_aes_kind, sizeof(struct o_aes), (struct o_object *)supplied))) {
 		p_aes_hooking(result);
 		if (key) {
 			result->block = block;
@@ -395,47 +383,27 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 			memcpy(result->expanded_key, key, d_min(size, const_n));
 			for (index = const_n, matrix = 1; index < const_b;
 					index+=const_n, matrix++) {
-				local_current = p_aes_key_core(result->expanded_key, index,
-						matrix);
-				local_current = p_aes_key_column(local_current,
-						result->expanded_key,
-						index, const_s, 0);
-				local_current = p_aes_key_column(local_current,
-						result->expanded_key,
-						index, const_s, 4);
-				local_current = p_aes_key_column(local_current,
-						result->expanded_key,
-						index, const_s, 8);
-				local_current = p_aes_key_column(local_current,
-						result->expanded_key,
-						index, const_s, 12);
+				local_current = p_aes_key_core(result->expanded_key, index, matrix);
+				local_current = p_aes_key_column(local_current, result->expanded_key, index, const_s, 0);
+				local_current = p_aes_key_column(local_current, result->expanded_key, index, const_s, 4);
+				local_current = p_aes_key_column(local_current, result->expanded_key, index, const_s, 8);
+				local_current = p_aes_key_column(local_current, result->expanded_key, index, const_s, 12);
 				if (result->block >= e_aes_block_192) {
 					jump = 16;
 					if (result->block == e_aes_block_256) {
-						local_current =
-							p_aes_key_special_column(local_current,
-									result->expanded_key,
-									index, const_s, jump);
+						local_current = p_aes_key_special_column(local_current, result->expanded_key, index, const_s, jump);
 						jump += 4;
 					}
-					local_current = p_aes_key_column(local_current,
-							result->expanded_key,
-							index, const_s, jump);
+					local_current = p_aes_key_column(local_current, result->expanded_key, index, const_s, jump);
 					jump += 4;
-					local_current = p_aes_key_column(local_current,
-							result->expanded_key,
-							index, const_s, jump);
+					local_current = p_aes_key_column(local_current, result->expanded_key, index, const_s, jump);
 					jump += 4;
 					if (result->block == e_aes_block_256)
-						local_current =
-							p_aes_key_column(local_current,
-									result->expanded_key, index,
-									const_s, jump);
+						local_current = p_aes_key_column(local_current, result->expanded_key, index, const_s, jump);
 				}
 			}
 		} else
-			d_throw(v_exception_null,
-					"key is undefined or content is a zero-length element");
+			d_throw(v_exception_null, "key is undefined or content is a zero-length element");
 	}
 	return result;
 }
@@ -443,11 +411,8 @@ struct o_aes *f_aes_new(struct o_aes *supplied, enum e_aes_block block,
 int p_aes_compare(struct o_object *object, struct o_object *other) {
 	struct o_aes *local_object, *local_other;
 	int result = p_object_compare(object, other);
-	if ((local_object = d_object_kind(object, aes)) &&
-			(local_other = d_object_kind(other, aes)))
-		if ((result = memcmp(local_object->expanded_key,
-						local_other->expanded_key,
-						d_aes_expanded_key_size)) == 0)
+	if ((local_object = d_object_kind(object, aes)) && (local_other = d_object_kind(other, aes)))
+		if ((result = memcmp(local_object->expanded_key, local_other->expanded_key, d_aes_expanded_key_size)) == 0)
 			result = (local_object->block - local_other->block);
 	return result;
 }
@@ -471,8 +436,7 @@ t_hash_value p_aes_hash(struct o_object *object) {
 			object->hash = 5381;
 			/* djb2 hash function */
 			for (index = 0; index < const_n; index++)
-				object->hash = ((object->hash<<5)+object->hash)+
-					local_object->expanded_key[index];
+				object->hash = ((object->hash<<5)+object->hash)+local_object->expanded_key[index];
 			object->s_flags.hashed = d_true;
 		}
 		result = object->hash;
@@ -503,13 +467,10 @@ char *p_aes_string(struct o_object *object, char *data, size_t size) {
 		written = ((written>size)?size:written);
 		local_size = size-written;
 		data += written;
-		for (index = 0; (index < const_n) && ((written+1) < size); index++,
-				written += local_written, data += local_written,
+		for (index = 0; (index < const_n) && ((written+1) < size); index++, written += local_written, data += local_written,
 				local_size -= local_written) {
-			local_written = snprintf(data, local_size, "%02x",
-					local_object->expanded_key[index]);
-			local_written = ((local_written>local_size)?local_size:
-					local_written);
+			local_written = snprintf(data, local_size, "%02x", local_object->expanded_key[index]);
+			local_written = ((local_written>local_size)?local_size:local_written);
 		}
 		if (written < size) {
 			*data = '>';
@@ -520,8 +481,7 @@ char *p_aes_string(struct o_object *object, char *data, size_t size) {
 	return data;
 }
 
-struct o_string *p_aes_padding(struct o_string *string, int local,
-		size_t const_n) {
+struct o_string *p_aes_padding(struct o_string *string, int local, size_t const_n) {
 	size_t padder, size = string->size;
 	struct o_string *result = string;
 	padder = (size%const_n);
@@ -529,8 +489,7 @@ struct o_string *p_aes_padding(struct o_string *string, int local,
 	if (local) {
 		if (padder != 0) {
 			if ((result->content = (char *) d_realloc(result->content, size))) {
-				memset((result->content+result->size), '\0',
-						(size-result->size));
+				memset((result->content+result->size), '\0', (size-result->size));
 				result->size = size;
 			} else
 				d_die(d_error_malloc);
@@ -546,14 +505,10 @@ unsigned int p_aes_mix_column(unsigned int box) {
 	keys[1] = (box>>8)&0xff;
 	keys[2] = (box>>16)&0xff;
 	keys[3] = (box>>24)&0xff;
-	galois[0] = (v_aes_mul_2[keys[0]])^(v_aes_mul_3[keys[1]])^
-		(keys[2])^(keys[3]);
-	galois[1] = (v_aes_mul_2[keys[1]])^(v_aes_mul_3[keys[2]])^
-		(keys[3])^(keys[0]);
-	galois[2] = (v_aes_mul_2[keys[2]])^(v_aes_mul_3[keys[3]])^
-		(keys[0])^(keys[1]);
-	galois[3] = (v_aes_mul_2[keys[3]])^(v_aes_mul_3[keys[0]])^
-		(keys[1])^(keys[2]);
+	galois[0] = (v_aes_mul_2[keys[0]])^(v_aes_mul_3[keys[1]])^(keys[2])^(keys[3]);
+	galois[1] = (v_aes_mul_2[keys[1]])^(v_aes_mul_3[keys[2]])^(keys[3])^(keys[0]);
+	galois[2] = (v_aes_mul_2[keys[2]])^(v_aes_mul_3[keys[3]])^(keys[0])^(keys[1]);
+	galois[3] = (v_aes_mul_2[keys[3]])^(v_aes_mul_3[keys[0]])^(keys[1])^(keys[2]);
 	return (galois[0]|(galois[1]<<8)|(galois[2]<<16)|(galois[3]<<24));
 }
 
@@ -563,19 +518,14 @@ unsigned int p_aes_mix_column_inverse(unsigned int box) {
 	keys[1] = (box>>8)&0xff;
 	keys[2] = (box>>16)&0xff;
 	keys[3] = (box>>24)&0xff;
-	galois[0] = (v_aes_mul_14[keys[0]])^ (v_aes_mul_11[keys[1]])^
-		(v_aes_mul_13[keys[2]])^(v_aes_mul_9[keys[3]]);
-	galois[1] = (v_aes_mul_14[keys[1]])^ (v_aes_mul_11[keys[2]])^
-		(v_aes_mul_13[keys[3]])^(v_aes_mul_9[keys[0]]);
-	galois[2] = (v_aes_mul_14[keys[2]])^ (v_aes_mul_11[keys[3]])^
-		(v_aes_mul_13[keys[0]])^(v_aes_mul_9[keys[1]]);
-	galois[3] = (v_aes_mul_14[keys[3]])^ (v_aes_mul_11[keys[0]])^
-		(v_aes_mul_13[keys[1]])^(v_aes_mul_9[keys[2]]);
+	galois[0] = (v_aes_mul_14[keys[0]])^ (v_aes_mul_11[keys[1]])^(v_aes_mul_13[keys[2]])^(v_aes_mul_9[keys[3]]);
+	galois[1] = (v_aes_mul_14[keys[1]])^ (v_aes_mul_11[keys[2]])^(v_aes_mul_13[keys[3]])^(v_aes_mul_9[keys[0]]);
+	galois[2] = (v_aes_mul_14[keys[2]])^ (v_aes_mul_11[keys[3]])^(v_aes_mul_13[keys[0]])^(v_aes_mul_9[keys[1]]);
+	galois[3] = (v_aes_mul_14[keys[3]])^ (v_aes_mul_11[keys[0]])^(v_aes_mul_13[keys[1]])^(v_aes_mul_9[keys[2]]);
 	return (galois[0]|(galois[1]<<8)|(galois[2]<<16)|(galois[3]<<24));
 }
 
-struct o_string *p_aes_crypt(struct o_aes *object,
-		struct o_string *string, int local) {
+struct o_string *p_aes_crypt(struct o_aes *object, struct o_string *string, int local) {
 	size_t index;
 	int const_n, const_a, executions;
 	struct o_string *result;
@@ -604,21 +554,13 @@ struct o_string *p_aes_crypt(struct o_aes *object,
 		*pointer[2] ^= *((unsigned int *)&object->expanded_key[8]);
 		*pointer[3] ^= *((unsigned int *)&object->expanded_key[12]);
 		for (executions = 0; executions < const_a; executions++) {
-			box[0] = v_aes_sbox[*pointer[0]&0xff]|
-				(v_aes_sbox[(*pointer[1]>>8)&0xff]<<8)|
-				(v_aes_sbox[(*pointer[2]>>16)&0xff]<<16)|
+			box[0] = v_aes_sbox[*pointer[0]&0xff]|(v_aes_sbox[(*pointer[1]>>8)&0xff]<<8)|(v_aes_sbox[(*pointer[2]>>16)&0xff]<<16)|
 				(v_aes_sbox[(*pointer[3]>>24)&0xff]<<24);
-			box[1] = v_aes_sbox[*pointer[1]&0xff]|
-				(v_aes_sbox[(*pointer[2]>>8)&0xff]<<8)|
-				(v_aes_sbox[(*pointer[3]>>16)&0xff]<<16)|
+			box[1] = v_aes_sbox[*pointer[1]&0xff]|(v_aes_sbox[(*pointer[2]>>8)&0xff]<<8)|(v_aes_sbox[(*pointer[3]>>16)&0xff]<<16)|
 				(v_aes_sbox[(*pointer[0]>>24)&0xff]<<24);
-			box[2] = v_aes_sbox[*pointer[2]&0xff]|
-				(v_aes_sbox[(*pointer[3]>>8)&0xff]<<8)|
-				(v_aes_sbox[(*pointer[0]>>16)&0xff]<<16)|
+			box[2] = v_aes_sbox[*pointer[2]&0xff]|(v_aes_sbox[(*pointer[3]>>8)&0xff]<<8)|(v_aes_sbox[(*pointer[0]>>16)&0xff]<<16)|
 				(v_aes_sbox[(*pointer[1]>>24)&0xff]<<24);
-			box[3] = v_aes_sbox[*pointer[3]&0xff]|
-				(v_aes_sbox[(*pointer[0]>>8)&0xff]<<8)|
-				(v_aes_sbox[(*pointer[1]>>16)&0xff]<<16)|
+			box[3] = v_aes_sbox[*pointer[3]&0xff]|(v_aes_sbox[(*pointer[0]>>8)&0xff]<<8)|(v_aes_sbox[(*pointer[1]>>16)&0xff]<<16)|
 				(v_aes_sbox[(*pointer[2]>>24)&0xff]<<24);
 			if ((executions < (const_a-1))) {
 				box[0] = p_aes_mix_column(box[0]);
@@ -626,21 +568,16 @@ struct o_string *p_aes_crypt(struct o_aes *object,
 				box[2] = p_aes_mix_column(box[2]);
 				box[3] = p_aes_mix_column(box[3]);
 			}
-			*pointer[0] = box[0]^
-				*((unsigned int*)&object->expanded_key[((executions+1)*16)]);
-			*pointer[1] = box[1]^
-				*((unsigned int*)&object->expanded_key[((executions+1)*16)+4]);
-			*pointer[2] = box[2]^
-				*((unsigned int*)&object->expanded_key[((executions+1)*16)+8]);
-			*pointer[3] = box[3]^
-				*((unsigned int*)&object->expanded_key[((executions+1)*16)+12]);
+			*pointer[0] = box[0]^*((unsigned int*)&object->expanded_key[((executions+1)*16)]);
+			*pointer[1] = box[1]^*((unsigned int*)&object->expanded_key[((executions+1)*16)+4]);
+			*pointer[2] = box[2]^*((unsigned int*)&object->expanded_key[((executions+1)*16)+8]);
+			*pointer[3] = box[3]^*((unsigned int*)&object->expanded_key[((executions+1)*16)+12]);
 		}
 	}
 	return result;
 }
 
-struct o_string *p_aes_decrypt(struct o_aes *object,
-		struct o_string *string, int local){
+struct o_string *p_aes_decrypt(struct o_aes *object, struct o_string *string, int local){
 	size_t index;
 	int const_n, const_a, executions;
 	struct o_string *result;
@@ -667,33 +604,20 @@ struct o_string *p_aes_decrypt(struct o_aes *object,
 		*pointer[0] ^= *((unsigned int *)&object->expanded_key[(const_a*16)]);
 		*pointer[1] ^= *((unsigned int *)&object->expanded_key[(const_a*16)+4]);
 		*pointer[2] ^= *((unsigned int *)&object->expanded_key[(const_a*16)+8]);
-		*pointer[3] ^=
-			*((unsigned int *)&object->expanded_key[(const_a*16)+12]);
+		*pointer[3] ^= *((unsigned int *)&object->expanded_key[(const_a*16)+12]);
 		for (executions = (const_a-1); executions >= 0; executions--) {
-			box[0] = v_aes_sbox_inv[*pointer[0]&0xff]|
-				(v_aes_sbox_inv[(*pointer[3]>>8)&0xff]<<8)|
-				(v_aes_sbox_inv[(*pointer[2]>>16)&0xff]<<16)|
+			box[0] = v_aes_sbox_inv[*pointer[0]&0xff]|(v_aes_sbox_inv[(*pointer[3]>>8)&0xff]<<8)|(v_aes_sbox_inv[(*pointer[2]>>16)&0xff]<<16)|
 				(v_aes_sbox_inv[(*pointer[1]>>24)&0xff]<<24);
-			box[1] = v_aes_sbox_inv[*pointer[1]&0xff]|
-				(v_aes_sbox_inv[(*pointer[0]>>8)&0xff]<<8)|
-				(v_aes_sbox_inv[(*pointer[3]>>16)&0xff]<<16)|
+			box[1] = v_aes_sbox_inv[*pointer[1]&0xff]|(v_aes_sbox_inv[(*pointer[0]>>8)&0xff]<<8)|(v_aes_sbox_inv[(*pointer[3]>>16)&0xff]<<16)|
 				(v_aes_sbox_inv[(*pointer[2]>>24)&0xff]<<24);
-			box[2] = v_aes_sbox_inv[*pointer[2]&0xff]|
-				(v_aes_sbox_inv[(*pointer[1]>>8)&0xff]<<8)|
-				(v_aes_sbox_inv[(*pointer[0]>>16)&0xff]<<16)|
+			box[2] = v_aes_sbox_inv[*pointer[2]&0xff]|(v_aes_sbox_inv[(*pointer[1]>>8)&0xff]<<8)|(v_aes_sbox_inv[(*pointer[0]>>16)&0xff]<<16)|
 				(v_aes_sbox_inv[(*pointer[3]>>24)&0xff]<<24);
-			box[3] = v_aes_sbox_inv[*pointer[3]&0xff]|
-				(v_aes_sbox_inv[(*pointer[2]>>8)&0xff]<<8)|
-				(v_aes_sbox_inv[(*pointer[1]>>16)&0xff]<<16)|
+			box[3] = v_aes_sbox_inv[*pointer[3]&0xff]|(v_aes_sbox_inv[(*pointer[2]>>8)&0xff]<<8)|(v_aes_sbox_inv[(*pointer[1]>>16)&0xff]<<16)|
 				(v_aes_sbox_inv[(*pointer[0]>>24)&0xff]<<24);
-			box[0] ^=
-				*((unsigned int*)&object->expanded_key[(executions*16)]);
-			box[1] ^=
-				*((unsigned int*)&object->expanded_key[(executions*16)+4]);
-			box[2] ^=
-				*((unsigned int*)&object->expanded_key[(executions*16)+8]);
-			box[3] ^=
-				*((unsigned int*)&object->expanded_key[(executions*16)+12]);
+			box[0] ^= *((unsigned int*)&object->expanded_key[(executions*16)]);
+			box[1] ^= *((unsigned int*)&object->expanded_key[(executions*16)+4]);
+			box[2] ^= *((unsigned int*)&object->expanded_key[(executions*16)+8]);
+			box[3] ^= *((unsigned int*)&object->expanded_key[(executions*16)+12]);
 			if (executions > 0) {
 				box[0] = p_aes_mix_column_inverse(box[0]);
 				box[1] = p_aes_mix_column_inverse(box[1]);
@@ -708,3 +632,4 @@ struct o_string *p_aes_decrypt(struct o_aes *object,
 	}
 	return result;
 }
+

@@ -40,8 +40,7 @@ void p_idea_key_shift_left(unsigned char *key, size_t length, int bits) {
 	if (shift_bits > 0) {
 		byte = (key[0]>>(8-shift_bits));
 		for (index = 0; index < (length-1); index++)
-			key[index] = ((key[index]<<shift_bits)|
-					(key[index+1]>>(8-shift_bits)));
+			key[index] = ((key[index]<<shift_bits)|(key[index+1]>>(8-shift_bits)));
 		key[index] = (key[index]<<shift_bits)|byte;
 	}
 }
@@ -62,8 +61,7 @@ void _p_idea_inverse_multiplication(int value, int module, int *result) {
 	}
 }
 
-void p_idea_inverse_multiplication(unsigned char *value,
-		unsigned char *result) {
+void p_idea_inverse_multiplication(unsigned char *value, unsigned char *result) {
 	int a = (int)d_idea_couple_bytes_to_uint(value), solution[3];
 	_p_idea_inverse_multiplication(a, 65537, solution);
 	solution[1] = (solution[1]+65537)%65537;
@@ -77,72 +75,46 @@ void p_idea_negative(unsigned char *value, unsigned char *result) {
 	result[0] = ((solution>>8)&0xff);
 }
 
-struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
-		size_t size) {
+struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key, size_t size) {
 	struct o_idea *result;
 	unsigned char *padded_key;
 	int index, jump, step;
-	if ((result = (struct o_idea *)
-				f_object_new(v_idea_kind, sizeof(struct o_idea),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_idea *) f_object_new(v_idea_kind, sizeof(struct o_idea), (struct o_object *)supplied))) {
 		p_idea_hooking(result);
 		if (key) {
-			if ((padded_key = (unsigned char *)
-						d_malloc(d_idea_expanded_key_bytes))) {
+			if ((padded_key = (unsigned char *) d_malloc(d_idea_expanded_key_bytes))) {
 				memset(padded_key, '\0', d_idea_expanded_key_bytes);
 				memcpy(padded_key, key, d_min(size, d_idea_expanded_key_bytes));
-				for (index = 0, jump = 0; index < 6; index++,
-						jump += d_idea_expanded_key_bytes) {
-					memcpy(&(result->expanded_key[e_idea_encrypt][jump]),
-							padded_key, d_idea_expanded_key_bytes);
-					p_idea_key_shift_left(padded_key,
-							d_idea_expanded_key_bytes, 25);
+				for (index = 0, jump = 0; index < 6; index++, jump += d_idea_expanded_key_bytes) {
+					memcpy(&(result->expanded_key[e_idea_encrypt][jump]), padded_key, d_idea_expanded_key_bytes);
+					p_idea_key_shift_left(padded_key, d_idea_expanded_key_bytes, 25);
 				}
-				memcpy(&(result->expanded_key[e_idea_encrypt][jump]),
-						padded_key, (d_idea_expanded_key_bytes/2));
+				memcpy(&(result->expanded_key[e_idea_encrypt][jump]), padded_key, (d_idea_expanded_key_bytes/2));
 				index = d_idea_expanded_key_size;
-				p_mul(&(result->expanded_key[e_idea_encrypt][6]),
-						&(result->expanded_key[e_idea_decrypt][index-2]));
-				p_neg(&(result->expanded_key[e_idea_encrypt][4]),
-						&(result->expanded_key[e_idea_decrypt][index-4]));
-				p_neg(&(result->expanded_key[e_idea_encrypt][2]),
-						&(result->expanded_key[e_idea_decrypt][index-6]));
-				p_mul(&(result->expanded_key[e_idea_encrypt][0]),
-						&(result->expanded_key[e_idea_decrypt][index-8]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][6]), &(result->expanded_key[e_idea_decrypt][index-2]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][4]), &(result->expanded_key[e_idea_decrypt][index-4]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][2]), &(result->expanded_key[e_idea_decrypt][index-6]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][0]), &(result->expanded_key[e_idea_decrypt][index-8]));
 				index -= 8;
-				for (step = 7, jump = 8; step > 0; step--, index -= 12,
-						jump += 12) {
-					p_cop(&(result->expanded_key[e_idea_decrypt][index-2]),
-							&(result->expanded_key[e_idea_encrypt][jump+2]));
-					p_cop(&(result->expanded_key[e_idea_decrypt][index-4]),
-							&(result->expanded_key[e_idea_encrypt][jump]));
-					p_mul(&(result->expanded_key[e_idea_encrypt][jump+10]),
-							&(result->expanded_key[e_idea_decrypt][index-6]));
-					p_neg(&(result->expanded_key[e_idea_encrypt][jump+6]),
-							&(result->expanded_key[e_idea_decrypt][index-8]));
-					p_neg(&(result->expanded_key[e_idea_encrypt][jump+8]),
-							&(result->expanded_key[e_idea_decrypt][index-10]));
-					p_mul(&(result->expanded_key[e_idea_encrypt][jump+4]),
-							&(result->expanded_key[e_idea_decrypt][index-12]));
+				for (step = 7, jump = 8; step > 0; step--, index -= 12, jump += 12) {
+					p_cop(&(result->expanded_key[e_idea_decrypt][index-2]), &(result->expanded_key[e_idea_encrypt][jump+2]));
+					p_cop(&(result->expanded_key[e_idea_decrypt][index-4]), &(result->expanded_key[e_idea_encrypt][jump]));
+					p_mul(&(result->expanded_key[e_idea_encrypt][jump+10]), &(result->expanded_key[e_idea_decrypt][index-6]));
+					p_neg(&(result->expanded_key[e_idea_encrypt][jump+6]), &(result->expanded_key[e_idea_decrypt][index-8]));
+					p_neg(&(result->expanded_key[e_idea_encrypt][jump+8]), &(result->expanded_key[e_idea_decrypt][index-10]));
+					p_mul(&(result->expanded_key[e_idea_encrypt][jump+4]), &(result->expanded_key[e_idea_decrypt][index-12]));
 				}
-				p_cop(&(result->expanded_key[e_idea_decrypt][index-2]),
-						&(result->expanded_key[e_idea_encrypt][jump+2]));
-				p_cop(&(result->expanded_key[e_idea_decrypt][index-4]),
-						&(result->expanded_key[e_idea_encrypt][jump]));
-				p_mul(&(result->expanded_key[e_idea_encrypt][jump+10]),
-						&(result->expanded_key[e_idea_decrypt][index-6]));
-				p_neg(&(result->expanded_key[e_idea_encrypt][jump+8]),
-						&(result->expanded_key[e_idea_decrypt][index-8]));
-				p_neg(&(result->expanded_key[e_idea_encrypt][jump+6]),
-						&(result->expanded_key[e_idea_decrypt][index-10]));
-				p_mul(&(result->expanded_key[e_idea_encrypt][jump+4]),
-						&(result->expanded_key[e_idea_decrypt][index-12]));
+				p_cop(&(result->expanded_key[e_idea_decrypt][index-2]), &(result->expanded_key[e_idea_encrypt][jump+2]));
+				p_cop(&(result->expanded_key[e_idea_decrypt][index-4]), &(result->expanded_key[e_idea_encrypt][jump]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][jump+10]), &(result->expanded_key[e_idea_decrypt][index-6]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][jump+8]), &(result->expanded_key[e_idea_decrypt][index-8]));
+				p_neg(&(result->expanded_key[e_idea_encrypt][jump+6]), &(result->expanded_key[e_idea_decrypt][index-10]));
+				p_mul(&(result->expanded_key[e_idea_encrypt][jump+4]), &(result->expanded_key[e_idea_decrypt][index-12]));
 				d_free(padded_key);
 			} else
 				d_die(d_error_malloc);
 		} else
-			d_throw(v_exception_null,
-					"key is undefined or content is a zero-length element");
+			d_throw(v_exception_null, "key is undefined or content is a zero-length element");
 	}
 	return result;
 }
@@ -150,14 +122,9 @@ struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
 int p_idea_compare(struct o_object *object, struct o_object *other) {
 	struct o_idea *local_object, *local_other;
 	int result = p_object_compare(object, other);
-	if ((local_object = d_object_kind(object, idea)) &&
-			(local_other = d_object_kind(other, idea)))
-		if ((result = memcmp(local_object->expanded_key[0],
-						local_other->expanded_key[0],
-						d_idea_expanded_key_size)) == 0)
-			result = memcmp(local_object->expanded_key[1],
-					local_other->expanded_key[1],
-					d_idea_expanded_key_size);
+	if ((local_object = d_object_kind(object, idea)) && (local_other = d_object_kind(other, idea)))
+		if ((result = memcmp(local_object->expanded_key[0],local_other->expanded_key[0], d_idea_expanded_key_size)) == 0)
+			result = memcmp(local_object->expanded_key[1], local_other->expanded_key[1], d_idea_expanded_key_size);
 	return result;
 }
 
@@ -170,9 +137,7 @@ t_hash_value p_idea_hash(struct o_object *object) {
 			object->hash = 5381;
 			/* djb2 hash function */
 			for (index = 0; index < d_idea_expanded_key_size; index++)
-				object->hash = ((object->hash<<5)+object->hash)+
-					local_object->expanded_key[0][index]+
-					local_object->expanded_key[1][index];
+				object->hash = ((object->hash<<5)+object->hash)+local_object->expanded_key[0][index]+local_object->expanded_key[1][index];
 			object->s_flags.hashed = d_true;
 		}
 		result = object->hash;
@@ -190,27 +155,19 @@ char *p_idea_string(struct o_object *object, char *data, size_t size) {
 		written = ((written>size)?size:written);
 		local_size = size-written;
 		data += written;
-		for (index = 0; (index < d_idea_expanded_key_size) &&
-				((written+1) < size); index++, written += local_written,
-				data += local_written, local_size -= local_written) {
-			local_written =
-				snprintf(data, local_size, "%02x",
-						local_object->expanded_key[e_idea_encrypt][index]);
-			local_written = ((local_written>local_size)?local_size:
-					local_written);
+		for (index = 0; (index < d_idea_expanded_key_size) && ((written+1) < size); index++, written += local_written, data += local_written,
+				local_size -= local_written) {
+			local_written = snprintf(data, local_size, "%02x", local_object->expanded_key[e_idea_encrypt][index]);
+			local_written = ((local_written>local_size)?local_size:local_written);
 		}
 		if (written < size) {
 			*data = ',';
 			data++;
 		}
-		for (index = 0; (index < d_idea_expanded_key_size) &&
-				((written+1) < size); index++, written += local_written,
-				data += local_written, local_size -= local_written) {
-			local_written =
-				snprintf(data, local_size, "%02x",
-						local_object->expanded_key[e_idea_decrypt][index]);
-			local_written = ((local_written>local_size)?local_size:
-					local_written);
+		for (index = 0; (index < d_idea_expanded_key_size) && ((written+1) < size); index++, written += local_written, data += local_written,
+				local_size -= local_written) {
+			local_written = snprintf(data, local_size, "%02x", local_object->expanded_key[e_idea_decrypt][index]);
+			local_written = ((local_written>local_size)?local_size:local_written);
 		}
 		if (written < size) {
 			*data = '>';
@@ -221,8 +178,7 @@ char *p_idea_string(struct o_object *object, char *data, size_t size) {
 	return data;
 }
 
-void p_idea_multiplication(unsigned char *left, unsigned char *right,
-		unsigned char *result) {
+void p_idea_multiplication(unsigned char *left, unsigned char *right, unsigned char *result) {
 	int solution, a, b;
 	a = d_idea_couple_bytes_to_uint(left);
 	b = d_idea_couple_bytes_to_uint(right);
@@ -245,16 +201,13 @@ void p_idea_multiplication(unsigned char *left, unsigned char *right,
 	result[0] = ((solution>>8)&0xff);
 }
 
-void p_idea_sum(unsigned char *left, unsigned char *right,
-		unsigned char *result) {
-	unsigned int solution = (d_idea_couple_bytes_to_uint(left)+
-			d_idea_couple_bytes_to_uint(right));
+void p_idea_sum(unsigned char *left, unsigned char *right, unsigned char *result) {
+	unsigned int solution = (d_idea_couple_bytes_to_uint(left)+d_idea_couple_bytes_to_uint(right));
 	result[1] = (solution&0xff);
 	result[0] = ((solution>>8)&0xff);
 }
 
-struct o_string *p_idea_execute(struct o_string *string, int local,
-		unsigned char *expanded_key) {
+struct o_string *p_idea_execute(struct o_string *string, int local, unsigned char *expanded_key) {
 	size_t index;
 	int copy, executions, key;
 	struct o_string *result;
@@ -283,24 +236,19 @@ struct o_string *p_idea_execute(struct o_string *string, int local,
 			d_idea_couple_bytes_xor(space[1], support[0]);
 			d_idea_couple_bytes_xor(space[2], support[1]);
 		}
-		p_idea_multiplication(space[0], &(expanded_key[key]),
-				(unsigned char *)&(result->content[index]));
-		p_idea_sum(space[2], &(expanded_key[key+2]),
-				(unsigned char *)&(result->content[index+2]));
-		p_idea_sum(space[1], &(expanded_key[key+4]),
-				(unsigned char *)&(result->content[index+4]));
-		p_idea_multiplication(space[3], &(expanded_key[key+6]),
-				(unsigned char *)&(result->content[index+6]));
+		p_idea_multiplication(space[0], &(expanded_key[key]), (unsigned char *)&(result->content[index]));
+		p_idea_sum(space[2], &(expanded_key[key+2]), (unsigned char *)&(result->content[index+2]));
+		p_idea_sum(space[1], &(expanded_key[key+4]), (unsigned char *)&(result->content[index+4]));
+		p_idea_multiplication(space[3], &(expanded_key[key+6]), (unsigned char *)&(result->content[index+6]));
 	}
 	return result;
 }
 
-struct o_string *p_idea_crypt(struct o_idea *object, struct o_string *string,
-		int local) {
+struct o_string *p_idea_crypt(struct o_idea *object, struct o_string *string, int local) {
 	return p_idea_execute(string, local, object->expanded_key[e_idea_encrypt]);
 }
 
-struct o_string *p_idea_decrypt(struct o_idea *object, struct o_string *string,
-		int local) {
+struct o_string *p_idea_decrypt(struct o_idea *object, struct o_string *string, int local) {
 	return p_idea_execute(string, local, object->expanded_key[e_idea_decrypt]);
 }
+

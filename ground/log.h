@@ -25,14 +25,11 @@
 #define d_log_description_size 32
 #define d_log_level_default e_log_level_medium
 #define d_clean_file(s) ((strrchr((s),'/')?0:(s)-1)+1)
-#define d_log(l,f,c...)\
-	p_log_write(stdout,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
-#define d_err(l,f,c...)\
-	p_log_write(stderr,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
+#define d_log(l,f,c...) p_log_write(stdout,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
+#define d_err(l,f,c...) p_log_write(stderr,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
 #define d_die(f...)\
 	do{\
-		p_log_write(stderr,e_log_level_ever,d_clean_file(__FILE__),\
-				__FUNCTION__,__LINE__,##f);\
+		p_log_write(stderr,e_log_level_ever,d_clean_file(__FILE__),__FUNCTION__,__LINE__,##f);\
 		exit(1);\
 	}while(0);
 enum e_log_level {
@@ -43,7 +40,5 @@ enum e_log_level {
 };
 extern enum e_log_level v_log_level;
 extern const char v_log_level_description[][d_log_description_size];
-extern void p_log_write(FILE *stream, enum e_log_level level, const char *file,
-		const char *function, unsigned int line,
-		const char *format, ...);
+extern void p_log_write(FILE *stream, enum e_log_level level, const char *file, const char *function, unsigned int line, const char *format, ...);
 #endif

@@ -17,8 +17,7 @@
  */
 #include "string.local.h"
 char *f_string_append(char **string, char *suffix, size_t *space) {
-	size_t size_string = d_strlen(*string), size_element = d_strlen(suffix),
-	       total;
+	size_t size_string = d_strlen(*string), size_element = d_strlen(suffix), total;
 	if ((total = size_string+size_element+1) >= *space) {
 		if ((*string = (char *) d_realloc(*string, total)))
 			*space = total;
@@ -32,8 +31,7 @@ char *f_string_append(char **string, char *suffix, size_t *space) {
 char *f_string_trim(char *string) {
 	size_t length = d_strlen(string);
 	char *begin = string, *final = (string+length)-1;
-	while ((d_space_character(*begin) || (d_space_character(*final)) ||
-				(d_final_character(*final))) && (final >= begin)) {
+	while ((d_space_character(*begin) || (d_space_character(*final)) || (d_final_character(*final))) && (final >= begin)) {
 		if (d_space_character(*begin))
 			begin++;
 		if ((d_space_character(*final)) || (d_final_character(*final))) {
@@ -46,8 +44,7 @@ char *f_string_trim(char *string) {
 	return string;
 }
 
-char *f_string_format(char *buffer, size_t size, char *symbols,
-		t_string_formatter functions[], char *format, ...) {
+char *f_string_format(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, ...) {
 	va_list parameters;
 	va_start(parameters, format);
 	f_string_format_args(buffer, size, symbols, functions, format, parameters);
@@ -55,9 +52,7 @@ char *f_string_format(char *buffer, size_t size, char *symbols,
 	return buffer;
 }
 
-char *f_string_format_args(char *buffer, size_t size, char *symbols,
-		t_string_formatter functions[], char *format,
-		va_list parameters) {
+char *f_string_format_args(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, va_list parameters) {
 	char *target = buffer, *pointer = format, *next, *last, *tail,
 	argument[d_string_arguent_size];
 	size_t dimension, remaining = size, lower, written;
@@ -72,15 +67,13 @@ char *f_string_format_args(char *buffer, size_t size, char *symbols,
 			if ((last = p_string_format_skip(pointer, symbols))) {
 				memset(argument, '\0', d_string_arguent_size);
 				memcpy(argument, next, (last-next));
-				if ((tail = strchr(symbols, *(last-1))) == NULL) {
-					written = vsnprintf(target, remaining, argument,
-							parameters);
+				if (!(tail = strchr(symbols, *(last-1)))) {
+					written = vsnprintf(target, remaining,argument, parameters);
 					written = ((written>remaining)?remaining:written);
 					remaining -= written;
 					target += written;
 				} else {
-					next = functions[(tail-symbols)](target, remaining,
-							argument, parameters);
+					next = functions[(tail-symbols)](target,remaining, argument,parameters);
 					remaining -= (next-target);
 					target = next;
 				}
@@ -115,11 +108,11 @@ char *p_string_format_skip(char *buffer, char *symbols) {
 	if (!error) {
 		while (strchr("hljztLq", *buffer))
 			buffer++;
-		if ((strchr("diouXxfFeEgGaAcsb%", *buffer)) ||
-				(strchr(symbols, *buffer)))
+		if ((strchr("diouXxfFeEgGaAcsb%", *buffer)) || (strchr(symbols, *buffer)))
 			buffer++;
 		else
 			error = d_true;
 	}
 	return (error)?NULL:buffer;
 }
+

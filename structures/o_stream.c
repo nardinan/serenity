@@ -32,12 +32,9 @@ void p_stream_hooking(struct o_stream *object) {
 	object->m_blocking = p_stream_blocking;
 }
 
-extern struct o_stream *f_stream_new(struct o_stream *supplied,
-		struct o_string *name, int descriptor) {
+extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string *name, int descriptor) {
 	struct o_stream *result;
-	if ((result = (struct o_stream *)
-				f_object_new(v_stream_kind, sizeof(struct o_stream),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_stream *) f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {
 		result->descriptor = descriptor;
 		result->s_flags.supplied = d_true;
 		result->s_flags.opened = d_true;
@@ -48,13 +45,9 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied,
 	return result;
 }
 
-extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
-		struct o_string *name,
-		const char *action, int permissions) {
+extern struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_string *name, const char *action, int permissions) {
 	struct o_stream *result;
-	if ((result = (struct o_stream *)
-				f_object_new(v_stream_kind, sizeof(struct o_stream),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_stream *) f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {
 		p_stream_hooking(result);
 		result->name = d_retain(name, struct o_string);
 		result->flags = -1;
@@ -67,14 +60,13 @@ extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 			case 'w':
 				result->flags = d_truncate_flags;
 				if (action[1] == 'a')
-					result->flags = d_append_flags;					
+					result->flags = d_append_flags;
 				break;
 		}
 		if (result->flags != -1) {
-			if ((result->descriptor = open(result->name->content,
-							result->flags, permissions)) > -1) {
+			if ((result->descriptor = open(result->name->content, result->flags, permissions)) > -1)
 				result->s_flags.opened = d_true;
-			} else
+			else
 				d_throw(v_exception_unreachable, "unable to open the file");
 		} else
 			d_throw(v_exception_malformed, "malformed action format");
@@ -82,14 +74,10 @@ extern struct o_stream *f_stream_new_file(struct o_stream *supplied,
 	return result;
 }
 
-struct o_stream *f_stream_new_raw(struct o_stream *supplied,
-		struct o_string *name,
-		const char *raw, size_t bytes) {
+struct o_stream *f_stream_new_raw(struct o_stream *supplied, struct o_string *name, const char *raw, size_t bytes) {
 	struct o_stream *result;
 	FILE *output;
-	if ((result = (struct o_stream *)
-				f_object_new(v_stream_kind, sizeof(struct o_stream),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_stream *) f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {
 		p_stream_hooking(result);
 		result->name = d_retain(name, struct o_string);
 		result->flags = d_write_read_flags;
@@ -100,8 +88,7 @@ struct o_stream *f_stream_new_raw(struct o_stream *supplied,
 			write(result->descriptor, raw, bytes);
 			p_stream_seek(result, 0, e_stream_seek_begin);
 		} else
-			d_throw(v_exception_unreachable,
-					"unable to open the temporary file");
+			d_throw(v_exception_unreachable, "unable to open the temporary file");
 	}
 	return result;
 }
@@ -121,9 +108,7 @@ char *p_stream_string(struct o_object *object, char *data, size_t size) {
 	char *pointer = data;
 	ssize_t written;
 	if ((local_object = d_object_kind(object, stream))) {
-		written = snprintf(pointer, size, "<file \"%s\" (%s) flags: ",
-				local_object->name->content,
-				(local_object->s_flags.opened)?"open":"close");
+		written = snprintf(pointer, size, "<file \"%s\" (%s) flags: ", local_object->name->content, (local_object->s_flags.opened)?"open":"close");
 		written = ((written>size)?size:written);
 		pointer += written;
 		if (written < size) {
@@ -187,24 +172,20 @@ struct o_object *p_stream_clone(struct o_object *object) {
 ssize_t p_stream_write(struct o_stream *object, size_t size, void *source) {
 	ssize_t written = 0;
 	if (object->s_flags.opened) {
-		if (((object->flags&O_RDWR) == O_RDWR) ||
-				((object->flags&O_WRONLY) == O_WRONLY))
+		if (((object->flags&O_RDWR) == O_RDWR) || ((object->flags&O_WRONLY) == O_WRONLY))
 			written = write(object->descriptor, source, size);
 		else
-			d_throw(v_exception_unsupported,
-					"can't write in a read-only stream");
+			d_throw(v_exception_unsupported, "can't write in a read-only stream");
 	} else
 		d_throw(v_exception_closed, "can't write in a closed stream");
 	return written;
 }
 
-ssize_t p_stream_write_string(struct o_stream *object,
-		struct o_string *string) {
+ssize_t p_stream_write_string(struct o_stream *object, struct o_string *string) {
 	return p_stream_write(object, string->m_length(string), string->content);
 }
 
-ssize_t p_stream_write_stream(struct o_stream *object,
-		struct o_stream *source) {
+ssize_t p_stream_write_stream(struct o_stream *object, struct o_stream *source) {
 	struct o_string *output = NULL;
 	ssize_t readed, total;
 	total = source->m_size(source);
@@ -214,13 +195,10 @@ ssize_t p_stream_write_stream(struct o_stream *object,
 			d_release(output);
 		} else {
 			d_release(output);
-			d_throw(v_exception_stream,
-					"size of file and readed bytes from source stream "
-					"are different");
+			d_throw(v_exception_stream, "size of file and readed bytes from source stream are different");
 		}
 	} else
-		d_throw(v_exception_stream,
-				"can't read from the source stream");
+		d_throw(v_exception_stream, "can't read from the source stream");
 	return total;
 }
 
@@ -228,8 +206,7 @@ struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 	struct o_string *result = NULL;
 	ssize_t readed;
 	if (object->s_flags.opened) {
-		if (((object->flags&O_RDWR) == O_RDWR) ||
-				((object->flags&O_RDONLY) == O_RDONLY)) {
+		if (((object->flags&O_RDWR) == O_RDWR) || ((object->flags&O_RDONLY) == O_RDONLY)) {
 			if ((result = f_string_new(NULL, size, NULL))) {
 				readed = read(object->descriptor, result->content, size);
 				if (readed <= 0) {
@@ -238,8 +215,7 @@ struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 				}
 			}
 		} else
-			d_throw(v_exception_unsupported,
-					"can't read from a write-only stream");
+			d_throw(v_exception_unsupported, "can't read from a write-only stream");
 	} else
 		d_throw(v_exception_closed, "can't read from a closed stream");
 	return result;
@@ -248,20 +224,17 @@ struct o_string *p_stream_read(struct o_stream *object, size_t size) {
 ssize_t p_stream_size(struct o_stream *object) {
 	ssize_t result = 0;
 	if (object->s_flags.opened) {
-		if (((object->flags&O_RDWR) == O_RDWR) ||
-				((object->flags&O_RDONLY) == O_RDONLY)) {
+		if (((object->flags&O_RDWR) == O_RDWR) || ((object->flags&O_RDONLY) == O_RDONLY)) {
 			result = (ssize_t)object->m_seek(object, 0, e_stream_seek_end);
 			object->m_seek(object, 0, e_stream_seek_begin);
 		} else
-			d_throw(v_exception_unsupported,
-					"can't read from a write-only stream");
+			d_throw(v_exception_unsupported, "can't read from a write-only stream");
 	} else
 		d_throw(v_exception_closed, "can't read from a closed stream");
 	return result;
 }
 
-off_t p_stream_seek(struct o_stream *object, off_t offset,
-		enum e_stream_seek whence) {
+off_t p_stream_seek(struct o_stream *object, off_t offset, enum e_stream_seek whence) {
 	int local_whence = SEEK_SET;
 	off_t result = 0;
 	if (object->s_flags.opened) {
@@ -280,8 +253,7 @@ off_t p_stream_seek(struct o_stream *object, off_t offset,
 		}
 		result = lseek(object->descriptor, offset, local_whence);
 	} else
-		d_throw(v_exception_closed,
-				"can't reposition cursor of a closed stream");
+		d_throw(v_exception_closed, "can't reposition cursor of a closed stream");
 	return result;
 }
 
@@ -299,3 +271,4 @@ void p_stream_blocking(struct o_stream *object, int blocking) {
 	} else
 		d_throw(v_exception_closed, "can't change flags of a closed stream");
 }
+

@@ -37,19 +37,15 @@ extern t_hash_value p_dictionary_hash_hooker(void *key) {
 }
 
 extern int p_dictionary_compare_hooker(void *left, void *right) {
-	struct o_object *object_left = (struct o_object *)left,
-			*object_right = (struct o_object *)right;
+	struct o_object *object_left = (struct o_object *)left, *object_right = (struct o_object *)right;
 	return d_compare(object_left, object_right);
 }
 
 struct o_dictionary *f_dictionary_new(struct o_dictionary *supplied) {
 	struct o_dictionary *result;
-	if ((result = (struct o_dictionary *)
-				f_object_new(v_dictionary_kind, sizeof(struct o_dictionary),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_dictionary *) f_object_new(v_dictionary_kind, sizeof(struct o_dictionary), (struct o_object *)supplied))) {
 		p_dictionary_hooking(result);
-		f_hash_init(&(result->table), p_dictionary_compare_hooker,
-				p_dictionary_hash_hooker);
+		f_hash_init(&(result->table), p_dictionary_compare_hooker, p_dictionary_hash_hooker);
 	}
 	return result;
 }
@@ -95,8 +91,7 @@ char *p_dictionary_string(struct o_object *object, char *data, size_t size) {
 		if ((keys = local_object->m_keys(local_object))) {
 			for (index = 0; index < keys->size; index++) {
 				if ((key = keys->m_get(keys, index))) {
-					next = key->s_delegate.m_string(key, pointer,
-							(size-written));
+					next = key->s_delegate.m_string(key, pointer, (size-written));
 					written += (next-pointer);
 					pointer = next;
 					if (written < size) {
@@ -104,8 +99,7 @@ char *p_dictionary_string(struct o_object *object, char *data, size_t size) {
 						if ((++written) < size) {
 							pointer++;
 							if ((value = f_hash_get(local_object->table, key))) {
-								next = value->s_delegate.m_string(value, pointer,
-										(size-written));
+								next = value->s_delegate.m_string(value, pointer, (size-written));
 								written += (next-pointer);
 								pointer = next;
 								if (written < size) {
@@ -139,13 +133,11 @@ struct o_object *p_dictionary_clone(struct o_object *object) {
 	if ((local_object = d_object_kind(object, dictionary))) {
 		result = (struct o_dictionary *)p_object_clone(object);
 		result->table = NULL;
-		f_hash_init(&(result->table), p_dictionary_compare_hooker,
-				p_dictionary_hash_hooker);
+		f_hash_init(&(result->table), p_dictionary_compare_hooker, p_dictionary_hash_hooker);
 		if ((keys = local_object->m_keys(local_object))) {
 			for (index = 0; index < keys->size; index++) {
 				key = keys->m_get(keys, index);
-				result->m_insert(result, key,
-						f_hash_get(local_object->table, key));
+				result->m_insert(result, key, f_hash_get(local_object->table, key));
 			}
 			d_release(keys);
 		}
@@ -154,12 +146,9 @@ struct o_object *p_dictionary_clone(struct o_object *object) {
 	return (o_object *)result;
 }
 
-int p_dictionary_insert(struct o_dictionary *object, struct o_object *key,
-		struct o_object *value) {
+int p_dictionary_insert(struct o_dictionary *object, struct o_object *key, struct o_object *value) {
 	struct s_hash_bucket replaced = {0};
-	int result;
-	result = f_hash_insert(object->table, d_retain(key, void),
-			d_retain(value, void), s_true, &replaced);
+	int result = f_hash_insert(object->table, d_retain(key, void), d_retain(value, void), s_true, &replaced);
 	if (replaced.value) {
 		/* an old value has been replaced */
 		d_release(key);
@@ -168,8 +157,7 @@ int p_dictionary_insert(struct o_dictionary *object, struct o_object *key,
 	return result;
 }
 
-struct o_object *p_dictionary_get(struct o_dictionary *object,
-		struct o_object *key) {
+struct o_object *p_dictionary_get(struct o_dictionary *object, struct o_object *key) {
 	return (struct o_object *)f_hash_get(object->table, (void *)key);
 }
 
@@ -196,3 +184,4 @@ struct o_array *p_dictionary_values(struct o_dictionary *object) {
 	}
 	return result;
 }
+

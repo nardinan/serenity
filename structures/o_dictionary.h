@@ -24,8 +24,7 @@ typedef struct o_dictionary {
 	d_object_head;
 	struct s_hash_table *table;
 	/* append here your methods */
-	int (*m_insert)(struct o_dictionary *, struct o_object *,
-			struct o_object *);
+	int (*m_insert)(struct o_dictionary *, struct o_object *, struct o_object *);
 	struct o_object *(*m_get)(struct o_dictionary *, struct o_object *);
 	struct o_array *(*m_keys)(struct o_dictionary *);
 	struct o_array *(*m_values)(struct o_dictionary *);
@@ -35,13 +34,11 @@ extern t_hash_value p_dictionary_hash_hooker(void *key);
 extern int p_dictionary_compare_hooker(void *left, void *right);
 extern struct o_dictionary *f_dictionary_new(struct o_dictionary *supplied);
 extern void p_dictionary_delete(struct o_object *object);
-extern char *p_dictionary_string(struct o_object *object, char *data,
-		size_t size);
+extern char *p_dictionary_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_dictionary_clone(struct o_object *object);
-extern int p_dictionary_insert(struct o_dictionary *object,
-		struct o_object *key, struct o_object *value);
-extern struct o_object *p_dictionary_get(struct o_dictionary *object,
-		struct o_object *key);
+extern int p_dictionary_insert(struct o_dictionary *object, struct o_object *key, struct o_object *value);
+extern struct o_object *p_dictionary_get(struct o_dictionary *object, struct o_object *key);
 extern struct o_array *p_dictionary_keys(struct o_dictionary *object);
 extern struct o_array *p_dictionary_values(struct o_dictionary *object);
 #endif
+

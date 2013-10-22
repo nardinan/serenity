@@ -32,8 +32,7 @@ void p_string_hooking(struct o_string *object) {
 	object->m_truncate = p_string_truncate;
 }
 
-struct o_string *f_string_new(struct o_string *supplied, size_t size,
-		const char *format, ...) {
+struct o_string *f_string_new(struct o_string *supplied, size_t size, const char *format, ...) {
 	struct o_string *result;
 	va_list parameters;
 	va_start(parameters, format);
@@ -42,26 +41,20 @@ struct o_string *f_string_new(struct o_string *supplied, size_t size,
 	return result;
 }
 
-struct o_string *f_string_new_args(struct o_string *supplied, size_t size,
-		const char *format, va_list parameters) {
+struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const char *format, va_list parameters) {
 	char *symbols = "@^";
 	t_string_formatter functions[] = {
 		p_string_format_object_content,
 		p_string_format_object_kind,
 	};
 	struct o_string *result;
-	if ((result = (struct o_string *)
-				f_object_new(v_string_kind, sizeof(struct o_string),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_string *) f_object_new(v_string_kind, sizeof(struct o_string), (struct o_object *)supplied))) {
 		p_string_hooking(result);
 		if ((result->size = size)) {
 			result->s_flags.constant = d_false;
 			if ((result->content = (char *) d_calloc(1, result->size))) {
 				if (format)
-					result->content =
-						f_string_format_args(result->content, result->size,
-								symbols, functions, (char *)format,
-								parameters);
+					result->content = f_string_format_args(result->content, result->size, symbols, functions, (char *)format, parameters);
 			} else
 				d_die(d_error_malloc);
 		}
@@ -69,12 +62,9 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size,
 	return result;
 }
 
-struct o_string *f_string_new_constant(struct o_string *supplied,
-		const char *content) {
+struct o_string *f_string_new_constant(struct o_string *supplied, const char *content) {
 	struct o_string *result;
-	if ((result = (struct o_string *)
-				f_object_new(v_string_kind, sizeof(struct o_string),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_string *) f_object_new(v_string_kind, sizeof(struct o_string), (struct o_object *)supplied))) {
 		p_string_hooking(result);
 		result->s_flags.constant = d_true;
 		if (content) {
@@ -85,8 +75,7 @@ struct o_string *f_string_new_constant(struct o_string *supplied,
 	return result;
 }
 
-char *p_string_format_object_kind(char *buffer, size_t size, char *format,
-		va_list parameters) {
+char *p_string_format_object_kind(char *buffer, size_t size, char *format, va_list parameters) {
 	struct o_object *object;
 	size_t written = 0;
 	if ((object = va_arg(parameters, struct o_object *)))
@@ -94,8 +83,7 @@ char *p_string_format_object_kind(char *buffer, size_t size, char *format,
 	return buffer+((written>size)?size:written);
 }
 
-char *p_string_format_object_content(char *buffer, size_t size, char *format,
-		va_list parameters) {
+char *p_string_format_object_content(char *buffer, size_t size, char *format, va_list parameters) {
 	struct o_object *object;
 	char *pointer = buffer;
 	if ((object = va_arg(parameters, struct o_object *)))
@@ -115,8 +103,7 @@ void p_string_delete(struct o_object *object) {
 int p_string_compare(struct o_object *object, struct o_object *other) {
 	struct o_string *local_object, *local_other;
 	int result = p_object_compare(object, other);
-	if ((local_object = d_object_kind(object, string)) &&
-			(local_other = d_object_kind(other, string)))
+	if ((local_object = d_object_kind(object, string)) && (local_other = d_object_kind(other, string)))
 		result = d_strcmp(local_object->content, local_other->content);
 	return result;
 }
@@ -161,8 +148,7 @@ struct o_object *p_string_clone(struct o_object *object) {
 		result = (struct o_string *)p_object_clone(object);
 		if (!local_object->s_flags.constant) {
 			if ((result->content = (char *) d_calloc(1, local_object->size)))
-				memcpy(result->content, local_object->content,
-						local_object->size);
+				memcpy(result->content, local_object->content, local_object->size);
 			else
 				d_die(d_error_malloc);
 		}
@@ -176,8 +162,7 @@ void p_string_trim(struct o_string *object) {
 		if (object->content)
 			f_string_trim(object->content);
 	} else
-		d_throw(v_exception_constant,
-				"operation not permitted with a constant");
+		d_throw(v_exception_constant, "operation not permitted with a constant");
 }
 
 void p_string_append(struct o_string *object, struct o_string *other) {
@@ -185,8 +170,7 @@ void p_string_append(struct o_string *object, struct o_string *other) {
 		if (other->content)
 			f_string_append(&object->content, other->content, &object->size);
 	} else
-		d_throw(v_exception_constant,
-				"operation not permitted with a constant");
+		d_throw(v_exception_constant, "operation not permitted with a constant");
 }
 
 size_t p_string_length(struct o_string *object) {
@@ -204,8 +188,7 @@ char p_string_character(struct o_string *object, size_t position) {
 	return result;
 }
 
-struct o_string *p_string_substring(struct o_string *object, size_t begin,
-		size_t length) {
+struct o_string *p_string_substring(struct o_string *object, size_t begin, size_t length) {
 	struct o_string *result = NULL;
 	if (object->content) {
 		if ((begin <= object->size) && ((begin+length) <= object->size))
@@ -230,17 +213,13 @@ struct o_array *p_string_split(struct o_string *object, char character) {
 		pointer = object->content;
 		while ((next = strchr(pointer, character))) {
 			if ((next-pointer) > 0)
-				if ((value = p_string_substring(object,
-								(pointer-object->content),
-								next-pointer))) {
+				if ((value = p_string_substring(object, (pointer-object->content), next-pointer))) {
 					result->m_insert(result, (struct o_object *)value, index++);
 					d_release(value);
 				}
 			pointer = next+1;
 		}
-		if ((value = p_string_substring(object, (pointer-object->content),
-						(length-(pointer-object->content)+1))))
-		{
+		if ((value = p_string_substring(object, (pointer-object->content), (length-(pointer-object->content)+1)))) {
 			result->m_insert(result, (struct o_object *)value, index);
 			d_release(value);
 		}
@@ -256,3 +235,4 @@ void p_string_truncate(struct o_string *object, size_t length) {
 			d_throw(v_exception_bound, "pointer out of bound");
 	}
 }
+

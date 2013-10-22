@@ -20,15 +20,10 @@
 #include <pthread.h>
 #include "o_exceptions.h"
 #define d_object_head struct o_object head
-#define d_compare(a,b)\
-	(((a)&&(b))?\
-	 ((struct o_object *)(a))->s_delegate.m_compare((struct o_object*)(a),\
-	 (struct o_object*)(b)):\
-	 (int)((a)-(b)))
+#define d_compare(a,b) (((a)&&(b))?((struct o_object *)(a))->s_delegate.m_compare((struct o_object*)(a),(struct o_object*)(b)):(int)((a)-(b)))
 #define d_retain(a,k) (k*)f_object_retain((struct o_object *)a)
 #define d_release(a) f_object_release((struct o_object *)a)
-#define d_clone(a,k)\
-	(k*)((struct o_object *)(a))->s_delegate.m_clone((struct o_object *)a)
+#define d_clone(a,k) (k*)((struct o_object *)(a))->s_delegate.m_clone((struct o_object *)a)
 #define d_object_constant(k,s,hook)\
 {\
 	d_list_node_constant,\
@@ -54,8 +49,7 @@
 		p_object_unlock\
 	}\
 }
-#define d_object_kind(o,k) \
-	((struct o_##k *)(((o)->kind==v_##k##_kind)?(o):NULL))
+#define d_object_kind(o,k) ((struct o_##k *)(((o)->kind==v_##k##_kind)?(o):NULL))
 #define d_object_kind_compare(a,b) ((a)->kind==(b)->kind)
 #define d_object_trylock(a) ((a)->s_delegate.m_trylock(a))
 #define d_object_lock(a) ((a)->s_delegate.m_lock(a))
@@ -81,8 +75,7 @@ typedef struct o_object {
 	} s_delegate;
 } o_object;
 extern void p_object_hooking(struct o_object *object);
-extern struct o_object *f_object_new(const char *kind, size_t size,
-		struct o_object *supplied);
+extern struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied);
 extern struct o_object *f_object_retain(struct o_object *object);
 extern void f_object_release(struct o_object *object);
 extern void p_object_delete(struct o_object *object);
@@ -94,3 +87,4 @@ extern int p_object_trylock(struct o_object *object);
 extern void p_object_lock(struct o_object *object);
 extern void p_object_unlock(struct o_object *object);
 #endif
+

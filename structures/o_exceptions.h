@@ -28,4 +28,5 @@ d_exception_declare(bound);
 d_exception_declare(kind);
 d_exception_declare(compare);
 d_exception_declare(stream);
+d_exception_declare(incompatible);
 #endif

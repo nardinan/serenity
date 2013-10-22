@@ -30,26 +30,21 @@ void p_filesystem_hooking(struct o_filesystem *object) {
 
 struct o_filesystem *f_filesystem_new(struct o_filesystem *supplied) {
 	struct o_filesystem *result;
-	if ((result = (struct o_filesystem *)
-				f_object_new(v_filesystem_kind, sizeof(struct o_filesystem),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_filesystem *) f_object_new(v_filesystem_kind, sizeof(struct o_filesystem), (struct o_object *)supplied))) {
 		p_filesystem_hooking(result);
 		result->files = f_dictionary_new(NULL);
 	}
 	return result;
 }
 
-struct o_filesystem *f_filesystem_new_stream(struct o_filesystem *supplied,
-		struct o_stream *stream) {
+struct o_filesystem *f_filesystem_new_stream(struct o_filesystem *supplied, struct o_stream *stream) {
 	struct o_filesystem *result;
 	struct o_stream *record;
 	struct o_string *content, *label;
 	struct s_exception *exception = NULL;
 	struct s_filesystem_header *header;
 	size_t readed = 0, dimension, length;
-	if ((result = (struct o_filesystem *)
-				f_object_new(v_filesystem_kind, sizeof(struct o_filesystem),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_filesystem *) f_object_new(v_filesystem_kind, sizeof(struct o_filesystem), (struct o_object *)supplied))) {
 		p_filesystem_hooking(result);
 		result->files = f_dictionary_new(NULL);
 		d_try {
@@ -57,15 +52,12 @@ struct o_filesystem *f_filesystem_new_stream(struct o_filesystem *supplied,
 			if ((content = stream->m_read(stream, dimension))) {
 				length = sizeof(struct s_filesystem_header);
 				while (readed < dimension) {
-					header = ((struct s_filesystem_header*)
-							(content->content+readed));
+					header = ((struct s_filesystem_header*)(content->content+readed));
 					if (f_endian_check() == d_big_endian)
 						d_swap(header->bytes);
 					readed += length;
 					label = d_string_pure(header->name);
-					if ((record = f_stream_new_raw(NULL, label,
-									(content->content+readed),
-									header->bytes))) {
+					if ((record = f_stream_new_raw(NULL, label, (content->content+readed), header->bytes))) {
 						p_filesystem_insert(result, label, record);
 						d_release(record);
 					}
@@ -91,7 +83,25 @@ void p_filesystem_delete(struct o_object *object) {
 }
 
 char *p_filesystem_string(struct o_object *object, char *data, size_t size) {
-	return NULL;
+	struct o_filesystem *local_object;
+	size_t written;
+	char *next;
+	if ((local_object = d_object_kind(object, filesystem))) {
+		written = snprintf(data, size, "<filesystem: ");
+		written = ((written>size)?size:written);
+		data += written;
+		if (written < size) {
+			next = local_object->files->head.s_delegate.m_string((struct o_object *)local_object->files, data, (size-written));
+			written += (next-data);
+			data = next;
+			if (written < size) {
+				*data = '>';
+				data++;
+			}
+		}
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_filesystem");
+	return data;
 }
 
 struct o_object *p_filesystem_clone(struct o_object *object) {
@@ -104,20 +114,15 @@ struct o_object *p_filesystem_clone(struct o_object *object) {
 	return (o_object *)result;
 }
 
-int p_filesystem_insert(struct o_filesystem *object, struct o_string *name,
-		struct o_stream *stream) {
-	return object->files->m_insert(object->files, (struct o_object *)name,
-			(struct o_object *)stream);
+int p_filesystem_insert(struct o_filesystem *object, struct o_string *name, struct o_stream *stream) {
+	return object->files->m_insert(object->files, (struct o_object *)name, (struct o_object *)stream);
 }
 
-struct o_stream *p_filesystem_get(struct o_filesystem *object,
-		struct o_string *name) {
-	return (struct o_stream *)object->files->m_get(object->files,
-			(struct o_object *)name);
+struct o_stream *p_filesystem_get(struct o_filesystem *object, struct o_string *name) {
+	return (struct o_stream *)object->files->m_get(object->files, (struct o_object *)name);
 }
 
-void p_filesystem_store(struct o_filesystem *object,
-		struct o_stream *destination) {
+void p_filesystem_store(struct o_filesystem *object, struct o_stream *destination) {
 	struct o_array *keys = NULL;
 	struct o_stream *stream;
 	struct o_string *key;
@@ -128,17 +133,13 @@ void p_filesystem_store(struct o_filesystem *object,
 		for (index = 0; index < keys->filled; index++) {
 			d_try {
 				key = (struct o_string *)keys->m_get(keys, index);
-				if ((stream = (struct o_stream *)
-							object->files->m_get(object->files,
-								(struct o_object *)key))) {
+				if ((stream = (struct o_stream *) object->files->m_get(object->files, (struct o_object *)key))) {
 					memset(&header, 0, sizeof(struct s_filesystem_header));
 					strncpy(header.name, key->content, d_filesystem_name_size);
 					header.bytes = stream->m_size(stream);
 					if (f_endian_check() == d_big_endian)
 						d_swap(header.bytes);
-					destination->m_write(destination,
-							sizeof(struct s_filesystem_header),
-							&header);
+					destination->m_write(destination, sizeof(struct s_filesystem_header), &header);
 					destination->m_write_stream(destination, stream);
 				}
 			} d_catch(exception) {
@@ -149,3 +150,4 @@ void p_filesystem_store(struct o_filesystem *object,
 		d_release(keys);
 	}
 }
+

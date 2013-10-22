@@ -26,3 +26,4 @@ d_exception_define(bound, 7, "out of bound exception");
 d_exception_define(kind, 8, "wrong object kind exception");
 d_exception_define(compare, 9, "different objects kind exception");
 d_exception_define(stream, 10, "damaged stream exception");
+d_exception_define(incompatible, 11, "the element is incompatible");

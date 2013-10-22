@@ -28,3 +28,4 @@ extern const struct s_bool s_true, s_false;
 #define d_min(a,b) (((a)>(b))?(b):(a))
 #define d_max(a,b) (((a)<(b))?(b):(a))
 #endif
+

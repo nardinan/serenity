@@ -32,15 +32,11 @@ struct o_array *f_array_new(struct o_array *supplied, size_t size) {
 	return f_array_new_bucket(supplied, d_array_default_bucket, size);
 }
 
-struct o_array *f_array_new_bucket(struct o_array *supplied, size_t bucket,
-		size_t size) {
+struct o_array *f_array_new_bucket(struct o_array *supplied, size_t bucket, size_t size) {
 	struct o_array *result;
-	if ((result = (struct o_array *)
-				f_object_new(v_array_kind, sizeof(struct o_array),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_array *) f_object_new(v_array_kind, sizeof(struct o_array), (struct o_object *)supplied))) {
 		p_array_hooking(result);
-		if ((result->content = (struct o_object **)
-					d_calloc(size, sizeof(struct o_object *)))) {
+		if ((result->content = (struct o_object **) d_calloc(size, sizeof(struct o_object *)))) {
 			result->size = size;
 			result->bucket = bucket;
 		} else
@@ -49,24 +45,18 @@ struct o_array *f_array_new_bucket(struct o_array *supplied, size_t bucket,
 	return result;
 }
 
-struct o_array *f_array_new_list(struct o_array *supplied, size_t bucket,
-		size_t size, ...) {
+struct o_array *f_array_new_list(struct o_array *supplied, size_t bucket, size_t size, ...) {
 	va_list arguments;
 	struct o_array *result;
 	struct o_object *value;
-	if ((result = (struct o_array *)
-				f_object_new(v_array_kind, sizeof(struct o_array),
-					(struct o_object *)supplied))) {
+	if ((result = (struct o_array *) f_object_new(v_array_kind, sizeof(struct o_array), (struct o_object *)supplied))) {
 		p_array_hooking(result);
-		if ((result->content = (struct o_object **)
-					d_calloc(size, sizeof(struct o_object *)))) {
+		if ((result->content = (struct o_object **) d_calloc(size, sizeof(struct o_object *)))) {
 			result->size = size;
 			result->bucket = bucket;
 			va_start(arguments, size);
-			while ((result->filled < result->size) &&
-					(value = va_arg(arguments, struct o_object *)))
-				result->content[result->filled++] = d_retain(value,
-						struct o_object);
+			while ((result->filled < result->size) && (value = va_arg(arguments, struct o_object *)))
+				result->content[result->filled++] = d_retain(value, struct o_object);
 			va_end(arguments);
 		} else
 			d_die(d_error_malloc);
@@ -90,12 +80,10 @@ void p_array_delete(struct o_object *object) {
 int p_array_compare(struct o_object *object, struct o_object *other) {
 	struct o_array *local_object, *local_other;
 	int result = p_object_compare(object, other), index;
-	if ((local_object = d_object_kind(object, array)) &&
-			(local_other = d_object_kind(other, array))) {
+	if ((local_object = d_object_kind(object, array)) && (local_other = d_object_kind(other, array))) {
 		result = (int)(local_object->filled-local_other->filled);
 		for (index = 0; (result == 0)&&(index < local_object->size); index++)
-			result = d_compare(local_object->content[index],
-					local_other->content[index]);
+			result = d_compare(local_object->content[index], local_other->content[index]);
 	}
 	return result;
 }
@@ -113,8 +101,7 @@ char *p_array_string(struct o_object *object, char *data, size_t size) {
 		}
 		for (index = 0; index < local_object->size; index++)
 			if ((value = local_object->content[index])) {
-				next = value->s_delegate.m_string(local_object->content[index],
-						pointer, (size-written));
+				next = value->s_delegate.m_string(local_object->content[index], pointer, (size-written));
 				written += (next-pointer);
 				pointer = next;
 				if ((written < size) && ((index+1) < local_object->size)) {
@@ -140,14 +127,12 @@ struct o_object *p_array_clone(struct o_object *object) {
 	if ((local_object = d_object_kind(object, array))) {
 		result = (struct o_array *)p_object_clone(object);
 		if (local_object->size > 0) {
-			if ((result->content = (struct o_object **)
-						d_calloc(local_object->size, sizeof(struct o_object *)))) {
+			if ((result->content = (struct o_object **) d_calloc(local_object->size, sizeof(struct o_object *)))) {
 				result->size = local_object->size;
 				result->bucket = local_object->bucket;
 				for (index = 0; index < local_object->size; index++)
 					if (local_object->content[index])
-						result->content[index] =
-							d_retain(local_object->content[index], struct o_object);
+						result->content[index] = d_retain(local_object->content[index], struct o_object);
 				result->filled = local_object->filled;
 			}
 		}
@@ -156,36 +141,26 @@ struct o_object *p_array_clone(struct o_object *object) {
 	return (o_object *)result;
 }
 
-size_t p_array_insert(struct o_array *object, struct o_object *value,
-		size_t position) {
+size_t p_array_insert(struct o_array *object, struct o_object *value, size_t position) {
 	if (position <= object->size) {
 		if (position == object->size) {
-			if ((object->content = (struct o_object **)
-						d_realloc(object->content, ((object->size+object->bucket)*
-								sizeof(struct o_object *))))) {
-				memset(&(object->content[object->size]), 0,
-						(object->bucket*sizeof(struct o_object *)));
+			if ((object->content = (struct o_object **) d_realloc(object->content, ((object->size+object->bucket)*sizeof(struct o_object *))))) {
+				memset(&(object->content[object->size]), 0, (object->bucket*sizeof(struct o_object *)));
 				object->size += object->bucket;
 			} else
 				d_die(d_error_malloc);
 		} else if (object->content[position]) {
 			if (object->content[object->size-1]) {
-				if ((object->content = (struct o_object **)
-							d_realloc(object->content, ((object->size+object->bucket)*
-									sizeof(struct o_object *))))) {
-					memset(&(object->content[object->size]), 0,
-							(object->bucket*sizeof(struct o_object *)));
-					memmove(&(object->content[position+1]),
-							&(object->content[position]),
-							((object->size-position)*
-							 sizeof(struct o_object *)));
+				if ((object->content = (struct o_object **) d_realloc(object->content,
+								((object->size+object->bucket)*sizeof(struct o_object *))))) {
+					memset(&(object->content[object->size]), 0, (object->bucket*sizeof(struct o_object *)));
+					memmove(&(object->content[position+1]), &(object->content[position]),
+							((object->size-position)*sizeof(struct o_object *)));
 					object->size += object->bucket;
 				} else
 					d_die(d_error_malloc);
 			} else
-				memmove(&(object->content[position+1]),
-						&(object->content[position]),
-						(object->size-position-1)*sizeof(struct o_object *));
+				memmove(&(object->content[position+1]), &(object->content[position]), (object->size-position-1)*sizeof(struct o_object *));
 		}
 		if (value) {
 			object->content[position] = d_retain(value, struct o_object);
@@ -219,3 +194,4 @@ struct o_object *p_array_get(struct o_array *object, size_t position) {
 		d_throw(v_exception_bound, "index is over the array's size");
 	return result;
 }
+

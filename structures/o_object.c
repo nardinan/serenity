@@ -26,8 +26,7 @@ void p_object_hooking(struct o_object *object) {
 	object->s_delegate.m_unlock = p_object_unlock;
 }
 
-struct o_object *f_object_new(const char *kind, size_t size,
-		struct o_object *supplied) {
+struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied) {
 	struct o_object *result = supplied;
 	if (result) {
 		memset(result, 0, size);
@@ -84,9 +83,7 @@ t_hash_value p_object_hash(struct o_object *object) {
 }
 
 char *p_object_string(struct o_object *object, char *data, size_t size) {
-	size_t written;
-	written = snprintf(data, size, "<%s size: %zu>", object->kind,
-			object->size);
+	size_t written = snprintf(data, size, "<%s size: %zu>", object->kind, object->size);
 	return data+((written>size)?size:written);
 }
 
@@ -118,3 +115,4 @@ void p_object_unlock(struct o_object *object) {
 	if (object->s_flags.mutexed)
 		pthread_mutex_unlock(&(object->mutex));
 }
+

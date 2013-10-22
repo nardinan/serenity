@@ -20,8 +20,7 @@
 #include "o_aes.h"
 #define d_idea_expanded_key_size 104 /* (52(subkeys)*2) */
 #define d_idea_expanded_key_bytes 16
-#define d_idea_couple_bytes_to_uint(a)\
-	((((unsigned int)(a)[0])<<8)|((unsigned int)(a)[1]))
+#define d_idea_couple_bytes_to_uint(a) ((((unsigned int)(a)[0])<<8)|((unsigned int)(a)[1]))
 #define d_idea_couple_bytes_copy(a,b)\
 	do{\
 		(a)[0]=(b)[0];\
@@ -44,29 +43,21 @@ extern const char v_idea_kind[];
 typedef struct o_idea {
 	d_object_head;
 	unsigned char expanded_key[2][d_idea_expanded_key_size];
-	struct o_string *(*m_crypt)(struct o_idea *object, struct o_string *string,
-			int local);
-	struct o_string *(*m_decrypt)(struct o_idea *object,
-			struct o_string *string, int local);
+	struct o_string *(*m_crypt)(struct o_idea *, struct o_string *, int);
+	struct o_string *(*m_decrypt)(struct o_idea *, struct o_string *, int);
 } o_idea;
 extern void p_idea_hooking(struct o_idea *object);
 extern void p_idea_key_shift_left(unsigned char *key, size_t length, int bits);
-extern void p_idea_inverse_multiplication(unsigned char *value,
-		unsigned char *result);
+extern void p_idea_inverse_multiplication(unsigned char *value, unsigned char *result);
 extern void p_idea_negative(unsigned char *value, unsigned char *result);
-extern struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key,
-		size_t size);
+extern struct o_idea *f_idea_new(struct o_idea *supplied, unsigned char *key, size_t size);
 extern int p_idea_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_idea_hash(struct o_object *object);
 extern char *p_idea_string(struct o_object *object, char *data, size_t size);
-extern void p_idea_multiplication(unsigned char *left, unsigned char *right,
-		unsigned char *result);
-extern void p_idea_sum(unsigned char *left, unsigned char *right,
-		unsigned char *result);
-extern struct o_string *p_idea_execute(struct o_string *string, int local,
-		unsigned char *expanded_key);
-extern struct o_string *p_idea_crypt(struct o_idea *object,
-		struct o_string *string, int local);
-extern struct o_string *p_idea_decrypt(struct o_idea *object,
-		struct o_string *string, int local);
+extern void p_idea_multiplication(unsigned char *left, unsigned char *right, unsigned char *result);
+extern void p_idea_sum(unsigned char *left, unsigned char *right, unsigned char *result);
+extern struct o_string *p_idea_execute(struct o_string *string, int local, unsigned char *expanded_key);
+extern struct o_string *p_idea_crypt(struct o_idea *object, struct o_string *string, int local);
+extern struct o_string *p_idea_decrypt(struct o_idea *object, struct o_string *string, int local);
 #endif
+
