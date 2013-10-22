@@ -82,7 +82,7 @@ void p_trb_delete(struct o_object *object) {
                 d_throw(v_exception_kind, "object is not an instance of o_trb");
 }
 
-t_hash_value p_trb_hash(struct o_object *objeact) {
+t_hash_value p_trb_hash(struct o_object *object) {
 	struct o_trb *local_object;
 	t_hash_value result = 0;
 	if ((local_object = d_object_kind(object, trb))) {
@@ -184,7 +184,7 @@ struct s_event *p_trb_event(struct o_trb *object, struct s_event *provided, time
 			if (object->stream_out)
 				object->stream_out->m_write(object->stream_out, readed, (void *)pointer);
 		}
-		return result;
 	}
+	return result;
 }
 

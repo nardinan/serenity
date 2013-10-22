@@ -18,6 +18,7 @@
 #ifndef serenity_o_trb_h
 #define serenity_o_trb_h
 #include "../o_string.h"
+#include "../o_stream.h"
 #include <usb.h>
 #define d_trb_manufacturer_label "DAMPE"
 #define d_trb_product_label "miniTRB-Device"
