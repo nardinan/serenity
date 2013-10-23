@@ -2,7 +2,7 @@ OBJSGRNDLIB = o_array.o o_dictionary.o o_exceptions.o o_filesystem.o o_object.o 
 CC = gcc
 CFLAGS = -Wall -Wno-variadic-macros -std=c99 -c -pedantic
 LFLAGS = -Wall
-LINKSLIB = -L../ground -lserenity_ground
+LINKSLIB = -L../ground -lserenity_ground -lpthread
 EXEC = libserenity_structures.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)

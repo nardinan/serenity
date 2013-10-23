@@ -26,6 +26,7 @@ void p_trb_hooking(struct o_trb *object) {
 	object->head.s_delegate.m_string = p_trb_string;
 	/* keep default clone function */
 	object->m_setup = p_trb_setup;
+	object->m_stream = p_trb_stream;
 	object->m_event = p_trb_event;
 }
 
@@ -145,6 +146,12 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 		}
 	}
 	return result;
+}
+
+void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_string *name, const char *action, int permission) {
+	if (object->stream_out)
+		d_release(object->stream_out);
+	object->stream_out = f_stream_new_file(supplied, name, action, permission);
 }
 
 struct s_event *p_trb_event(struct o_trb *object, struct s_event *provided, time_t timeout) {

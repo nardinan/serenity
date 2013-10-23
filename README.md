@@ -1,4 +1,4 @@
-SERENITY (ground + structures + structures/crypto) 
+SERENITY (ground + structures + structures/crypto + structures/infn) 
 -------------------------
 My personal basic library
 -------------------------

@@ -27,4 +27,5 @@ cleanall:
 	cd ../structures/infn; make clean
 	rm -f *.o
 	rm -f *.bin
+	rm -f *.so
 
