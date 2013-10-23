@@ -23,15 +23,12 @@ int main (int argc, char *argv[]) {
 	d_pool_begin(pool) {
 		out = d_stdout;
 		in = d_stdin;
-		out->m_write_string(out, d_P(d_string(128, "hello! from stream %@"
-						".. and what's your name? ", out),
-					struct o_string));
+		out->m_write_string(out, d_P(d_string(128, "hello! from stream %@.. and what's your name? ", out), struct o_string));
 		readed = in->m_read(in, 64);
 		if (readed) {
 			if (readed->m_character(readed, readed->m_length(readed)-1) == '\n')
 				readed->m_truncate(readed, (readed->m_length(readed)-1));
-			out->m_write_string(out, d_P(d_string(128, "hi %@!\n", readed),
-						struct o_string));
+			out->m_write_string(out, d_P(d_string(128, "hi %@!\n", readed), struct o_string));
 			d_release(readed);
 		}
 	} d_pool_end_flush;

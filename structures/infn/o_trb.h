@@ -28,6 +28,7 @@
 #define d_trb_buffer_size 1560
 #define d_trb_event_size_normal 780
 #define d_trb_event_size_debug 112
+#define d_trb_packet_size 512
 extern const char v_trb_kind[];
 enum e_trb_mode {
 	e_trb_mode_normal,
@@ -37,7 +38,7 @@ enum e_trb_mode {
 } e_trb_mode;
 typedef struct s_event {
 	unsigned char code;
-	short unsigned int values[d_trb_channels];
+	short unsigned int values[d_trb_channels], temperature[2];
 	int filled;
 } s_event;
 typedef struct o_trb {
@@ -48,6 +49,7 @@ typedef struct o_trb {
 	int write_address, read_address, buffer_fill, event_size;
 	unsigned char buffer[d_trb_buffer_size], mode;
 	int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned char, unsigned char, time_t);
+	void (*m_stream)(struct o_trb *, struct o_stream *, struct o_string *, const char *, int);
 	struct s_event *(*m_event)(struct o_trb *, struct s_event *, time_t);
 } o_trb;
 extern void p_trb_hooking(struct o_trb *object);

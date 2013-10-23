@@ -19,8 +19,7 @@
 int main (int argc, char *argv[]) {
 	struct s_exception *exc;
 	struct o_pool *pool = f_pool_new(NULL);
-	struct o_string string = d_string_constant("hello,salut,what,we,,have"),
-			*singleton,
+	struct o_string string = d_string_constant("hello,salut,what,we,,have"), *singleton,
 			*example[] = {
 				d_string_pure("example 1"),
 				d_string_pure("example 2"),
@@ -38,8 +37,7 @@ int main (int argc, char *argv[]) {
 			else
 				printf("\t<null>\n");
 		}
-		printf("in the array we have %zd elements and %zd spaces\n",
-				array->filled, array->size);
+		printf("in the array we have %zd elements and %zd spaces\n", array->filled, array->size);
 		array->m_insert(array, (struct o_object *)example[0], array->filled);
 		array->m_insert(array, (struct o_object *)example[1], array->filled);
 		array->m_insert(array, (struct o_object *)example[2], array->filled);
@@ -60,8 +58,7 @@ int main (int argc, char *argv[]) {
 				printf("\t<null>\n");
 		}		
 
-		printf("in the array we have %zd elements and %zd spaces\n",
-				array->filled, array->size);
+		printf("in the array we have %zd elements and %zd spaces\n", array->filled, array->size);
 		clone = d_clone(array, struct o_array);
 		d_release(array);
 		for (index = 0; index < clone->size; index++) {
@@ -74,14 +71,8 @@ int main (int argc, char *argv[]) {
 		d_release(clone);
 		printf("creating an array from a list\n");
 		d_pool_begin(pool) {
-			array = f_array_new_list(NULL, d_array_default_bucket, 4,
-					d_P(d_string_pure("This"),
-						struct o_string),
-					d_P(d_string_pure("Is"),
-						struct o_string),
-					d_P(d_string_pure("The"),
-						struct o_string),
-					d_P(d_string_pure("Time"),
+			array = f_array_new_list(NULL, d_array_default_bucket, 4, d_P(d_string_pure("This"), struct o_string), 
+					d_P(d_string_pure("Is"), struct o_string), d_P(d_string_pure("The"), struct o_string), d_P(d_string_pure("Time"), 
 						struct o_string));
 			/* just verifying the "to string" function */
 			out = d_stdout;

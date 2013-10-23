@@ -23,34 +23,14 @@ int main(int argc, char *argv[]) {
 	d_pool_begin(pool) {
 		out_stream = d_stdout;
 		dictionary = f_dictionary_new(NULL);
-		dictionary->m_insert(dictionary,
-				d_P(d_string_pure("key 1"),
-					struct o_object),
-				d_P(d_string_pure("I have no idea"),
-					struct o_object));
-		dictionary->m_insert(dictionary,
-				d_P(d_string_pure("Key 2"),
-					struct o_object),
-				d_P(d_string_pure("What I am doing"),
-					struct o_object));
-		dictionary->m_insert(dictionary,
-				d_P(d_string_pure("Key 3"),
-					struct o_object),
-				d_P(d_string_pure("Here"),
-					struct o_object));
-		dictionary->m_insert(dictionary,
-				d_P(d_string_pure("Key 4"),
-					struct o_object),
-				d_P(d_string_pure("Forever a stone"),
-					struct o_object));
-		out_stream->m_write_string(out_stream,
-				d_P(d_string(512, "%@\n", dictionary),
-					struct o_string));
+		dictionary->m_insert(dictionary, d_P(d_string_pure("key 1"), struct o_object), d_P(d_string_pure("I have no idea"), struct o_object));
+		dictionary->m_insert(dictionary, d_P(d_string_pure("Key 2"), struct o_object), d_P(d_string_pure("What I am doing"), struct o_object));
+		dictionary->m_insert(dictionary, d_P(d_string_pure("Key 3"), struct o_object), d_P(d_string_pure("Here"), struct o_object));
+		dictionary->m_insert(dictionary, d_P(d_string_pure("Key 4"), struct o_object), d_P(d_string_pure("Forever a stone"), struct o_object));
+		out_stream->m_write_string(out_stream, d_P(d_string(512, "%@\n", dictionary), struct o_string));
 		clone = d_clone(dictionary, struct o_dictionary);
 		d_release(dictionary);
-		out_stream->m_write_string(out_stream,
-				d_P(d_string(512, "(clone) %@\n", clone),
-					struct o_string));
+		out_stream->m_write_string(out_stream, d_P(d_string(512, "(clone) %@\n", clone), struct o_string));
 		d_release(clone);
 		d_release(out_stream);
 	} d_pool_end_flush;
@@ -58,3 +38,4 @@ int main(int argc, char *argv[]) {
 	f_memory_flush(e_log_level_ever);
 	return 0;
 }
+

@@ -33,11 +33,9 @@ struct s_list_node *f_person_allocate(const char *name, const char *surname) {
 int main (int argc, char *argv[]) {
 	struct s_list *list = NULL;
 	struct s_person *current = NULL;
-	struct s_list_node *element = f_person_allocate("silvio", "berlusconi"), 
-			   *support;
+	struct s_list_node *element = f_person_allocate("silvio", "berlusconi"), *support;
 	f_list_init(&list);
-	f_list_append(list, f_person_allocate("mario", "monti"),
-			e_list_insert_head);
+	f_list_append(list, f_person_allocate("mario", "monti"), e_list_insert_head);
 	f_list_append(list, element, e_list_insert_head);
 	f_list_insert(list, f_person_allocate("mario", "rossi"), element);
 	printf("elements in the list: %zu\n", list->fill);

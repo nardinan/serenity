@@ -25,20 +25,12 @@ int main (int argc, char *argv[]) {
 	struct o_stream *out;
 	d_pool_begin(pool) {
 		out = d_stdout;
-		out->m_write_string(out, d_P(d_string(512, "%@\n", idea),
-					struct o_string));
-		input = d_string_pure("Lorem ipsum dolor sit amet, consectetur "
-				"adipisici elit, sed eiusmod tempor incidunt ut "
-				"labore et dolore magna aliqua. Ut enim ad minim "
-				"veniam, quis nostrud\n");
-		out->m_write_string(out, d_P(d_string(512, "size of input before "
-						"m_crypt: %zd\n", input->size),
-					struct o_string));
+		out->m_write_string(out, d_P(d_string(512, "%@\n", idea), struct o_string));
+		input = d_string_pure("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. "
+				"Ut enim ad minim veniam, quis nostrud\n");
+		out->m_write_string(out, d_P(d_string(512, "size of input before m_crypt: %zd\n", input->size), struct o_string));
 		output = idea->m_crypt(idea, input, d_true);
-		out->m_write_string(out, d_P(d_string(512, "size of input after "
-						"m_crypt (padded): %zd\n",
-						input->size),
-					struct o_string));
+		out->m_write_string(out, d_P(d_string(512, "size of input after m_crypt (padded): %zd\n", input->size), struct o_string));
 		output = idea->m_decrypt(idea, input, d_true);
 		out->m_write_string(out, input);
 		pool->m_clean(pool, d_true);
@@ -50,3 +42,4 @@ int main (int argc, char *argv[]) {
 	f_memory_flush(e_log_level_ever);
 	return 0;
 }
+

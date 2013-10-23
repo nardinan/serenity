@@ -169,7 +169,9 @@ struct s_event *p_trb_event(struct o_trb *object, struct s_event *provided, time
 					result->code = object->buffer[2];
 					for (index = 4, local_index = 0; index < object->event_size; index += 2, local_index++)
 						result->values[local_index] = ((unsigned short int)object->buffer[index])|
-							((unsigned short int)object->buffer[index])<<8;
+							((unsigned short int)object->buffer[index+1])<<8;
+					result->temperature[0] = ((unsigned short int)object->buffer[index])|((unsigned short int)object->buffer[index+1])<<8;
+					result->temperature[1] = ((unsigned short int)object->buffer[index+2])|((unsigned short int)object->buffer[index+3])<<8;
 					result->filled = d_true;
 				}
 				object->buffer_fill -= object->event_size;
@@ -186,11 +188,12 @@ struct s_event *p_trb_event(struct o_trb *object, struct s_event *provided, time
 
 		}
 		pointer = (char *)object->buffer+object->buffer_fill;
-		if ((readed = p_trb_read(object, pointer, (d_trb_buffer_size-object->buffer_fill), timeout)) > 0) {
-			object->buffer_fill += readed;
-			if (object->stream_out)
-				object->stream_out->m_write(object->stream_out, readed, (void *)pointer);
-		}
+		if ((d_trb_buffer_size-object->buffer_fill) >= d_trb_packet_size)
+			if ((readed = p_trb_read(object, pointer, d_trb_packet_size, timeout)) > 0) {
+				object->buffer_fill += readed;
+				if (object->stream_out)
+					object->stream_out->m_write(object->stream_out, readed, (void *)pointer);
+			}
 	}
 	return result;
 }

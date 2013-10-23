@@ -32,9 +32,7 @@ int main(int argc, char *argv[]) {
 					filesystem = f_filesystem_new(NULL);
 					for (index = 3; index < argc; index += 2)
 						if ((file[0] = f_stream_new_file(NULL, d_SP(argv[index]), "r", 0777))) {
-							filesystem->m_insert(filesystem,
-									d_SP(argv[index+1]),
-									file[0]);
+							filesystem->m_insert(filesystem, d_SP(argv[index+1]), file[0]);
 							d_release(file[0]);
 						}
 					file[1] = f_stream_new_file(NULL, d_SP(argv[2]), "w", 0755);
@@ -44,10 +42,8 @@ int main(int argc, char *argv[]) {
 				} else if (strcmp(argv[1], "D") == 0) {
 					if ((file[0] = f_stream_new_file(NULL, d_SP(argv[2]), "r", 0777))) {
 						if ((filesystem = f_filesystem_new_stream(NULL, file[0]))) {
-							if ((file[1] =filesystem->m_get(filesystem,
-											d_SP(argv[4])))) {
-								file[2] = f_stream_new_file(NULL, d_SP(argv[3]),
-										"w", 0755);
+							if ((file[1] =filesystem->m_get(filesystem, d_SP(argv[4])))) {
+								file[2] = f_stream_new_file(NULL, d_SP(argv[3]), "w", 0755);
 								file[2]->m_write_stream(file[2], file[1]);
 								d_release(file[2]);
 							}
@@ -61,13 +57,9 @@ int main(int argc, char *argv[]) {
 				wrong = s_true;
 			if (d_is_true(wrong)) {
 				d_printf(out_stream, d_SP("Collapse multiple files:\n"));
-				d_printf(out_stream, d_S(512, "\t%s C <destination.pack> "
-							"<path#1> <label#1> <path#2> "
-							"<label#2> ... \n",argv[0]));
+				d_printf(out_stream, d_S(512, "\t%s C <destination.pack> <path#1> <label#1> <path#2> <label#2> ... \n",argv[0]));
 				d_printf(out_stream, d_SP("Extract a file using label:\n"));
-				d_printf(out_stream, d_S(512, "\t%s D <source.pack> "
-							"<destination path> "
-							"<label>\n",argv[0]));
+				d_printf(out_stream, d_S(512, "\t%s D <source.pack> <destination path> <label>\n",argv[0]));
 			}
 			d_release(out_stream);
 		} d_pool_end_clean;
@@ -78,3 +70,4 @@ int main(int argc, char *argv[]) {
 	f_memory_flush(e_log_level_ever);
 	return 0;
 }
+

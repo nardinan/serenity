@@ -16,8 +16,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "../ground/ground.h"
-char *f_formatter_length(char *buffer, size_t size, char *template,
-		va_list parameters) {
+char *f_formatter_length(char *buffer, size_t size, char *template, va_list parameters) {
 	char *value = NULL;
 	size_t written = 0;
 	value = va_arg(parameters, char*);
@@ -28,8 +27,7 @@ char *f_formatter_length(char *buffer, size_t size, char *template,
 int main (int argc, char *argv[]) {
 	char target[256], *symbols = "@";
 	t_string_formatter functions[] = {f_formatter_length};
-	f_string_format(target, 256, symbols, functions, "%d is a number, "
-			"'%s' is a phrase and '%c' is a character and length is %@",
-			12, "hello, how are you?", 'p', "calculate strlen here");
+	f_string_format(target, 256, symbols, functions, "%d is a number, '%s' is a phrase and '%c' is a character and length is %@", 12, 
+			"hello, how are you?", 'p', "calculate strlen here");
 	printf("'%s'\n", target);
 }

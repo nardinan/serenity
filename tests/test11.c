@@ -24,33 +24,22 @@ int main(int argc, char *argv[]) {
 		out_stream = d_stdout;
 		if (argc == 3) {
 			d_try {
-				out_stream->m_write_string(out_stream,
-						d_P(d_string(512, "%s -> %s\n",
-								argv[1], argv[2]),
-							struct o_string));
-				in_file = f_stream_new_file(NULL,
-						d_P(d_string_pure(argv[1]),
-							struct o_string), "r", 0777);
-				out_stream->m_write_string(out_stream,
-						d_P(d_string(128, "%@\n", in_file),
-							struct o_string));
-				out_file = f_stream_new_file(NULL,
-						d_P(d_string_pure(argv[2]),
-							struct o_string), "w", 0777);
+				out_stream->m_write_string(out_stream, d_P(d_string(512, "%s -> %s\n", argv[1], argv[2]), struct o_string));
+				in_file = f_stream_new_file(NULL, d_P(d_string_pure(argv[1]), struct o_string), "r", 0777);
+				out_stream->m_write_string(out_stream, d_P(d_string(128, "%@\n", in_file), struct o_string));
+				out_file = f_stream_new_file(NULL, d_P(d_string_pure(argv[2]), struct o_string), "w", 0777);
 				out_file->m_write_stream(out_file, in_file);
 				d_release(out_file);
 				d_release(in_file);
 			} d_catch(exception) {
 				d_exception_dump(stderr, exception);
 			} d_endtry;
-		} else {
-			out_stream->m_write_string(out_stream,
-					d_P(d_string(512, "%s <src> <dst>\n",
-							argv[0]), struct o_string));
-		}
+		} else
+			out_stream->m_write_string(out_stream, d_P(d_string(512, "%s <src> <dst>\n", argv[0]), struct o_string));
 	} d_pool_end_flush;
 	d_release(out_stream);
 	d_release(pool);
 	f_memory_flush(e_log_level_ever);
 	return 0;
 }
+
