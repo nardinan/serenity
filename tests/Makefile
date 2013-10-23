@@ -2,7 +2,8 @@ NUMBER = 14
 OBJSGRNDLIB = test$(NUMBER).o
 CC = gcc
 CFLAGS = -Wall -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
-LFLAGS = -Wall -L../ground -L../structures -L../structures/crypto -L../structures/infn -lserenity_structures -lserenity_ground -lserenity_crypto -lserenity_infn `libusb-legacy-config --libs`
+LFLAGS = -Wall
+LIBSLINK = -L../ground -L../structures -L../structures/crypto -L../structures/infn -lserenity_structures -lserenity_ground -lserenity_crypto -lserenity_infn `libusb-legacy-config --libs`
 EXEC = test$(NUMBER).bin
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
@@ -10,7 +11,7 @@ all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
 	cd ../structures; make
 	cd ../structures/crypto; make
 	cd ../structures/infn; make
-	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC)
+	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) $(LIBSLINK)
 
 test$(NUMBER).o: test$(NUMBER).c ../ground/ground.h ../structures/structures.h ../structures/crypto/crypto.h ../structures/infn/infn.h
 	$(CC) $(CFLAGS) test$(NUMBER).c 

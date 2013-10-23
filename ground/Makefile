@@ -34,4 +34,4 @@ types.o: types.c types.h
 
 clean:
 	rm -f *.o
-	rm $(EXEC)
+	rm -f $(EXEC)

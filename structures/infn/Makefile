@@ -1,11 +1,12 @@
 OBJSGRNDLIB = o_trb.o
 CC = gcc
 CFLAGS = -Wall -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
-LFLAGS = -Wall -L../ -L../../ground -lserenity_structures -lserenity_ground `libusb-legacy-config --libs`
+LFLAGS = -Wall
+LINKSLIB = -L../ -L../../ground -lserenity_structures -lserenity_ground `libusb-legacy-config --libs`
 EXEC = libserenity_infn.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
-	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) -shared
+	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) $(LINKSLIB) -shared
 	cp $(EXEC) ../../tests/
 	
 o_trb.o: o_trb.c o_trb.h ../o_string.h
@@ -13,4 +14,4 @@ o_trb.o: o_trb.c o_trb.h ../o_string.h
 
 clean:
 	rm -f *.o
-	rm $(EXEC)
+	rm -f $(EXEC)

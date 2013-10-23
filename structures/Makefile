@@ -1,11 +1,12 @@
 OBJSGRNDLIB = o_array.o o_dictionary.o o_exceptions.o o_filesystem.o o_object.o o_pool.o o_stream.o o_string.o
 CC = gcc
 CFLAGS = -Wall -Wno-variadic-macros -std=c99 -c -pedantic
-LFLAGS = -Wall -L../ground -lserenity_ground
+LFLAGS = -Wall
+LINKSLIB = -L../ground -lserenity_ground
 EXEC = libserenity_structures.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
-	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) -shared
+	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) $(LINKSLIB) -shared
 	cp $(EXEC) ../tests/
 
 o_array.o: o_array.c o_array.h o_object.h
@@ -34,4 +35,4 @@ o_string.o: o_string.c o_string.h o_array.h
 
 clean:
 	rm -f *.o
-	rm $(EXEC)
+	rm -f $(EXEC)

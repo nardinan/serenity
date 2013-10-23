@@ -17,7 +17,7 @@
  */
 #include "../structures/structures.h"
 #include "../structures/infn/infn.h"
-int check_manifacturer(struct usb_dev_handler *udev, struct usb_device *dev) {
+int check_manifacturer(struct usb_dev_handle *udev, struct usb_device *dev) {
 	int result = d_false;
 	char buffer[256];
 	if (dev->descriptor.iManufacturer) {
