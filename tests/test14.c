@@ -88,32 +88,33 @@ int main(int argc, char *argv[]) {
 				usb_find_devices();
 				for (bus = usb_get_busses(); bus; bus = bus->next)
 					for (device = bus->devices; device; device = device->next, device_num++) {
-						handler = usb_open(device);
-						if (check_manifacturer(handler, device) == d_true)
-							if ((trb_device = f_trb_new(NULL, device, handler))) {
-								printf("[DEVICE %d] -<%d events>-\n", device_num, counter);
-								errors = 0;
-								if ((out_file = get_argument(argc, argv, 2, NULL)))
-									trb_device->m_stream(trb_device, NULL, d_SP(out_file), "w", 0777);
-								trb_device->m_setup(trb_device, trigger, delay, mode, dac, channel, 1000);
-								local_counter = counter;
-								while (local_counter) {
-									trb_device->m_event(trb_device, event, 500);
-									if (event->filled) {
-										local_counter--;
-										if ((last >= 0) && ((event->code > 0) && (event->code-1 != last))) {
-											printf("[WARNING] {counter_trigger %d, last is %d}\n", event->code,
-													last);
-											errors++;
-										} else
-											printf("[EVENT %d]\n", event->code);
-										last = event->code;
+						if ((handler = usb_open(device))) {
+							if (check_manifacturer(handler, device) == d_true)
+								if ((trb_device = f_trb_new(NULL, device, handler))) {
+									printf("[DEVICE %d] -<%d events>-\n", device_num, counter);
+									errors = 0;
+									if ((out_file = get_argument(argc, argv, 2, NULL)))
+										trb_device->m_stream(trb_device, NULL, d_SP(out_file), "w", 0777);
+									trb_device->m_setup(trb_device, trigger, delay, mode, dac, channel, 1000);
+									local_counter = counter;
+									while (local_counter) {
+										trb_device->m_event(trb_device, event, 500);
+										if (event->filled) {
+											local_counter--;
+											if ((last >= 0) && ((event->code > 0) && (event->code-1 != last))) {
+												printf("[WARNING] {counter_trigger %d, last is %d}\n", event->code,
+														last);
+												errors++;
+											} else
+												printf("[EVENT %d]\n", event->code);
+											last = event->code;
+										}
 									}
+									d_release(trb_device);
+									printf("[DEVICE %d] - errors %d\n", device_num, errors);
 								}
-								d_release(trb_device);
-								printf("[DEVICE %d] - errors %d\n", device_num, errors);
-							}
-						usb_close(handler);
+							usb_close(handler);
+						}
 					}
 			}
 			d_release(out_stream);
