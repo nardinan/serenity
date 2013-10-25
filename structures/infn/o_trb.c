@@ -154,22 +154,24 @@ void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_stri
 	object->stream_out = f_stream_new_file(supplied, name, action, permission);
 }
 
-struct s_event *p_trb_event(struct o_trb *object, struct s_event *provided, time_t timeout) {
-	struct s_event *result = provided;
+struct s_trb_event *p_trb_event(struct o_trb *object, struct s_trb_event *provided, time_t timeout) {
+	struct s_trb_event *result = provided;
 	char *pointer;
-	int index, readed, local_index, local_size;
+	int index, channel, readed, local_index, local_size;
 	if (object->handler) {
 		if (!result)
-			if (!(result = ((struct s_event*) d_malloc(sizeof(struct s_event)))))
+			if (!(result = ((struct s_trb_event*) d_malloc(sizeof(struct s_trb_event)))))
 				d_die(d_error_malloc);
 		result->filled = d_false;
 		while ((object->buffer_fill >= object->event_size) && (!result->filled))  {
 			if ((object->buffer[0] == 0x90) && (object->buffer[1] == 0xeb)) {
 				if (object->buffer[3] == object->mode) {
 					result->code = object->buffer[2];
-					for (index = 4, local_index = 0; index < object->event_size; index += 2, local_index++)
-						result->values[local_index] = ((unsigned short int)object->buffer[index])|
+					for (index = 0, local_index = 0; index < d_trb_channels; index += 2, local_index++) {
+						channel = (((local_index%2)*d_trb_channels_half)+(local_index/2));
+						result->values[channel] = ((unsigned short int)object->buffer[index])|
 							((unsigned short int)object->buffer[index+1])<<8;
+					}
 					result->temperature[0] = ((unsigned short int)object->buffer[index])|((unsigned short int)object->buffer[index+1])<<8;
 					result->temperature[1] = ((unsigned short int)object->buffer[index+2])|((unsigned short int)object->buffer[index+3])<<8;
 					result->filled = d_true;

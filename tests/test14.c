@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
 	float delay;
 	enum e_trb_mode mode = e_trb_mode_normal;
 	char *out_file;
-	struct s_event *event = (struct s_event *) d_malloc(sizeof(struct s_event));
+	struct s_trb_event *event = (struct s_trb_event *) d_malloc(sizeof(struct s_trb_event));
 	d_try {
 		d_pool_begin(pool) {
 			out_stream = d_stdout;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 						trigger = 0x22;
 						break;
 					default:
-						trigger = 0x1;
+						trigger = 0x11;
 				}
 				delay = atof(get_argument(argc, argv, 4, "6.4"));
 				if ((delay < 3.0f) || (delay > 10.0f)) {
