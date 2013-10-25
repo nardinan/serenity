@@ -1,6 +1,6 @@
 OBJSGRNDLIB = endian.o exception.o hash.o list.o log.o memory.o string.local.o types.o
 CC = gcc
-CFLAGS = -Wall -Wno-variadic-macros -std=c99 -c -pedantic
+CFLAGS = -Wall -fPIC -Wno-variadic-macros -std=c99 -c -pedantic
 LFLAGS = -Wall
 EXEC = libserenity_ground.so
 

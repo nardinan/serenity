@@ -1,6 +1,6 @@
 OBJSGRNDLIB = o_idea.o o_aes.o
 CC = gcc
-CFLAGS = -Wall -Wno-variadic-macros -std=c99 -c -pedantic
+CFLAGS = -Wall -fPIC -Wno-variadic-macros -std=c99 -c -pedantic
 LFLAGS = -Wall
 LINKSLIB = -L../ -L../../ground -lserenity_structures -lserenity_ground
 EXEC = libserenity_crypto.so

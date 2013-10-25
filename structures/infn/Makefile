@@ -1,6 +1,6 @@
 OBJSGRNDLIB = o_trb.o
 CC = gcc
-CFLAGS = -Wall -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
+CFLAGS = -Wall -fPIC -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
 LFLAGS = -Wall
 LINKSLIB = -L../ -L../../ground -lserenity_structures -lserenity_ground `libusb-legacy-config --libs`
 EXEC = libserenity_infn.so
