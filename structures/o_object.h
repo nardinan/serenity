@@ -75,6 +75,7 @@ typedef struct o_object {
 	} s_delegate;
 } o_object;
 extern void p_object_hooking(struct o_object *object);
+extern struct o_object *f_object_new_pure(struct o_object *supplied);
 extern struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied);
 extern struct o_object *f_object_retain(struct o_object *object);
 extern void f_object_release(struct o_object *object);

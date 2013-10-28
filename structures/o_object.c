@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "o_object.h"
+const char v_object_kind[] = "object";
 void p_object_hooking(struct o_object *object) {
 	object->s_delegate.m_compare = p_object_compare;
 	object->s_delegate.m_hash = p_object_hash;
@@ -24,6 +25,10 @@ void p_object_hooking(struct o_object *object) {
 	object->s_delegate.m_trylock = p_object_trylock;
 	object->s_delegate.m_lock = p_object_lock;
 	object->s_delegate.m_unlock = p_object_unlock;
+}
+
+struct o_object *f_object_new_pure(struct o_object *supplied) {
+	return f_object_new(v_object_kind, sizeof(struct o_object), supplied);
 }
 
 struct o_object *f_object_new(const char *kind, size_t size, struct o_object *supplied) {

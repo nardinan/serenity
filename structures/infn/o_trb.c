@@ -44,17 +44,24 @@ int p_trb_write(struct o_trb *object, char *data, size_t size, time_t timeout) {
 	return result;
 }
 
+int p_trb_check(struct usb_device *device, struct usb_dev_handle *handler) {
+	int result = d_false;
+	char manufacturer[d_string_buffer_size], product[d_string_buffer_size];
+	usb_get_string_simple(handler, device->descriptor.iManufacturer, manufacturer, d_string_buffer_size);
+	usb_get_string_simple(handler, device->descriptor.iProduct, product, d_string_buffer_size);
+	if ((strncmp(d_trb_manufacturer_label, manufacturer, strlen(d_trb_manufacturer_label)) == 0) &&
+			(strncmp(d_trb_product_label, product, strlen(d_trb_product_label)) == 0))
+		result = d_true;
+	return result;
+}
+
 struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struct usb_dev_handle *handler) {
 	struct o_trb *result;
-	char manufacturer[d_string_buffer_size], product[d_string_buffer_size];
 	if ((result = (struct o_trb *) f_object_new(v_trb_kind, sizeof(struct o_trb), (struct o_object *)supplied))) {
 		p_trb_hooking(result);
 		result->device = device;
 		result->handler = handler;
-		usb_get_string_simple(result->handler, result->device->descriptor.iManufacturer, manufacturer, d_string_buffer_size);
-		usb_get_string_simple(result->handler, result->device->descriptor.iProduct, product, d_string_buffer_size);
-		if ((strncmp(d_trb_manufacturer_label, manufacturer, strlen(d_trb_manufacturer_label)) == 0) &&
-				(strncmp(d_trb_product_label, product, strlen(d_trb_product_label)) == 0)) {
+		if (p_trb_check(result->device, result->handler)) {
 			if (usb_set_configuration(result->handler, 1) >= 0) {
 				result->write_address = result->device->config->interface->altsetting->endpoint[d_trb_write_endpoint].bEndpointAddress;
 				result->read_address = result->device->config->interface->altsetting->endpoint[d_trb_read_endpoint].bEndpointAddress;
@@ -76,11 +83,11 @@ int p_trb_compare(struct o_object *object, struct o_object *other) {
 
 void p_trb_delete(struct o_object *object) {
 	struct o_trb *local_object;
-        if ((local_object = d_object_kind(object, trb))) {
-                if (local_object->stream_out)
+	if ((local_object = d_object_kind(object, trb))) {
+		if (local_object->stream_out)
 			d_release(local_object->stream_out);
-        } else
-                d_throw(v_exception_kind, "object is not an instance of o_trb");
+	} else
+		d_throw(v_exception_kind, "object is not an instance of o_trb");
 }
 
 t_hash_value p_trb_hash(struct o_object *object) {

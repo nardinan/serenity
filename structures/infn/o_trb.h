@@ -56,6 +56,7 @@ typedef struct o_trb {
 extern void p_trb_hooking(struct o_trb *object);
 extern int p_trb_read(struct o_trb *object, char *data, size_t size, time_t timeout);
 extern int p_trb_write(struct o_trb *object, char *data, size_t size, time_t timeout);
+extern int p_trb_check(struct usb_device *device, struct usb_dev_handle *handler);
 extern struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struct usb_dev_handle *handler);
 extern void p_trb_delete(struct o_object *object);
 extern int p_trb_compare(struct o_object *object, struct o_object *other);
@@ -67,3 +68,4 @@ extern void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct
 extern struct s_trb_event *p_trb_event(struct o_trb *object, struct s_trb_event *provided, time_t timeout);
 extern void p_trb_close(struct o_trb *object);
 #endif
+

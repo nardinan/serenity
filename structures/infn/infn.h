@@ -18,5 +18,6 @@
 #ifndef serenity_infn_h
 #define serenity_infn_h
 #include "o_trb.h"
+#include "o_trbs.h"
 #endif
 
