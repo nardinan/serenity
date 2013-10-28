@@ -39,15 +39,16 @@ int p_trbs_thread_continue(struct o_trbs *object) {
 }
 
 int p_trbs_thread_already(struct o_trbs *object, struct usb_device *device) {
-	int result = d_false, index;
+	int result = d_false, index, filled = 0;
 	for (index = 0; index < d_trbs_slots_size; index++)
-		if (object->devices[index].device)
-			/* no idea, we have to check */
+		if (object->devices[index].device) {
+			filled++;
 			if (object->devices[index].device == device) {
 				object->devices[index].referenced = d_true;
 				result = d_true;
 				break;
 			}
+		}
 	return result;
 }
 
@@ -60,19 +61,20 @@ void *p_trbs_thread(void *parameters) {
 	while ((p_trbs_thread_continue(local_parameters->object)) && (usleep(local_parameters->sleep)==0))
 		if ((usb_find_busses()) | (usb_find_devices())) {
 			for (bus = usb_get_busses(); bus; bus = bus->next)
-				for (device = bus->devices; device && (!p_trbs_thread_already(local_parameters->object, device)); device = device->next) {
-					for (index = 0; index < d_trbs_slots_size; index++)
-						if (!local_parameters->object->devices[index].device) {
-							local_parameters->object->devices[index].device = device;
-							local_parameters->object->devices[index].referenced = d_true;
+				for (device = bus->devices; device; device = device->next)
+					if (!p_trbs_thread_already(local_parameters->object, device))
+						if ((handler = usb_open(device))) {
+							if ((p_trb_check(device, handler))) {
+								for (index = 0; index < d_trbs_slots_size; index++)
+									if (!local_parameters->object->devices[index].device) {
+										local_parameters->object->devices[index].device = device;
+										local_parameters->object->devices[index].referenced = d_true;
+										break;
+									}
+								local_parameters->handle(f_trb_new(NULL, device, handler));
+							} else
+								usb_close(handler);
 						}
-					if ((handler = usb_open(device))) {
-						if ((p_trb_check(device, handler)))
-							local_parameters->handle(f_trb_new(NULL, device, handler));
-						else
-							usb_close(handler);
-					}
-				}
 			for (index = 0; index < d_trbs_slots_size; index++) {
 				if (local_parameters->object->devices[index].device)
 					if (!local_parameters->object->devices[index].referenced)
