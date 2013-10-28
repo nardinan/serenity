@@ -7,7 +7,7 @@ EXEC = libserenity_crypto.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
 	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) $(LINKSLIB) -shared
-	cp $(EXEC) ../../tests/
+	cp $(EXEC) ../..
 	
 o_idea.o: o_idea.c o_idea.h o_aes.h
 	$(CC) $(CFLAGS) o_idea.c 

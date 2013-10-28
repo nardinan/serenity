@@ -7,7 +7,7 @@ EXEC = libserenity_infn.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
 	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) $(LINKSLIB) -shared
-	cp $(EXEC) ../../tests/
+	cp $(EXEC) ../..
 	
 o_trb.o: o_trb.c o_trb.h ../o_string.h
 	$(CC) $(CFLAGS) o_trb.c 

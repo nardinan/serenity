@@ -15,8 +15,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../structures/structures.h"
-#include "../structures/infn/infn.h"
+#include <serenity/structures/structures.h>
+#include <serenity/structures/infn/infn.h>
 int check_manifacturer(struct usb_dev_handle *udev, struct usb_device *dev) {
 	int result = d_false;
 	char buffer[256];

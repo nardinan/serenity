@@ -15,7 +15,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../structures/structures.h"
+#include <serenity/structures/structures.h>
 int main (int argc, char *argv[]) {
 	size_t index;
 	struct o_string constant = d_string_constant("hello world"), *string[4], *result;

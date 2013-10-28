@@ -15,7 +15,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../ground/ground.h"
+#include <serenity/ground/ground.h>
 d_exception_define(generic, 1, "generic exception");
 d_exception_define(arithmetic, 2, "arithmetic exception");
 d_exception_define(range, 3, "index out of range exception");

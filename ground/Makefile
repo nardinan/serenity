@@ -6,7 +6,7 @@ EXEC = libserenity_ground.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
 	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) -shared
-	cp $(EXEC) ../tests/
+	cp $(EXEC) ..
 
 endian.o: endian.c endian.h types.h
 	$(CC) $(CFLAGS) endian.c

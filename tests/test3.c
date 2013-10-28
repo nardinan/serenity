@@ -15,7 +15,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../ground/ground.h"
+#include <serenity/ground/ground.h>
 typedef struct s_person {
 	d_list_node_head; /* must be in the head */
 	char name[12], surname[12];

@@ -7,7 +7,7 @@ EXEC = libserenity_structures.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
 	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) $(LINKSLIB) -shared
-	cp $(EXEC) ../tests/
+	cp $(EXEC) ..
 
 o_array.o: o_array.c o_array.h o_object.h
 	$(CC) $(CFLAGS) o_array.c

@@ -16,7 +16,7 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <stdio.h>
-#include "../ground/ground.h"
+#include <serenity/ground/ground.h>
 int compare (void *a, void *b) {
 	char *as = (char *)a, *bs = (char *)b;
 	return strcmp(as, bs);

@@ -15,8 +15,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "../structures/structures.h"
-#include "../structures/crypto/crypto.h"
+#include <serenity/structures/structures.h>
+#include <serenity/structures/crypto/crypto.h>
 int main (int argc, char *argv[]) {
 	unsigned char key[16] = {0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7, 0, 8};
 	struct o_pool *pool = f_pool_new(NULL);
