@@ -17,8 +17,9 @@
  */
 #include <serenity/structures/structures.h>
 #include <serenity/structures/infn/infn.h>
-int incoming_trb(struct o_trb *trb) {
-	printf("incoming!\n");
+int incoming_trb(struct o_trb *trb, void *data) {
+	printf("- incoming device!\n");
+	return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -31,7 +32,7 @@ int main(int argc, char *argv[]) {
 		d_pool_begin(pool) {
 			out_stream = d_stdout;
 			trbs = f_trbs_new(NULL);
-			trbs->m_async_search(trbs, incoming_trb, 1000000);
+			trbs->m_async_search(trbs, incoming_trb, 1000000, NULL);
 			while (d_true) {
 				usleep(1000000);
 				printf("Searching for new miniTRB ...\n");

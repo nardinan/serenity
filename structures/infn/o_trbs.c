@@ -71,7 +71,7 @@ void *p_trbs_thread(void *parameters) {
 										local_parameters->object->devices[index].referenced = d_true;
 										break;
 									}
-								local_parameters->handle(f_trb_new(NULL, device, handler));
+								local_parameters->handle(f_trb_new(NULL, device, handler), local_parameters->user_data);
 							} else
 								usb_close(handler);
 						}
@@ -126,7 +126,7 @@ char *p_trbs_string(struct o_object *object, char *data, size_t size) {
 	return data;
 }
 
-int p_trbs_async_search(struct o_trbs *object, t_trbs_handle *handle, time_t sleep) {
+int p_trbs_async_search(struct o_trbs *object, t_trbs_handle *handle, time_t sleep, void *user_data) {
 	int result = d_false;
 	struct s_trbs_parameters *parameters;
 	if (pthread_equal(object->thread_id, pthread_self())) {
@@ -134,6 +134,7 @@ int p_trbs_async_search(struct o_trbs *object, t_trbs_handle *handle, time_t sle
 			parameters->object = object;
 			parameters->handle = handle;
 			parameters->sleep = sleep;
+			parameters->user_data = user_data;
 			d_object_lock(object->semaphore);
 			if ((pthread_create(&(object->thread_id), NULL, p_trbs_thread, parameters)) == 0)
 				result = d_true;

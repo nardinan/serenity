@@ -22,10 +22,11 @@
 #define d_trbs_slots_size 15
 extern const char v_trbs_kind[];
 extern int v_trbs_usb_init;
-typedef int (t_trbs_handle)(struct o_trb *);
+typedef int (t_trbs_handle)(struct o_trb *, void *);
 typedef struct s_trbs_parameters {
 	struct o_trbs *object;
 	t_trbs_handle *handle;
+	void *user_data;
 	time_t sleep;
 } s_trbs_parameters;
 typedef struct o_trbs {
@@ -36,7 +37,7 @@ typedef struct o_trbs {
 		int referenced;
 	} devices[d_trbs_slots_size];
 	pthread_t thread_id;
-	int (*m_async_search)(struct o_trbs *, t_trbs_handle *, time_t);
+	int (*m_async_search)(struct o_trbs *, t_trbs_handle *, time_t, void *);
 } o_trbs;
 extern void p_trbs_hooking(struct o_trbs *object);
 extern int p_trbs_thread_continue(struct o_trbs *object);
@@ -46,5 +47,5 @@ extern void p_trbs_delete(struct o_object *object);
 extern int p_trbs_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_trbs_hash(struct o_object *object);
 extern char *p_trbs_string(struct o_object *object, char *data, size_t size);
-extern int p_trbs_async_search(struct o_trbs *object, t_trbs_handle *handle, time_t sleep);
+extern int p_trbs_async_search(struct o_trbs *object, t_trbs_handle *handle, time_t sleep, void *user_data);
 #endif
