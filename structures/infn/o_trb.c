@@ -26,6 +26,7 @@ void p_trb_hooking(struct o_trb *object) {
 	object->head.s_delegate.m_string = p_trb_string;
 	/* keep default clone function */
 	object->m_setup = p_trb_setup;
+	object->m_close_stream = p_trb_close_stream;
 	object->m_stream = p_trb_stream;
 	object->m_event = p_trb_event;
 }
@@ -61,6 +62,7 @@ struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struc
 		p_trb_hooking(result);
 		result->device = device;
 		result->handler = handler;
+		result->stream_lock = f_object_new_pure(NULL);
 		if (p_trb_check(result->device, result->handler)) {
 			if (usb_set_configuration(result->handler, 1) >= 0) {
 				result->write_address = result->device->config->interface->altsetting->endpoint[d_trb_write_endpoint].bEndpointAddress;
@@ -86,6 +88,7 @@ void p_trb_delete(struct o_object *object) {
 	if ((local_object = d_object_kind(object, trb))) {
 		if (local_object->stream_out)
 			d_release(local_object->stream_out);
+		d_release(local_object->stream_lock);
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_trb");
 }
@@ -155,10 +158,18 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 	return result;
 }
 
-void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_string *name, const char *action, int permission) {
+void p_trb_close_stream(struct o_trb *object) {
+	d_object_lock(object->stream_lock);
 	if (object->stream_out)
 		d_release(object->stream_out);
+	d_object_unlock(object->stream_lock);
+}
+
+void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_string *name, const char *action, int permission) {
+	p_trb_close_stream(object);
+	d_object_lock(object->stream_lock);
 	object->stream_out = f_stream_new_file(supplied, name, action, permission);
+	d_object_unlock(object->stream_lock);
 }
 
 struct s_trb_event *p_trb_event(struct o_trb *object, struct s_trb_event *provided, time_t timeout) {
@@ -200,8 +211,10 @@ struct s_trb_event *p_trb_event(struct o_trb *object, struct s_trb_event *provid
 		if ((d_trb_buffer_size-object->buffer_fill) >= d_trb_packet_size)
 			if ((readed = p_trb_read(object, pointer, d_trb_packet_size, timeout)) > 0) {
 				object->buffer_fill += readed;
+				d_object_lock(object->stream_lock);
 				if (object->stream_out)
 					object->stream_out->m_write(object->stream_out, readed, (void *)pointer);
+				d_object_unlock(object->stream_lock);
 			}
 	}
 	return result;
