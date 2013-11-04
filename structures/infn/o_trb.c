@@ -162,6 +162,7 @@ void p_trb_close_stream(struct o_trb *object) {
 	d_object_lock(object->stream_lock);
 	if (object->stream_out)
 		d_release(object->stream_out);
+	object->stream_out = NULL;
 	d_object_unlock(object->stream_lock);
 }
 
