@@ -26,6 +26,7 @@
 #define d_trb_read_endpoint 1
 #define d_trb_channels 384
 #define d_trb_channels_half 192
+#define d_trb_vas 6
 #define d_trb_buffer_size 1560
 #define d_trb_event_size_normal 780
 #define d_trb_event_size_debug 112
