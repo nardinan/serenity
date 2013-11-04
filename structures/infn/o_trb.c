@@ -185,7 +185,7 @@ struct s_trb_event *p_trb_event(struct o_trb *object, struct s_trb_event *provid
 			if ((object->buffer[0] == 0x90) && (object->buffer[1] == 0xeb)) {
 				if (object->buffer[3] == object->mode) {
 					result->code = object->buffer[2];
-					for (index = 0, local_index = 0; index < d_trb_channels; index += 2, local_index++) {
+					for (index = 4, local_index = 0; local_index < d_trb_channels; index += 2, local_index++) {
 						channel = (((local_index%2)*d_trb_channels_half)+(local_index/2));
 						result->values[channel] = ((unsigned short int)object->buffer[index])|
 							((unsigned short int)object->buffer[index+1])<<8;
