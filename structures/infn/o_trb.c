@@ -175,13 +175,14 @@ void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_stri
 
 struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provided, time_t timeout) {
 	struct o_trb_event *result = provided;
-	unsigned char *pointer, *end;
+	unsigned char *pointer;
 	size_t readed;
 	if (object->handler) {
 		if (!result)
 			result = f_trb_event_new(NULL);
+		result->filled = d_false;
 		while ((object->buffer_fill >= object->event_size) && (!result->filled))  {
-			if ((end = result->m_load(result, object->buffer, object->buffer_fill))) {
+			if (result->m_load(result, object->buffer, object->buffer_fill)) {
 				object->buffer_fill -= object->event_size;
 				memmove(object->buffer, (object->buffer+object->event_size), object->buffer_fill);
 			} else
