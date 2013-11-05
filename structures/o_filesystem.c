@@ -49,7 +49,7 @@ struct o_filesystem *f_filesystem_new_stream(struct o_filesystem *supplied, stru
 		result->files = f_dictionary_new(NULL);
 		d_try {
 			dimension = stream->m_size(stream);
-			if ((content = stream->m_read(stream, dimension))) {
+			if ((content = stream->m_read(stream, NULL, dimension))) {
 				length = sizeof(struct s_filesystem_header);
 				while (readed < dimension) {
 					header = ((struct s_filesystem_header*)(content->content+readed));

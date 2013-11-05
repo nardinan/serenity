@@ -26,6 +26,7 @@ void p_stream_hooking(struct o_stream *object) {
 	object->m_write = p_stream_write;
 	object->m_write_string = p_stream_write_string;
 	object->m_write_stream = p_stream_write_stream;
+	object->m_read_raw = p_stream_read_raw;
 	object->m_read = p_stream_read;
 	object->m_size = p_stream_size;
 	object->m_seek = p_stream_seek;
@@ -189,7 +190,7 @@ ssize_t p_stream_write_stream(struct o_stream *object, struct o_stream *source) 
 	struct o_string *output = NULL;
 	ssize_t readed, total;
 	total = source->m_size(source);
-	if ((output = source->m_read(source, total))) {
+	if ((output = source->m_read(source, NULL, total))) {
 		if ((readed = output->size) == total) {
 			p_stream_write(object, output->size, output->content);
 			d_release(output);
@@ -202,22 +203,35 @@ ssize_t p_stream_write_stream(struct o_stream *object, struct o_stream *source) 
 	return total;
 }
 
-struct o_string *p_stream_read(struct o_stream *object, size_t size) {
-	struct o_string *result = NULL;
-	ssize_t readed;
+ssize_t p_stream_read_raw(struct o_stream *object, unsigned char *buffer, size_t size) {
+	ssize_t readed = 0;
 	if (object->s_flags.opened) {
-		if (((object->flags&O_RDWR) == O_RDWR) || ((object->flags&O_RDONLY) == O_RDONLY)) {
-			if ((result = f_string_new(NULL, size, NULL))) {
-				readed = read(object->descriptor, result->content, size);
-				if (readed <= 0) {
-					d_release(result);
-					result = NULL;
-				}
-			}
-		} else
+		if (((object->flags&O_RDWR) == O_RDWR) || ((object->flags&O_RDONLY) == O_RDONLY))
+			readed = read(object->descriptor, buffer, size);
+		else
 			d_throw(v_exception_unsupported, "can't read from a write-only stream");
 	} else
 		d_throw(v_exception_closed, "can't read from a closed stream");
+	return readed;
+}
+
+struct o_string *p_stream_read(struct o_stream *object, struct o_string *supplied, size_t size) {
+	struct s_exception *exception = NULL;
+	struct o_string *result = supplied;
+	int local_allocation = (supplied)?d_false:d_true;
+	ssize_t readed;
+	d_try {
+		if (!result)
+			result = f_string_new(NULL, size, NULL);
+		if ((readed = p_stream_read_raw(object, (unsigned char *)result->content, size)) == 0) {
+			if (local_allocation)
+				d_release(result);
+			result = NULL;
+		}
+	} d_catch(exception) {
+		d_exception_dump(stderr, exception);
+		d_raise;
+	} d_endtry;
 	return result;
 }
 

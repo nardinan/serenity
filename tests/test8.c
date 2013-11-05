@@ -24,7 +24,7 @@ int main (int argc, char *argv[]) {
 		out = d_stdout;
 		in = d_stdin;
 		out->m_write_string(out, d_P(d_string(128, "hello! from stream %@.. and what's your name? ", out), struct o_string));
-		readed = in->m_read(in, 64);
+		readed = in->m_read(in, NULL, 64);
 		if (readed) {
 			if (readed->m_character(readed, readed->m_length(readed)-1) == '\n')
 				readed->m_truncate(readed, (readed->m_length(readed)-1));
