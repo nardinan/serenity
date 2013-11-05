@@ -31,17 +31,17 @@ void p_trb_hooking(struct o_trb *object) {
 	object->m_event = p_trb_event;
 }
 
-int p_trb_read(struct o_trb *object, char *data, size_t size, time_t timeout) {
+int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
 	int result = -1;
 	if (object->handler)
-		result = usb_bulk_read(object->handler, object->read_address, data, size, timeout);
+		result = usb_bulk_read(object->handler, object->read_address, (char *)data, size, timeout);
 	return result;
 }
 
-int p_trb_write(struct o_trb *object, char *data, size_t size, time_t timeout) {
+int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
 	int result = -1;
 	if (object->handler)
-		result = usb_bulk_write(object->handler, object->write_address, data, size, timeout);
+		result = usb_bulk_write(object->handler, object->write_address, (char *)data, size, timeout);
 	return result;
 }
 
@@ -123,7 +123,7 @@ char *p_trb_string(struct o_object *object, char *data, size_t size) {
 
 int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel, time_t timeout) {
 	int result = -1;
-	char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	if (object->handler) {
 		if ((hold_delay >= 3.0) && (hold_delay <= 10.0)) {
 			setup_command[4] = ((float)hold_delay/0.05);
@@ -173,42 +173,21 @@ void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_stri
 	d_object_unlock(object->stream_lock);
 }
 
-struct s_trb_event *p_trb_event(struct o_trb *object, struct s_trb_event *provided, time_t timeout) {
-	struct s_trb_event *result = provided;
-	char *pointer;
-	int index, channel, readed, local_index, local_size;
+struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provided, time_t timeout) {
+	struct o_trb_event *result = provided;
+	unsigned char *pointer, *end;
+	size_t readed;
 	if (object->handler) {
 		if (!result)
-			if (!(result = ((struct s_trb_event*) d_malloc(sizeof(struct s_trb_event)))))
-				d_die(d_error_malloc);
-		result->filled = d_false;
+			result = f_trb_event_new(NULL);
 		while ((object->buffer_fill >= object->event_size) && (!result->filled))  {
-			if ((object->buffer[0] == 0x90) && (object->buffer[1] == 0xeb)) {
-				if (object->buffer[3] == object->mode) {
-					result->code = object->buffer[2];
-					for (index = 4, local_index = 0; local_index < d_trb_channels; index += 2, local_index++) {
-						channel = (((local_index%2)*d_trb_channels_half)+(local_index/2));
-						result->values[channel] = ((unsigned short int)object->buffer[index])|
-							((unsigned short int)object->buffer[index+1])<<8;
-					}
-					result->temperature[0] = ((unsigned short int)object->buffer[index])|((unsigned short int)object->buffer[index+1])<<8;
-					result->temperature[1] = ((unsigned short int)object->buffer[index+2])|((unsigned short int)object->buffer[index+3])<<8;
-					result->filled = d_true;
-				}
+			if ((end = result->m_load(result, object->buffer, object->buffer_fill))) {
 				object->buffer_fill -= object->event_size;
 				memmove(object->buffer, (object->buffer+object->event_size), object->buffer_fill);
-			} else {
-				for (index = 0, local_size = 0; index < object->buffer_fill; index++)
-					if ((object->buffer[index] == 0x90) && ((index == (object->buffer_fill-1)) || (object->buffer[index+1] == 0xeb))) {
-						local_size = object->buffer_fill-index;
-						memmove(object->buffer, &(object->buffer[index]), local_size);
-						break;
-					}
-				object->buffer_fill = local_size;
-			}
-
+			} else
+				object->buffer_fill = p_trb_event_align(object->buffer, object->buffer_fill);
 		}
-		pointer = (char *)object->buffer+object->buffer_fill;
+		pointer = (unsigned char *)object->buffer+object->buffer_fill;
 		if ((d_trb_buffer_size-object->buffer_fill) >= d_trb_packet_size)
 			if ((readed = p_trb_read(object, pointer, d_trb_packet_size, timeout)) > 0) {
 				object->buffer_fill += readed;

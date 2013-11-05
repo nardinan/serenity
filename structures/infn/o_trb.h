@@ -19,18 +19,13 @@
 #define serenity_o_trb_h
 #include "../o_string.h"
 #include "../o_stream.h"
+#include "o_trb_event.h"
 #include <usb.h>
 #define d_trb_manufacturer_label "DAMPE"
 #define d_trb_product_label "miniTRB-Device"
 #define d_trb_write_endpoint 0
 #define d_trb_read_endpoint 1
-#define d_trb_channels 384
-#define d_trb_channels_half 192
-#define d_trb_vas 6
-#define d_trb_channels_on_va 64
 #define d_trb_buffer_size 1560
-#define d_trb_event_size_normal 780
-#define d_trb_event_size_debug 112
 #define d_trb_packet_size 512
 extern const char v_trb_kind[];
 enum e_trb_mode {
@@ -39,11 +34,6 @@ enum e_trb_mode {
 	e_trb_mode_calibration_debug_analogic,
 	e_trb_mode_calibration_debug_digital
 } e_trb_mode;
-typedef struct s_trb_event {
-	unsigned char code;
-	short unsigned int values[d_trb_channels], temperature[2];
-	int filled;
-} s_trb_event;
 typedef struct o_trb {
 	d_object_head;
 	struct usb_device *device;
@@ -55,11 +45,11 @@ typedef struct o_trb {
 	int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned char, unsigned char, time_t);
 	void (*m_close_stream)(struct o_trb *);
 	void (*m_stream)(struct o_trb *, struct o_stream *, struct o_string *, const char *, int);
-	struct s_trb_event *(*m_event)(struct o_trb *, struct s_trb_event *, time_t);
+	struct o_trb_event *(*m_event)(struct o_trb *, struct o_trb_event *, time_t);
 } o_trb;
 extern void p_trb_hooking(struct o_trb *object);
-extern int p_trb_read(struct o_trb *object, char *data, size_t size, time_t timeout);
-extern int p_trb_write(struct o_trb *object, char *data, size_t size, time_t timeout);
+extern int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout);
+extern int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout);
 extern int p_trb_check(struct usb_device *device, struct usb_dev_handle *handler);
 extern struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struct usb_dev_handle *handler);
 extern void p_trb_delete(struct o_object *object);
@@ -70,7 +60,6 @@ extern int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_d
 		time_t timeout);
 extern void p_trb_close_stream(struct o_trb *object);
 extern void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_string *name, const char *action, int permission);
-extern struct s_trb_event *p_trb_event(struct o_trb *object, struct s_trb_event *provided, time_t timeout);
-extern void p_trb_close(struct o_trb *object);
+extern struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provided, time_t timeout);
 #endif
 

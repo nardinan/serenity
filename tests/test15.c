@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 	struct o_stream *out_stream;
 	struct s_exception *exception;
 	struct o_trbs *trbs;
-	struct s_trb_event *event = (struct s_trb_event *) d_malloc(sizeof(struct s_trb_event));
+	struct o_trb_event *event = f_trb_event_new(NULL);
 	d_try {
 		d_pool_begin(pool) {
 			out_stream = d_stdout;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 	} d_catch(exception) {
 		d_exception_dump(stdout, exception);
 	} d_endtry;
-	d_free(event);
+	d_release(event);
 	f_memory_flush(e_log_level_ever);
 	return 0;
 }
