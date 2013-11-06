@@ -14,6 +14,6 @@ $ make install
 
 If you want to compile, for instance, the source tests/test11.c you have to use
 
-$ make tests NUMBER=11
+$ make tests number=11
 
 Good work!

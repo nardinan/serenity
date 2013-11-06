@@ -1,37 +1,23 @@
-INC_DIR = /usr/local/include
-LIB_DIR = /usr/local/lib
-DIR_NAME = serenity
+prefix = /usr/local
+include_dir = $(prefix)/include
+library_dir = $(prefix)/lib
+library_name = serenity
+folders = ground structures structures/crypto structures/infn 
 
 all:
-	cd ground; make
-	cd structures; make
-	cd structures/crypto; make
-	cd structures/infn; make
+	for current_dir in $(folders); do make -C $${current_dir}; done
 
 install:
-	sudo mv *.so $(LIB_DIR)
-	sudo rm -rf $(INC_DIR)/$(DIR_NAME)
-	sudo mkdir $(INC_DIR)/$(DIR_NAME)
-	sudo mkdir $(INC_DIR)/$(DIR_NAME)/ground
-	sudo mkdir $(INC_DIR)/$(DIR_NAME)/structures
-	sudo mkdir $(INC_DIR)/$(DIR_NAME)/structures/crypto
-	sudo mkdir $(INC_DIR)/$(DIR_NAME)/structures/infn
-	sudo cp -f ground/*.h $(INC_DIR)/$(DIR_NAME)/ground
-	sudo cp -f structures/*.h $(INC_DIR)/$(DIR_NAME)/structures
-	sudo cp -f structures/crypto/*.h $(INC_DIR)/$(DIR_NAME)/structures/crypto
-	sudo cp -f structures/infn/*.h $(INC_DIR)/$(DIR_NAME)/structures/infn
+	rm -rf $(include_dir)/$(library_name)
+	mkdir $(include_dir)/$(library_name)
+	for current_dir in $(folders); do \
+		mkdir $(include_dir)/$(library_name)/$${current_dir} && cp -f $${current_dir}/*.h $(include_dir)/$(library_name)/$${current_dir}; \
+	done
 
 test:
-	cd tests; make NUMBER=$(NUMBER) INC_DIR=$(INC_DIR) LIB_DIR=$(LIB_DIR)
+	cd tests; make number=$(number) include_dir=$(include_dir) library_dir=$(library_dir)
 
 clean:
 	rm -f *.so
-
-cleanall:
-	cd ground; make clean
-	cd structures; make clean
-	cd structures/crypto; make clean
-	cd structures/infn; make clean
-	cd tests; make clean
-	rm -f *.so
-
+	for current_dir in $(folders); do make clean -C $${current_dir}; done
+	make clean -C tests

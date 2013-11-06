@@ -1,15 +1,15 @@
-OBJSGRNDLIB = test$(NUMBER).o
-CC = gcc
-CFLAGS = -Wall -I$(INC_DIR) -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
-LFLAGS = -Wall
-LIBSLINK = -L$(LIB_DIR) -lserenity_structures -lserenity_ground -lserenity_crypto -lserenity_infn `libusb-legacy-config --libs`
-EXEC = test$(NUMBER).bin
+object = test$(number).o
+cc = gcc
+cflags = -Wall -I$(include_dir) -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
+lflags = -Wall
+library_links = -L$(library_dir) -lserenity_ground -lserenity_structures -lserenity_crypto -lserenity_infn `libusb-legacy-config --libs`
+exec = test$(number).bin
 
-all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
-	$(CC) $(LFLAGS) $(OBJSGRNDLIB) $(MAINGRNDLIB) -o $(EXEC) $(LIBSLINK)
+all: $(object)
+	$(cc) $(lflags) $(object) -o $(exec) $(library_links)
 
-test$(NUMBER).o: test$(NUMBER).c
-	$(CC) $(CFLAGS) test$(NUMBER).c 
+test$(number).o: test$(number).c
+	$(cc) $(cflags) test$(number).c 
 
 clean:
 	rm -f *.o
