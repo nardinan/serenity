@@ -17,7 +17,8 @@
  */
 #ifndef serenity_o_trb_event_h
 #define serenity_o_trb_event_h
-#include "../o_object.h"
+#include <math.h>
+#include "../o_array.h"
 #define d_trb_event_channels 384
 #define d_trb_event_channels_half 192
 #define d_trb_event_vas 6
@@ -36,6 +37,9 @@ typedef struct o_trb_event {
 } o_trb_event;
 extern void p_trb_event_hooking(struct o_trb_event *object);
 extern unsigned int p_trb_event_align(unsigned char *buffer, size_t size);
+extern float *p_trb_event_pedestal(struct o_array *events, float *supplied);
+extern float *p_trb_event_sigma_raw(struct o_array *events, float *supplied);
+extern float *p_trb_event_sigma(struct o_array *events, float sigma_multiplicator, float *sigma_raw, float *pedestal, float *supplied);
 extern struct o_trb_event *f_trb_event_new(struct o_trb_event *supplied);
 extern int p_trb_event_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_trb_event_hash(struct o_object *object);

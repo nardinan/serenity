@@ -2,7 +2,7 @@ OBJSGRNDLIB = o_trb_event.o o_trb.o o_trbs.o
 CC = gcc
 CFLAGS = -Wall -fPIC -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
 LFLAGS = -Wall
-LINKSLIB = -L../ -L../../ground -lserenity_structures -lserenity_ground `libusb-legacy-config --libs` -lpthread
+LINKSLIB = -L../ -L../../ground -lm -lserenity_structures -lserenity_ground `libusb-legacy-config --libs` -lpthread
 EXEC = libserenity_infn.so
 
 all: $(OBJSGRNDLIB) $(MAINGRNDLIB)
