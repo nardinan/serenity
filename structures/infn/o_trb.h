@@ -40,7 +40,7 @@ typedef struct o_trb {
 	struct usb_dev_handle *handler;
 	struct o_stream *stream_out;
 	struct o_object *stream_lock;
-	int write_address, read_address, buffer_fill, event_size;
+	int write_address, read_address, buffer_fill, event_size, last_error;
 	unsigned char buffer[d_trb_buffer_size], mode;
 	int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned char, unsigned char, time_t);
 	void (*m_close_stream)(struct o_trb *);

@@ -20,10 +20,10 @@
 #include <pthread.h>
 #include "o_exceptions.h"
 #define d_object_head struct o_object head
-#define d_compare(a,b) (((a)&&(b))?((struct o_object *)(a))->s_delegate.m_compare((struct o_object*)(a),(struct o_object*)(b)):(int)((a)-(b)))
+#define d_compare(a,b) (((a)&&(b))?((struct o_object *)a)->s_delegate.m_compare((struct o_object*)(a),(struct o_object*)(b)):((int)a)-((int)b))
 #define d_retain(a,k) (k*)f_object_retain((struct o_object *)a)
 #define d_release(a) f_object_release((struct o_object *)a)
-#define d_clone(a,k) (k*)((struct o_object *)(a))->s_delegate.m_clone((struct o_object *)a)
+#define d_clone(a,k) (k*)((struct o_object *)a)->s_delegate.m_clone((struct o_object *)a)
 #define d_object_constant(k,s,hook)\
 {\
 	d_list_node_constant,\

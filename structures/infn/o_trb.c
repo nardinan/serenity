@@ -32,14 +32,14 @@ void p_trb_hooking(struct o_trb *object) {
 }
 
 int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
-	int result = -1;
+	int result = d_false;
 	if (object->handler)
 		result = usb_bulk_read(object->handler, object->read_address, (char *)data, size, timeout);
 	return result;
 }
 
 int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
-	int result = -1;
+	int result = d_false;
 	if (object->handler)
 		result = usb_bulk_write(object->handler, object->write_address, (char *)data, size, timeout);
 	return result;
@@ -122,7 +122,7 @@ char *p_trb_string(struct o_object *object, char *data, size_t size) {
 }
 
 int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel, time_t timeout) {
-	int result = -1;
+	int result = d_false;
 	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	if (object->handler) {
 		if ((hold_delay >= 3.0) && (hold_delay <= 10.0)) {
@@ -155,6 +155,7 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 				result = p_trb_write(object, startup_command, sizeof(startup_command), timeout);
 		}
 	}
+	object->last_error = result;
 	return result;
 }
 
@@ -176,7 +177,7 @@ void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_stri
 struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provided, time_t timeout) {
 	struct o_trb_event *result = provided;
 	unsigned char *pointer;
-	size_t readed;
+	ssize_t readed = d_false;
 	if (object->handler) {
 		if (!result)
 			result = f_trb_event_new(NULL);
@@ -198,6 +199,7 @@ struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provid
 				d_object_unlock(object->stream_lock);
 			}
 	}
+	object->last_error = readed;
 	return result;
 }
 
