@@ -13,6 +13,7 @@ install:
 	for current_dir in $(folders); do \
 		mkdir $(include_dir)/$(library_name)/$${current_dir} && cp -f $${current_dir}/*.h $(include_dir)/$(library_name)/$${current_dir}; \
 	done
+	cp *.so $(library_dir)
 
 test:
 	cd tests; make number=$(number) include_dir=$(include_dir) library_dir=$(library_dir)
