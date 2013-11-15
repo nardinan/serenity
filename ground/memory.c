@@ -33,7 +33,7 @@ void *p_memory_insert(void *pointer, const char *file, const char *function, uns
 	if ((!founded) && (node = (struct s_pointer *) malloc(sizeof(struct s_pointer)))) {
 		memset(node, 0, sizeof(struct s_pointer));
 		node->pointer = pointer;
-		strncpy(node->file, d_clean_file(file), d_memory_coordinate_size);
+		strncpy(node->file, file, d_memory_coordinate_size);
 		strncpy(node->function, function, d_memory_coordinate_size);
 		node->line = line;
 		if (v_memory_root)

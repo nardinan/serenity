@@ -25,8 +25,8 @@
 #define d_trb_product_label "miniTRB-Device"
 #define d_trb_write_endpoint 0
 #define d_trb_read_endpoint 1
-#define d_trb_buffer_size 1560
 #define d_trb_packet_size 512
+#define d_trb_buffer_size 1560
 extern const char v_trb_kind[];
 enum e_trb_mode {
 	e_trb_mode_normal,

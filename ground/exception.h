@@ -31,13 +31,13 @@
 		v_exception_hook=&_local_hook;\
 		if((_local_code = setjmp(_local_hook))==0){
 #define d_catch_kind(k,o)\
-		}else if(_local_code==k.identificator){\
+		}else if(_local_code==(k).identificator){\
 			v_exception_hook=_last_hook;\
-			o=&v_exception_raised;
+			(o)=&v_exception_raised;
 #define d_catch(o)\
 		}else{\
 			v_exception_hook=_last_hook;\
-			o=&v_exception_raised;
+			(o)=&v_exception_raised;
 #define d_endtry\
 		}\
 		v_exception_hook=_last_hook;\
@@ -45,20 +45,18 @@
 #define d_throw(x,m)\
 	do{\
 		if(v_exception_hook){\
-			p_exception_fill(x,m,d_clean_file(__FILE__),__FUNCTION__,__LINE__);\
+			p_exception_fill((x),(m),__FILE__,__FUNCTION__,__LINE__);\
 			longjmp(*v_exception_hook,v_exception_raised.identificator);\
 		}\
 	}while(0)
 #define d_raise\
 	do{\
-		if(v_exception_hook)\
-		longjmp(*v_exception_hook,v_exception_raised.identificator);\
+		if(v_exception_hook) longjmp(*v_exception_hook,v_exception_raised.identificator);\
 	}while(0)
 #define d_exception_dump(s,o)\
 	do{\
-		if((o->level++)==0)\
-		fprintf(s,"%s:%s() @ %d {%s} %s\n",o->file,o->function,o->line,o->kind,o->description);\
-		fprintf(s,"\t%s:%s() @ %d\n",d_clean_file(__FILE__),__FUNCTION__,__LINE__);\
+		if(((o)->level++)==0) fprintf((s),"%s:%s() @ %d {%s} %s\n",(o)->file,o->function,(o)->line,(o)->kind,(o)->description);\
+		fprintf((s),"\t%s:%s() @ %d\n",__FILE__,__FUNCTION__,__LINE__);\
 	}while(0)
 #define d_exception_declare(k) extern const struct s_exception v_exception_##k
 #define d_exception_define(k,i,m) const struct s_exception v_exception_##k ={m,"undefined","undefine","undefined",0,0,i}

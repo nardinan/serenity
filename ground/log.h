@@ -24,12 +24,11 @@
 #define d_log_time_size 64
 #define d_log_description_size 32
 #define d_log_level_default e_log_level_medium
-#define d_clean_file(s) ((strrchr((s),'/')?0:(s)-1)+1)
-#define d_log(l,f,c...) p_log_write(stdout,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
-#define d_err(l,f,c...) p_log_write(stderr,l,d_clean_file(__FILE__),__FUNCTION__,__LINE__,f,##c)
+#define d_log(l,f,c...) p_log_write(stdout,l,__FILE__,__FUNCTION__,__LINE__,f,##c)
+#define d_err(l,f,c...) p_log_write(stderr,l,__FILE__,__FUNCTION__,__LINE__,f,##c)
 #define d_die(f...)\
 	do{\
-		p_log_write(stderr,e_log_level_ever,d_clean_file(__FILE__),__FUNCTION__,__LINE__,##f);\
+		p_log_write(stderr,e_log_level_ever,__FILE__,__FUNCTION__,__LINE__,##f);\
 		exit(1);\
 	}while(0);
 enum e_log_level {
