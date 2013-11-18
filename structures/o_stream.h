@@ -50,6 +50,7 @@ typedef struct o_stream {
 	ssize_t (*m_write_string)(struct o_stream *, struct o_string *);
 	ssize_t (*m_write_stream)(struct o_stream *, struct o_stream *);
 	ssize_t (*m_read_raw)(struct o_stream *, unsigned char *, size_t);
+	struct o_string *(*m_read_line)(struct o_stream *, struct o_string *, size_t);
 	struct o_string *(*m_read)(struct o_stream *, struct o_string *, size_t);
 	ssize_t (*m_size)(struct o_stream *);
 	off_t (*m_seek)(struct o_stream *, off_t, enum e_stream_seek);
@@ -67,6 +68,7 @@ extern ssize_t p_stream_write(struct o_stream *object, size_t size, void *source
 extern ssize_t p_stream_write_string(struct o_stream *object, struct o_string *string);
 extern ssize_t p_stream_write_stream(struct o_stream *object, struct o_stream *source);
 extern ssize_t p_stream_read_raw(struct o_stream *object, unsigned char *buffer, size_t size);
+extern struct o_string *p_stream_read_line(struct o_stream *object, struct o_string *supplied, size_t size);
 extern struct o_string *p_stream_read(struct o_stream *object, struct o_string *supplied, size_t size);
 extern ssize_t p_stream_size(struct o_stream *object);
 extern off_t p_stream_seek(struct o_stream *object, off_t offset, enum e_stream_seek whence);

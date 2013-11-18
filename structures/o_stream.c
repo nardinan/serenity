@@ -27,6 +27,7 @@ void p_stream_hooking(struct o_stream *object) {
 	object->m_write_string = p_stream_write_string;
 	object->m_write_stream = p_stream_write_stream;
 	object->m_read_raw = p_stream_read_raw;
+	object->m_read_line = p_stream_read_line;
 	object->m_read = p_stream_read;
 	object->m_size = p_stream_size;
 	object->m_seek = p_stream_seek;
@@ -215,16 +216,41 @@ ssize_t p_stream_read_raw(struct o_stream *object, unsigned char *buffer, size_t
 	return readed;
 }
 
+struct o_string *p_stream_read_line(struct o_stream *object, struct o_string *supplied, size_t size) {
+	struct o_string *result = supplied;
+	char character;
+	ssize_t readed = 0;
+	if (object->s_flags.opened) {
+		if (((object->flags&O_RDWR) == O_RDWR) || ((object->flags&O_RDONLY) == O_RDONLY)) {
+			if (!result)
+				result = f_string_new(NULL, size, NULL);
+			while ((readed < size) && (read(object->descriptor, &character, 1)))
+				if ((character != '\n') && (character != '\0'))
+					result->content[readed++] = character;
+				else
+					break;
+			result->content[readed] = '\0';
+			if (!readed) {
+				if (!supplied)
+					d_release(result);
+				result = NULL;
+			}
+		} else
+			d_throw(v_exception_unsupported, "can't read from a write-only stream");
+	} else
+		d_throw(v_exception_closed, "can't read from a closed stream");
+	return result;
+}
+
 struct o_string *p_stream_read(struct o_stream *object, struct o_string *supplied, size_t size) {
 	struct s_exception *exception = NULL;
 	struct o_string *result = supplied;
-	int local_allocation = (supplied)?d_false:d_true;
 	ssize_t readed;
 	d_try {
 		if (!result)
 			result = f_string_new(NULL, size, NULL);
 		if ((readed = p_stream_read_raw(object, (unsigned char *)result->content, size)) == 0) {
-			if (local_allocation)
+			if (!supplied)
 				d_release(result);
 			result = NULL;
 		}
