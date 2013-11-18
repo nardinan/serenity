@@ -52,7 +52,7 @@ typedef struct o_string {
 	size_t (*m_length)(struct o_string *);
 	char (*m_character)(struct o_string *, size_t);
 	struct o_string *(*m_substring)(struct o_string *, size_t, size_t);
-	struct o_array *(*m_split)(struct o_string *, char character);
+	struct o_array *(*m_split)(struct o_string *, char);
 	void (*m_truncate)(struct o_string *, size_t);
 } o_string;
 extern void p_string_hooking(struct o_string *object);

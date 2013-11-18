@@ -24,6 +24,7 @@ void p_dictionary_hooking(struct o_dictionary *object) {
 	/* keep default hash function */
 	object->head.s_delegate.m_string = p_dictionary_string;
 	object->head.s_delegate.m_clone = p_dictionary_clone;
+	object->m_load = p_dictionary_load;
 	object->m_insert = p_dictionary_insert;
 	object->m_get = p_dictionary_get;
 	object->m_keys = p_dictionary_keys;
@@ -89,7 +90,7 @@ char *p_dictionary_string(struct o_object *object, char *data, size_t size) {
 				pointer++;
 		}
 		if ((keys = local_object->m_keys(local_object))) {
-			for (index = 0; index < keys->size; index++) {
+			for (index = 0; index < keys->size; index++)
 				if ((key = keys->m_get(keys, index))) {
 					next = key->s_delegate.m_string(key, pointer, (size-written));
 					written += (next-pointer);
@@ -111,7 +112,6 @@ char *p_dictionary_string(struct o_object *object, char *data, size_t size) {
 						}
 					}
 				}
-			}
 			d_release(keys);
 		}
 		if (written < size) {
@@ -144,6 +144,27 @@ struct o_object *p_dictionary_clone(struct o_object *object) {
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_dictionary");
 	return (o_object *)result;
+}
+
+int p_dictionary_load(struct o_dictionary *object, struct o_stream *stream) {
+	struct o_string *singleton, *buffer = NULL;
+	struct o_array *values;
+	int result = d_false;
+	while ((singleton = stream->m_read_line(stream, buffer, d_string_buffer_size))) {
+		buffer = singleton;
+		if ((values = singleton->m_split(singleton, '='))) {
+			result = d_true;
+			if (values->filled >= 2)
+				p_dictionary_insert(object, values->m_get(values, 0), values->m_get(values, 1));
+			else
+				result = d_false;
+			d_release(values);
+			if (!result)
+				break;
+		}
+	}
+	d_release(buffer);
+	return result;
 }
 
 int p_dictionary_insert(struct o_dictionary *object, struct o_object *key, struct o_object *value) {
