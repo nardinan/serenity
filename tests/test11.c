@@ -42,10 +42,11 @@ int main(int argc, char *argv[]) {
 		d_try {
 			if ((out_file = f_stream_new_file(NULL, d_P(d_string_pure("test_file.txt"), struct o_string), "r", 0777))) {
 				if ((dictionary = f_dictionary_new(NULL))) {
-					dictionary->m_load(dictionary, out_file);
-					out_stream->m_write_string(out_stream, d_P(d_string(128, "%@\n", dictionary), struct o_string));
-					if ((value = (struct o_string *)dictionary->m_get(dictionary, d_P(d_string_pure("name"), struct o_object)))) {
-						printf("The customer's name is: %s\n", value->content);
+					if ((dictionary->m_load(dictionary, out_file))) {
+						out_stream->m_write_string(out_stream, d_P(d_string(128, "%@\n", dictionary), struct o_string));
+						if ((value = (struct o_string *)dictionary->m_get(dictionary, d_P(d_string_pure("name"), struct o_object)))) {
+							printf("The customer's name is: %s\n", value->content);
+						}
 					}
 					d_release(dictionary);
 				}

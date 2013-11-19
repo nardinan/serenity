@@ -20,7 +20,7 @@
 #include "o_object.h"
 #include "o_stream.h"
 #include "o_array.h"
-#define d_dictionary_get_string(d,k) (struct o_string *)((d)->m_get((d),(struct o_object *)(k))
+#define d_dictionary_get_string(d,k) (struct o_string *)((d)->m_get((d),(struct o_object *)(k)))
 extern const char v_dictionary_kind[];
 typedef struct o_dictionary {
 	d_object_head;

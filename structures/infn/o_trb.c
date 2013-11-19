@@ -47,7 +47,7 @@ int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t t
 
 int p_trb_check(struct usb_device *device, struct usb_dev_handle *handler) {
 	int result = d_false;
-	char manufacturer[d_string_buffer_size], product[d_string_buffer_size];
+	char manufacturer[d_string_buffer_size] = {0}, product[d_string_buffer_size] = {0};
 	usb_get_string_simple(handler, device->descriptor.iManufacturer, manufacturer, d_string_buffer_size);
 	usb_get_string_simple(handler, device->descriptor.iProduct, product, d_string_buffer_size);
 	if ((strncmp(d_trb_manufacturer_label, manufacturer, strlen(d_trb_manufacturer_label)) == 0) &&
