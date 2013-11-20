@@ -28,6 +28,9 @@
 #define d_trb_event_size_minimum 112
 #define d_trb_event_header(v) (((v)[0]==0x90)&&((v)[1]==0xeb))
 extern const char v_trb_event_kind[];
+typedef enum e_trb_event_channels {
+	e_trb_event_channel_damaged = 0x1
+} e_trb_event_channels;
 typedef struct o_trb_event {
 	d_object_head;
 	unsigned char code, kind;
@@ -39,7 +42,8 @@ extern void p_trb_event_hooking(struct o_trb_event *object);
 extern unsigned int p_trb_event_align(unsigned char *buffer, size_t size);
 extern float *p_trb_event_pedestal(struct o_trb_event *events, size_t size, float *supplied);
 extern float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *supplied);
-extern float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, float *supplied);
+extern float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, int *flags,
+		float *supplied);
 extern struct o_trb_event *f_trb_event_new(struct o_trb_event *supplied);
 extern int p_trb_event_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_trb_event_hash(struct o_object *object);

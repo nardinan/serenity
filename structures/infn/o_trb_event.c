@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "o_trb_event.h"
+#include "o_trb.h"
 #include <unistd.h>
 #include <stdlib.h>
 const char v_trb_event_kind[] = "trb_event";
@@ -69,12 +70,12 @@ float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *sup
 		}
 		total *= fraction;
 		total_square *= fraction;
-		result[channel] = sqrt(abs((total_square-(total*total))));
+		result[channel] = sqrt(fabs((total_square-(total*total))));
 	}
 	return result;
 }
 
-float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, float *supplied) {
+float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, int *flags, float *supplied) {
 	float *result = supplied, common_noise[d_trb_event_vas], common_noise_va, common_noise_pure[d_trb_event_channels] = {0},
 	      common_noise_pure_square[d_trb_event_channels] = {0}, value, fraction;
 	int va, channel, local_channel, event, entries, local_entries[d_trb_event_vas] = {0};
@@ -83,16 +84,15 @@ float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_mu
 			d_die(d_error_malloc);
 	for (event = 0; event < size; event++) {
 		for (va = 0, channel = 0; va < d_trb_event_vas; va++, channel += d_trb_event_channels_on_va) {
-			common_noise[va] = 0;
-			common_noise_va = 0;
-			entries = 0;
-			for (local_channel = channel; local_channel < (channel+d_trb_event_channels_on_va); local_channel++) {
-				value = ((float)(events[event].values[local_channel]))-pedestal[local_channel];
-				if (fabs(value) < (sigma_multiplicator*sigma_raw[local_channel])) {
-					common_noise_va += value;
-					entries++;
+			for (local_channel = channel, common_noise[va] = 0, common_noise_va = 0, entries = 0;
+					local_channel < (channel+d_trb_event_channels_on_va); local_channel++)
+				if ((!flags) || (flags[local_channel]&e_trb_event_channel_damaged) != e_trb_event_channel_damaged) {
+					value = ((float)(events[event].values[local_channel]))-pedestal[local_channel];
+					if (fabs(value) < (sigma_multiplicator*sigma_raw[local_channel])) {
+						common_noise_va += value;
+						entries++;
+					}
 				}
-			}
 			if (entries)
 				common_noise[va] = common_noise_va/(float)entries;
 		}
@@ -110,7 +110,7 @@ float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_mu
 			fraction = (1.0/(float)local_entries[channel]);
 			common_noise_pure[channel] *= fraction;
 			common_noise_pure_square[channel] *= fraction;
-			result[channel] = sqrt(abs(common_noise_pure_square[channel]-(common_noise_pure[channel]*common_noise_pure[channel])));
+			result[channel] = sqrt(fabs(common_noise_pure_square[channel]-(common_noise_pure[channel]*common_noise_pure[channel])));
 		}
 	return result;
 }
