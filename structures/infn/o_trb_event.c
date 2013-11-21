@@ -78,7 +78,7 @@ float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *sup
 float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, int *flags, float *supplied) {
 	float *result = supplied, common_noise[d_trb_event_vas], common_noise_va, common_noise_pure[d_trb_event_channels] = {0},
 	      common_noise_pure_square[d_trb_event_channels] = {0}, value, fraction;
-	int va, channel, local_channel, event, entries, local_entries[d_trb_event_vas] = {0};
+	int va, channel, local_channel, event, entries, local_entries[d_trb_event_channels] = {0};
 	if (!result)
 		if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
 			d_die(d_error_malloc);
