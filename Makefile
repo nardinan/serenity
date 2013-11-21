@@ -1,6 +1,7 @@
-prefix = /usr/local
-include_dir = $(prefix)/include
-library_dir = $(prefix)/lib
+prefix_inc = /usr/local
+prefix_lib = /usb
+include_dir = $(prefix_inc)/include
+library_dir = $(prefix_lib)/lib
 library_name = serenity
 folders = ground structures structures/crypto structures/infn 
 
