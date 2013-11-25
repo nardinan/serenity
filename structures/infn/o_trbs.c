@@ -56,6 +56,7 @@ void *p_trbs_thread(void *parameters) {
 	struct usb_bus *bus;
 	struct usb_device *device;
 	struct usb_dev_handle *handler;
+	struct s_exception *exception = NULL;
 	struct s_trbs_parameters *local_parameters = (struct s_trbs_parameters *)parameters;
 	int index;
 	while ((p_trbs_thread_continue(local_parameters->object)) && (usleep(local_parameters->sleep)==0))
@@ -71,7 +72,12 @@ void *p_trbs_thread(void *parameters) {
 										local_parameters->object->devices[index].referenced = d_true;
 										break;
 									}
-								local_parameters->handle(f_trb_new(NULL, device, handler), local_parameters->user_data);
+								d_try {
+									local_parameters->handle(f_trb_new(NULL, device, handler), local_parameters->user_data);
+								} d_catch(exception) {
+									d_exception_dump(stdout, exception);
+									d_raise;
+								} d_endtry;
 							} else
 								usb_close(handler);
 						}

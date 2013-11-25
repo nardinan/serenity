@@ -23,8 +23,8 @@
 #include <usb.h>
 #define d_trb_manufacturer_label "DAMPE"
 #define d_trb_product_label "miniTRB-Device"
-#define d_trb_write_endpoint 0
-#define d_trb_read_endpoint 1
+#define d_trb_write_endpoint 0x02
+#define d_trb_read_endpoint 0x86
 #define d_trb_packet_size 512
 #define d_trb_buffer_size 1560
 extern const char v_trb_kind[];

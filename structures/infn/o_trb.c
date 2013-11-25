@@ -65,8 +65,11 @@ struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struc
 		result->stream_lock = f_object_new_pure(NULL);
 		if (p_trb_check(result->device, result->handler)) {
 			if (usb_set_configuration(result->handler, 1) >= 0) {
-				result->write_address = result->device->config->interface->altsetting->endpoint[d_trb_write_endpoint].bEndpointAddress;
-				result->read_address = result->device->config->interface->altsetting->endpoint[d_trb_read_endpoint].bEndpointAddress;
+				if (usb_claim_interface(result->handler, 0) >= 0) {
+					result->write_address = d_trb_write_endpoint;
+					result->read_address = d_trb_read_endpoint;
+				} else
+					d_throw(v_exception_unsupported, "unable to claim the USB interface");
 			} else
 				d_throw(v_exception_unsupported, "unable to set an active configuration");
 		} else
