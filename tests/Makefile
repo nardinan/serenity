@@ -1,8 +1,8 @@
 object = test$(number).o
 cc = gcc
-cflags = -Wall -I$(include_dir) -I/opt/local/include/libusb -Wno-variadic-macros -std=c99 -c -pedantic
+cflags = -Wall -I$(include_dir) `libusb-config --cflags` -Wno-variadic-macros -std=c99 -c -pedantic
 lflags = -Wall
-library_links = -L$(library_dir) -lserenity_ground -lserenity_structures -lserenity_crypto -lserenity_infn `libusb-legacy-config --libs`
+library_links = -L$(library_dir) -lserenity_ground -lserenity_structures -lserenity_crypto -lserenity_infn `libusb-config --libs`
 exec = test$(number).bin
 
 all: $(object)
