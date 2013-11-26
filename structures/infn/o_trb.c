@@ -140,12 +140,6 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 					startup_command[4] = dac;
 					object->event_size = d_trb_event_size_normal;
 					break;
-				case e_trb_mode_calibration_debug_analogic:
-					startup_command[1] = 0xa2;
-					startup_command[4] = dac;
-					startup_command[5] = channel;
-					object->event_size = d_trb_event_size_debug;
-					break;
 				case e_trb_mode_calibration_debug_digital:
 					startup_command[1] = 0xa3;
 					startup_command[4] = dac;

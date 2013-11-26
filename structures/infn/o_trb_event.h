@@ -23,6 +23,7 @@
 #define d_trb_event_channels_half 192
 #define d_trb_event_vas 6
 #define d_trb_event_channels_on_va 64
+#define d_trb_event_samples 50
 #define d_trb_event_size_normal 780
 #define d_trb_event_size_debug 112
 #define d_trb_event_size_minimum 112
