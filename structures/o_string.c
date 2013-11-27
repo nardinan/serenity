@@ -52,7 +52,7 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const
 		p_string_hooking(result);
 		if ((result->size = size)) {
 			result->s_flags.constant = d_false;
-			if ((result->content = (char *) d_calloc(1, result->size))) {
+			if ((result->content = (char *) d_calloc(result->size, sizeof(char)))) {
 				if (format)
 					result->content = f_string_format_args(result->content, result->size, symbols, functions, (char *)format, parameters);
 			} else
@@ -192,7 +192,7 @@ struct o_string *p_string_substring(struct o_string *object, size_t begin, size_
 	struct o_string *result = NULL;
 	if (object->content) {
 		if ((begin <= object->size) && ((begin+length) <= object->size))
-			result = f_string_new(NULL, length, object->content+begin);
+			result = f_string_new(NULL, (length+1), object->content+begin);
 		else
 			d_throw(v_exception_bound, "pointer out of bound");
 	}
