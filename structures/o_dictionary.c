@@ -153,7 +153,7 @@ int p_dictionary_load(struct o_dictionary *object, struct o_stream *stream) {
 	while ((singleton = stream->m_read_line(stream, buffer, d_string_buffer_size))) {
 		buffer = singleton;
 		if (buffer->m_length(buffer) > 0)
-			if ((values = singleton->m_split(singleton, '='))) {
+			if ((values = singleton->m_split(buffer, '='))) {
 				if (values->filled >= 2) {
 					p_dictionary_insert(object, values->m_get(values, 0), values->m_get(values, 1));
 					result = d_true;

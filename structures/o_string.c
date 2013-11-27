@@ -192,7 +192,7 @@ struct o_string *p_string_substring(struct o_string *object, size_t begin, size_
 	struct o_string *result = NULL;
 	if (object->content) {
 		if ((begin <= object->size) && ((begin+length) <= object->size))
-			result = f_string_new(NULL, (length+1), object->content+begin);
+			result = f_string_new(NULL, length, object->content+begin);
 		else
 			d_throw(v_exception_bound, "pointer out of bound");
 	}

@@ -18,7 +18,7 @@
 #ifndef serenity_o_string_h
 #define serenity_o_string_h
 #include "o_array.h"
-#define d_string_buffer_size 256
+#define d_string_buffer_size 512
 #define d_string_constant(c)\
 {\
 	.head = d_object_constant(v_string_kind,sizeof(struct o_string),string),\
