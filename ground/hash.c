@@ -31,7 +31,7 @@ void p_hash_allocate(struct s_hash_table *table, t_hash_value dimension) {
 
 void p_hash_resize(struct s_hash_table *table, t_hash_value dimension) {
 	struct s_hash_bucket *current = table->table, *item;
-	t_hash_value elements = (table->mask+1);
+	t_hash_value elements = table->mask;
 	p_hash_allocate(table, dimension);
 	for (; elements >= 0; elements--) {
 		item = &current[elements];
@@ -54,8 +54,7 @@ struct s_hash_bucket *p_hash_lookup(struct s_hash_table *table, void *key, t_has
 			if (backup)
 				item = backup;
 			break;
-		} else if ((item->hash == hash) &&
-				(table->compare(item->key, key) == 0))
+		} else if ((item->hash == hash) && (table->compare(item->key, key) == 0))
 			break;
 		index = ((index<<2)+index+shift)+1;
 		shift >>= d_hash_shift;
