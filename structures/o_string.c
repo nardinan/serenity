@@ -50,11 +50,11 @@ struct o_string *f_string_new_args(struct o_string *supplied, size_t size, const
 	struct o_string *result;
 	if ((result = (struct o_string *) f_object_new(v_string_kind, sizeof(struct o_string), (struct o_object *)supplied))) {
 		p_string_hooking(result);
-		if ((result->size = size)) {
+		if ((result->size = (size+1))) {
 			result->s_flags.constant = d_false;
 			if ((result->content = (char *) d_calloc(result->size, sizeof(char)))) {
 				if (format)
-					result->content = f_string_format_args(result->content, result->size, symbols, functions, (char *)format, parameters);
+					result->content = f_string_format_args(result->content, (result->size-1), symbols, functions, (char *)format, parameters);
 			} else
 				d_die(d_error_malloc);
 		}
