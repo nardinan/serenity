@@ -33,7 +33,7 @@ void p_hash_resize(struct s_hash_table *table, t_hash_value dimension) {
 	struct s_hash_bucket *current = table->table, *item;
 	t_hash_value elements = (table->mask+1);
 	p_hash_allocate(table, dimension);
-	for (; elements; elements--) {
+	for (; elements >= 0; elements--) {
 		item = &current[elements];
 		if (item->kind == e_hash_kind_fill)
 			f_hash_insert(table, item->key, item->value, s_true, NULL);
