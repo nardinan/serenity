@@ -31,7 +31,7 @@ void p_trb_event_hooking(struct o_trb_event *object) {
 
 unsigned int p_trb_event_align(unsigned char *buffer, size_t size) {
 	size_t index, result = 0;
-	for (index = 0; index < size; index++)
+	for (index = 1; index < size; index++)
 		if ((buffer[index] == 0x90) && ((index == (size-1)) || (buffer[index+1] == 0xeb))) {
 			result = size-index;
 			memmove(buffer, &(buffer[index]), result);
@@ -172,7 +172,8 @@ unsigned char *p_trb_event_load(struct o_trb_event *object, unsigned char *raw_d
 	object->filled = d_false;
 	if (size >= d_trb_event_size_minimum)
 		if (d_trb_event_header(raw_data)) {
-			object->kind = raw_data[2];
+			object->code = raw_data[2];
+			object->kind = raw_data[3];
 			if (object->kind != 0xa3) {
 				event_size = d_trb_event_size_normal;
 				event_steps = d_trb_event_channels;
@@ -181,7 +182,6 @@ unsigned char *p_trb_event_load(struct o_trb_event *object, unsigned char *raw_d
 				event_steps = d_trb_event_samples;
 			}
 			if (size >= event_size) {
-				object->code = raw_data[3];
 				memset(object->values, 0, sizeof(unsigned short int)*d_trb_event_channels);
 				for (index = 0, result = (raw_data+4); index < event_steps; index++, result += 2) {
 					channel = ((index%2)*d_trb_event_channels_half)+(index/2);
