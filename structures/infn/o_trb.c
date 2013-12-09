@@ -179,13 +179,12 @@ struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provid
 		if (!result)
 			result = f_trb_event_new(NULL);
 		result->filled = d_false;
-		while ((object->buffer_fill >= object->event_size) && (!result->filled))  {
+		while ((object->buffer_fill >= object->event_size) && (!result->filled))
 			if (result->m_load(result, object->buffer, object->buffer_fill)) {
 				object->buffer_fill -= object->event_size;
 				memmove(object->buffer, (object->buffer+object->event_size), object->buffer_fill);
 			} else
 				object->buffer_fill = p_trb_event_align(object->buffer, object->buffer_fill);
-		}
 		pointer = (unsigned char *)object->buffer+object->buffer_fill;
 		if ((d_trb_buffer_size-object->buffer_fill) >= d_trb_packet_size)
 			if ((readed = p_trb_read(object, pointer, d_trb_packet_size, timeout)) > 0) {
