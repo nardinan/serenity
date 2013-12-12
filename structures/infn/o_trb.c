@@ -147,7 +147,7 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 					object->event_size = d_trb_event_size_debug;
 					break;
 			}
-			object->mode = startup_command[1];
+			object->kind = startup_command[1];
 			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
 				result = p_trb_write(object, startup_command, sizeof(startup_command), timeout);
 		}
@@ -180,7 +180,7 @@ struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provid
 			result = f_trb_event_new(NULL);
 		result->filled = d_false;
 		while ((object->buffer_fill >= object->event_size) && (!result->filled))
-			if (result->m_load(result, object->buffer, object->buffer_fill)) {
+			if (result->m_load(result, object->buffer, object->kind, object->buffer_fill)) {
 				object->buffer_fill -= object->event_size;
 				memmove(object->buffer, (object->buffer+object->event_size), object->buffer_fill);
 			} else
