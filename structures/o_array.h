@@ -20,6 +20,7 @@
 #include "o_object.h"
 #define d_array_none -1
 #define d_array_default_bucket 8
+#define d_array_cast(f,a,s,p,d) (((s)=(struct o_string *)(a)->m_get((a),p))?(f)((s)->content):d)
 extern const char v_array_kind[];
 typedef struct o_array {
 	d_object_head;
