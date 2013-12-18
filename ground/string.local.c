@@ -53,8 +53,7 @@ char *f_string_format(char *buffer, size_t size, char *symbols, t_string_formatt
 }
 
 char *f_string_format_args(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, va_list parameters) {
-	char *target = buffer, *pointer = format, *next, *last, *tail,
-	argument[d_string_arguent_size];
+	char *target = buffer, *pointer = format, *next, *last, *tail, argument[d_string_arguent_size];
 	size_t dimension, remaining = size, lower, written;
 	while ((next = strchr(pointer, '%'))) {
 		if ((dimension = (next-pointer)) > 0)
@@ -68,7 +67,26 @@ char *f_string_format_args(char *buffer, size_t size, char *symbols, t_string_fo
 				memset(argument, '\0', d_string_arguent_size);
 				memcpy(argument, next, (last-next));
 				if (!(tail = strchr(symbols, *(last-1)))) {
-					written = vsnprintf(target, remaining,argument, parameters);
+					switch (tolower(*(last-1))) {
+						case 'd':
+						case 'i':
+						case 'u':
+						case 'x':
+						case 'o':
+						case 'n':
+						case 'c':
+							written = snprintf(target, remaining, argument, va_arg(parameters, long));
+							break;
+						case 'f':
+						case 'e':
+						case 'g':
+							written = snprintf(target, remaining, argument, va_arg(parameters, double));
+							break;
+						case 's':
+						case 'p':
+							written = snprintf(target, remaining, argument, va_arg(parameters, void *));
+							break;
+					}
 					written = ((written>remaining)?remaining:written);
 					remaining -= written;
 					target += written;
