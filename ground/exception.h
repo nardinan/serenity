@@ -51,11 +51,13 @@
 	}while(0)
 #define d_raise\
 	do{\
-		if(v_exception_hook) longjmp(*v_exception_hook,v_exception_raised.identificator);\
+		if(v_exception_hook)\
+			longjmp(*v_exception_hook,v_exception_raised.identificator);\
 	}while(0)
 #define d_exception_dump(s,o)\
 	do{\
-		if(((o)->level++)==0) fprintf((s),"%s:%s() @ %d {%s} %s\n",(o)->file,o->function,(o)->line,(o)->kind,(o)->description);\
+		if(((o)->level++)==0)\
+			fprintf((s),"%s:%s() @ %d {%s} %s\n",(o)->file,o->function,(o)->line,(o)->kind,(o)->description);\
 		fprintf((s),"\t%s:%s() @ %d\n",__FILE__,__FUNCTION__,__LINE__);\
 	}while(0)
 #define d_exception_declare(k) extern const struct s_exception v_exception_##k

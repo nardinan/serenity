@@ -29,9 +29,9 @@
 	d_list_node_constant,\
 	.kind = (k),\
 	.size = (s),\
-	0,\
-	0,\
-	0,\
+	.references = 0,\
+	.hash = 0,\
+	.mutex = 0,\
 	.s_flags = {\
 		d_true,\
 		d_false,\

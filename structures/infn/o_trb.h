@@ -37,7 +37,7 @@ typedef struct o_trb {
 	d_object_head;
 	struct usb_device *device;
 	struct usb_dev_handle *handler;
-	struct o_stream *stream_out;
+	struct o_stream *stream_out, *stream_in;
 	struct o_object *stream_lock;
 	int write_address, read_address, buffer_fill, event_size, last_error;
 	unsigned char buffer[d_trb_buffer_size], kind;

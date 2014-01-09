@@ -263,10 +263,13 @@ struct o_string *p_stream_read(struct o_stream *object, struct o_string *supplie
 
 ssize_t p_stream_size(struct o_stream *object) {
 	ssize_t result = 0;
+	off_t current_offset;
 	if (object->s_flags.opened) {
 		if (((object->flags&O_RDWR) == O_RDWR) || ((object->flags&O_RDONLY) == O_RDONLY)) {
-			result = (ssize_t)object->m_seek(object, 0, e_stream_seek_end);
+			current_offset = object->m_seek(object, 0, e_stream_seek_current);
 			object->m_seek(object, 0, e_stream_seek_begin);
+			result = (ssize_t)object->m_seek(object, 0, e_stream_seek_end);
+			object->m_seek(object, current_offset, e_stream_seek_begin);
 		} else
 			d_throw(v_exception_unsupported, "can't read from a write-only stream");
 	} else

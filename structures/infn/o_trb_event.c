@@ -85,7 +85,7 @@ float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_mu
 					local_channel < (channel+d_trb_event_channels_on_va); local_channel++)
 				if ((!flags) || ((flags[local_channel]&e_trb_event_channel_damaged) != e_trb_event_channel_damaged)) {
 					value = ((float)(events[event].values[local_channel]))-pedestal[local_channel];
-					if (fabs(value) < (sigma_multiplicator*sigma_raw[local_channel])) {
+					if (fabs(value) < sigma_multiplicator*sigma_raw[local_channel]) {
 						common_noise_va += value;
 						entries++;
 					}
