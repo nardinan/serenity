@@ -193,6 +193,8 @@ unsigned char *p_trb_event_load(struct o_trb_event *object, unsigned char *raw_d
 				result += 2;
 				object->temperature[1] = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
 				result += 2;
+				object->version = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
+				result += 2;
 				object->filled = d_true;
 			}
 		}

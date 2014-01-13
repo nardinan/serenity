@@ -36,7 +36,7 @@ typedef enum e_trb_event_channels {
 typedef struct o_trb_event {
 	d_object_head;
 	unsigned char code, kind;
-	unsigned short int values[d_trb_event_channels], temperature[2];
+	unsigned short int values[d_trb_event_channels], temperature[2], version;
 	int filled;
 	unsigned char *(*m_load)(struct o_trb_event *, unsigned char *, unsigned char, size_t);
 } o_trb_event;

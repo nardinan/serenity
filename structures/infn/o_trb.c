@@ -26,6 +26,7 @@ void p_trb_hooking(struct o_trb *object) {
 	object->head.s_delegate.m_string = p_trb_string;
 	/* keep default clone function */
 	object->m_setup = p_trb_setup;
+	object->m_stop = p_trb_stop;
 	object->m_close_stream = p_trb_close_stream;
 	object->m_stream = p_trb_stream;
 	object->m_event = p_trb_event;
@@ -126,7 +127,8 @@ char *p_trb_string(struct o_object *object, char *data, size_t size) {
 
 int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel, time_t timeout) {
 	int result = d_false;
-	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+	enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00};
 	if (object->handler) {
 		if ((hold_delay >= 3.0) && (hold_delay <= 10.0)) {
 			setup_command[4] = ((float)hold_delay/0.05);
@@ -149,9 +151,19 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 			}
 			object->kind = startup_command[1];
 			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
-				result = p_trb_write(object, startup_command, sizeof(startup_command), timeout);
+				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
+					result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
 		}
 	}
+	object->last_error = result;
+	return result;
+}
+
+int p_trb_stop(struct o_trb *object, time_t timeout) {
+	int result = d_false;
+	unsigned char disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00};
+	if (object->handler)
+		result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout);
 	object->last_error = result;
 	return result;
 }

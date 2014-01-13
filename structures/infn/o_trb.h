@@ -42,6 +42,7 @@ typedef struct o_trb {
 	int write_address, read_address, buffer_fill, event_size, last_error;
 	unsigned char buffer[d_trb_buffer_size], kind;
 	int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned char, unsigned char, time_t);
+	int (*m_stop)(struct o_trb *, time_t);
 	void (*m_close_stream)(struct o_trb *);
 	void (*m_stream)(struct o_trb *, struct o_stream *, struct o_string *, const char *, int);
 	struct o_trb_event *(*m_event)(struct o_trb *, struct o_trb_event *, time_t);
@@ -57,6 +58,7 @@ extern t_hash_value p_trb_hash(struct o_object *object);
 extern char *p_trb_string(struct o_object *object, char *data, size_t size);
 extern int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel,
 		time_t timeout);
+extern int p_trb_stop(struct o_trb *object, time_t timeout);
 extern void p_trb_close_stream(struct o_trb *object);
 extern void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_string *name, const char *action, int permission);
 extern struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provided, time_t timeout);
