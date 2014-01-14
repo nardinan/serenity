@@ -34,26 +34,15 @@ void p_trb_hooking(struct o_trb *object) {
 
 int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
 	int result = d_false, index;
-	if (object->handler) {
+	if (object->handler)
 		result = usb_bulk_read(object->handler, object->read_address, (char *)data, size, timeout);
-		printf("READ %d: [", result);
-		for (index = 0; index < result; index++)
-			printf("0x%x ", data[index]);
-		printf("]\n");
-	}
 	return result;
 }
 
 int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
 	int result = d_false, index;
-	if (object->handler) {
-		printf("WRITE: [");
-		for (index = 0; index < size; index++)
-			printf("0x%x ", data[index]);
-		printf("]\n");
+	if (object->handler)
 		result = usb_bulk_write(object->handler, object->write_address, (char *)data, size, timeout);
-		printf("written: %d\n", result);
-	}
 	return result;
 }
 
