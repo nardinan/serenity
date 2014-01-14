@@ -1,5 +1,5 @@
 objects = o_trb_event.o o_trb.o o_trbs.o
-cc = gcc
+cc = gcc -g
 cflags = -Wall -fPIC `libusb-config --cflags` -Wno-variadic-macros -std=c99 -c -pedantic
 lflags = -Wall
 library_links = -L../ -L../../ground -lm -lserenity_structures -lserenity_ground `libusb-config --libs` -lpthread

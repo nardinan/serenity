@@ -25,7 +25,7 @@
 #define d_trb_event_channels_on_va 64
 #define d_trb_event_samples 100
 #define d_trb_event_samples_half 50
-#define d_trb_event_size_normal 780
+#define d_trb_event_size_normal 1024
 #define d_trb_event_size_debug 112
 #define d_trb_event_size_header 4
 #define d_trb_event_header(v) (((v)[0]==0x90)&&((v)[1]==0xeb))
@@ -46,6 +46,7 @@ extern float *p_trb_event_pedestal(struct o_trb_event *events, size_t size, floa
 extern float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *supplied);
 extern float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, int *flags,
 		float *supplied);
+extern size_t p_trb_event_size(unsigned char key, short int code);
 extern struct o_trb_event *f_trb_event_new(struct o_trb_event *supplied);
 extern int p_trb_event_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_trb_event_hash(struct o_object *object);

@@ -33,16 +33,27 @@ void p_trb_hooking(struct o_trb *object) {
 }
 
 int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
-	int result = d_false;
-	if (object->handler)
+	int result = d_false, index;
+	if (object->handler) {
 		result = usb_bulk_read(object->handler, object->read_address, (char *)data, size, timeout);
+		printf("READ %d: [", result);
+		for (index = 0; index < result; index++)
+			printf("0x%x ", data[index]);
+		printf("]\n");
+	}
 	return result;
 }
 
 int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
-	int result = d_false;
-	if (object->handler)
+	int result = d_false, index;
+	if (object->handler) {
+		printf("WRITE: [");
+		for (index = 0; index < size; index++)
+			printf("0x%x ", data[index]);
+		printf("]\n");
 		result = usb_bulk_write(object->handler, object->write_address, (char *)data, size, timeout);
+		printf("written: %d\n", result);
+	}
 	return result;
 }
 
@@ -128,7 +139,7 @@ char *p_trb_string(struct o_object *object, char *data, size_t size) {
 int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel, time_t timeout) {
 	int result = d_false;
 	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-	enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00};
+		      enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00};
 	if (object->handler) {
 		if ((hold_delay >= 3.0) && (hold_delay <= 10.0)) {
 			setup_command[4] = ((float)hold_delay/0.05);
@@ -139,14 +150,15 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 					break;
 				case e_trb_mode_calibration:
 					startup_command[1] = 0xa1;
-					startup_command[4] = dac;
 					object->event_size = d_trb_event_size_normal;
+					startup_command[4] = (((float)dac/1024.0f)*4096.0f)/2.0f; /* just a copypaste from Zhang Fei's implementation */
 					break;
 				case e_trb_mode_calibration_debug_digital:
 					startup_command[1] = 0xa3;
-					startup_command[4] = dac;
-					startup_command[5] = channel;
 					object->event_size = d_trb_event_size_debug;
+					startup_command[4] = (((float)dac/1024.0f)*4096.0f)/2.0f; /* just a copypaste from Zhang Fei's implementation */
+					startup_command[5] = channel;
+
 					break;
 			}
 			object->kind = startup_command[1];
@@ -197,21 +209,21 @@ struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provid
 				memmove(object->buffer, (object->buffer+object->event_size), object->buffer_fill);
 			} else
 				object->buffer_fill = p_trb_event_align(object->buffer, object->buffer_fill);
-		pointer = (unsigned char *)object->buffer+object->buffer_fill;
-		if ((d_trb_buffer_size-object->buffer_fill) >= d_trb_packet_size) {
-			if (object->stream_in) {
-				if ((readed = object->stream_in->m_read_raw(object->stream_in, pointer, d_trb_packet_size)) < d_trb_packet_size)
-					object->stream_in = NULL;
-			} else
-				readed = p_trb_read(object, pointer, d_trb_packet_size, timeout);
-			if (readed) {
-				object->buffer_fill += readed;
-				d_object_lock(object->stream_lock);
-				if (object->stream_out)
-					object->stream_out->m_write(object->stream_out, readed, (void *)pointer);
-				d_object_unlock(object->stream_lock);
+			pointer = (unsigned char *)object->buffer+object->buffer_fill;
+			if ((d_trb_buffer_size-object->buffer_fill) >= d_trb_packet_size) {
+				if (object->stream_in) {
+					if ((readed = object->stream_in->m_read_raw(object->stream_in, pointer, d_trb_packet_size)) < d_trb_packet_size)
+						object->stream_in = NULL;
+				} else
+					readed = p_trb_read(object, pointer, d_trb_packet_size, timeout);
+				if (readed) {
+					object->buffer_fill += readed;
+					d_object_lock(object->stream_lock);
+					if (object->stream_out)
+						object->stream_out->m_write(object->stream_out, readed, (void *)pointer);
+					d_object_unlock(object->stream_lock);
+				}
 			}
-		}
 	}
 	object->last_error = readed;
 	return result;

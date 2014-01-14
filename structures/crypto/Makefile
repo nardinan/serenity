@@ -1,5 +1,5 @@
 objects = o_idea.o o_aes.o
-cc = gcc
+cc = gcc -g
 cflags = -Wall -fPIC -Wno-variadic-macros -std=c99 -c -pedantic
 lflags = -Wall
 library_links = -L../ -L../../ground -lserenity_structures -lserenity_ground

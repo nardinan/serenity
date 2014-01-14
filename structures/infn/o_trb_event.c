@@ -174,12 +174,12 @@ unsigned char *p_trb_event_load(struct o_trb_event *object, unsigned char *raw_d
 			switch (object->kind) {
 				case 0xa0:
 				case 0xa1:
-					event_size = d_trb_event_size_normal;
 					event_steps = d_trb_event_channels;
+					event_size = d_trb_event_size_normal;
 					break;
 				case 0xa3:
-					event_size = d_trb_event_size_debug;
 					event_steps = d_trb_event_samples;
+					event_size = d_trb_event_size_debug;
 					break;
 			}
 			result = (raw_data+4);
