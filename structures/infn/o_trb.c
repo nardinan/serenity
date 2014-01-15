@@ -204,12 +204,7 @@ struct o_trb_event *p_trb_event(struct o_trb *object, struct o_trb_event *provid
 				object->buffer_fill = p_trb_event_align(object->buffer, object->buffer_fill);
 			pointer = (unsigned char *)object->buffer+object->buffer_fill;
 			if ((d_trb_buffer_size-object->buffer_fill) >= d_trb_packet_size) {
-				if (object->stream_in) {
-					if ((readed = object->stream_in->m_read_raw(object->stream_in, pointer, d_trb_packet_size)) < d_trb_packet_size)
-						object->stream_in = NULL;
-				} else
-					readed = p_trb_read(object, pointer, d_trb_packet_size, timeout);
-				if (readed) {
+				if ((readed = p_trb_read(object, pointer, d_trb_packet_size, timeout))) {
 					object->buffer_fill += readed;
 					d_object_lock(object->stream_lock);
 					if (object->stream_out)
