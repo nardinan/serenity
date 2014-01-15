@@ -33,7 +33,7 @@ void p_trb_hooking(struct o_trb *object) {
 }
 
 int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
-	int result = d_false, index;
+	int result = d_false;
 	if (object->handler)
 		result = usb_bulk_read(object->handler, object->read_address, (char *)data, size, timeout);
 	return result;
@@ -41,8 +41,13 @@ int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t ti
 
 int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
 	int result = d_false, index;
-	if (object->handler)
+	if (object->handler) {
 		result = usb_bulk_write(object->handler, object->write_address, (char *)data, size, timeout);
+		printf("WR[");
+		for (index = 0; index < size; index++)
+			printf("0x%x ", data[index]);
+		printf("] (%d)\n", result);
+	}
 	return result;
 }
 
@@ -147,7 +152,6 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 					object->event_size = d_trb_event_size_debug;
 					startup_command[4] = (((float)dac/1024.0f)*4096.0f)/2.0f; /* just a copypaste from Zhang Fei's implementation */
 					startup_command[5] = channel;
-
 					break;
 			}
 			object->kind = startup_command[1];
