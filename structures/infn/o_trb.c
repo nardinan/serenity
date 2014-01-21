@@ -41,13 +41,8 @@ int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t ti
 
 int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
 	int result = d_false, index;
-	if (object->handler) {
+	if (object->handler)
 		result = usb_bulk_write(object->handler, object->write_address, (char *)data, size, timeout);
-		printf("WR[");
-		for (index = 0; index < size; index++)
-			printf("0x%x ", data[index]);
-		printf("] (%d)\n", result);
-	}
 	return result;
 }
 
@@ -133,7 +128,8 @@ char *p_trb_string(struct o_object *object, char *data, size_t size) {
 int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel, time_t timeout) {
 	int result = d_false;
 	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-		      enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00};
+		      enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00}, disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00},
+		      buffer[d_trb_packet_size];
 	if (object->handler) {
 		if ((hold_delay >= 3.0) && (hold_delay <= 10.0)) {
 			setup_command[4] = ((float)hold_delay/0.05);
@@ -155,9 +151,12 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 					break;
 			}
 			object->kind = startup_command[1];
-			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
-				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
-					result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
+			if ((result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout)) > 0) {
+				while (p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout) > 0);
+				if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
+					if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
+						result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
+			}
 		}
 	}
 	object->last_error = result;

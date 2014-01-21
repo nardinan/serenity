@@ -27,6 +27,7 @@
 #define d_trb_read_endpoint 0x86
 #define d_trb_packet_size 512
 #define d_trb_buffer_size 2048
+#define d_trb_buffer_timeout 150
 extern const char v_trb_kind[];
 enum e_trb_mode {
 	e_trb_mode_normal,
