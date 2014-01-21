@@ -125,7 +125,7 @@ int p_trb_event_compare(struct o_object *object, struct o_object *other) {
 	if ((local_object = d_object_kind(object, trb_event)) && (local_other = d_object_kind(other, trb_event)))
 		if (((result = local_object->code-local_other->code) == 0) && ((result = local_object->filled-local_other->filled) == 0) &&
 				((result = local_object->kind-local_other->kind) == 0) &&
-				((result = local_object->temperature[0]-local_other->temperature[1]) == 0) &&
+				((result = local_object->temperature[0]-local_other->temperature[0]) == 0) &&
 				((result = local_object->temperature[1]-local_other->temperature[1]) == 0))
 			while ((index < d_trb_event_channels) && (result == 0)) {
 				result = local_object->values[index]-local_other->values[index];
