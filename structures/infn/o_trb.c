@@ -40,7 +40,7 @@ int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t ti
 }
 
 int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout) {
-	int result = d_false, index;
+	int result = d_false;
 	if (object->handler)
 		result = usb_bulk_write(object->handler, object->write_address, (char *)data, size, timeout);
 	return result;

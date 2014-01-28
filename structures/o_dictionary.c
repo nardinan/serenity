@@ -147,7 +147,7 @@ struct o_object *p_dictionary_clone(struct o_object *object) {
 }
 
 int p_dictionary_load(struct o_dictionary *object, struct o_stream *stream) {
-	struct o_string *singleton, *buffer = NULL, *value1, *value2;
+	struct o_string *singleton, *buffer = NULL;
 	struct o_array *values;
 	int result = d_true;
 	while ((singleton = stream->m_read_line(stream, buffer, d_string_buffer_size))) {
