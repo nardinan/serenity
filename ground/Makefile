@@ -1,6 +1,6 @@
 objects = endian.o exception.o hash.o list.o log.o memory.o string.local.o types.o
 cc = gcc -g
-cflags = -Wall -fPIC -Wno-variadic-macros -std=c99 -c -pedantic
+cflags = -Wall -fPIC -Wno-variadic-macros -std=c99 -c -pedantic -Wno-gnu
 lflags = -Wall
 executable = libserenity_ground.so
 
