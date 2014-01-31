@@ -26,7 +26,7 @@
 typedef long long t_hash_value;
 typedef t_hash_value (t_hash_calculate)(void *key);
 typedef int (t_hash_compare)(void *left, void *right);
-enum e_hash_kind {
+typedef enum e_hash_kind {
 	e_hash_kind_deleted,
 	e_hash_kind_empty,
 	e_hash_kind_fill

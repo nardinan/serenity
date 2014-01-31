@@ -22,7 +22,7 @@
 #define d_list_node_head struct s_list_node head
 #define d_list_node_constant {NULL, NULL}
 typedef size_t t_list_value;
-enum e_list_insert_kind {
+typedef enum e_list_insert_kind {
 	e_list_insert_head,
 	e_list_insert_tail
 } e_list_insert_kind;

@@ -29,7 +29,7 @@
 #define d_trb_buffer_size 2048
 #define d_trb_buffer_timeout 150
 extern const char v_trb_kind[];
-enum e_trb_mode {
+typedef enum e_trb_mode {
 	e_trb_mode_normal,
 	e_trb_mode_calibration,
 	e_trb_mode_calibration_debug_digital

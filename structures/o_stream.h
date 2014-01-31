@@ -32,7 +32,7 @@
 #define d_stdin f_stream_new(NULL,d_P(d_string(8,"<stdin>"),struct o_string), fileno(stdin))
 #define d_printf(s,c) (s)->m_write_string((s),(c))
 extern const char v_stream_kind[];
-enum e_stream_seek {
+typedef enum e_stream_seek {
 	e_stream_seek_begin,
 	e_stream_seek_current,
 	e_stream_seek_end
