@@ -131,32 +131,30 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 		      enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00}, disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00},
 		      buffer[d_trb_packet_size];
 	if (object->handler) {
-		if ((hold_delay >= 3.0) && (hold_delay <= 10.0)) {
-			setup_command[4] = ((float)hold_delay/0.05);
-			switch (mode) {
-				case e_trb_mode_normal:
-					startup_command[1] = 0xa0;
-					object->event_size = d_trb_event_size_normal;
-					break;
-				case e_trb_mode_calibration:
-					startup_command[1] = 0xa1;
-					object->event_size = d_trb_event_size_normal;
-					startup_command[4] = dac;
-					break;
-				case e_trb_mode_calibration_debug_digital:
-					startup_command[1] = 0xa3;
-					object->event_size = d_trb_event_size_debug;
-					startup_command[4] = dac;
-					startup_command[5] = channel;
-					break;
-			}
-			object->kind = startup_command[1];
-			if ((result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout)) > 0) {
-				while (p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout) > 0);
-				if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
-					if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
-						result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
-			}
+		setup_command[4] = (unsigned int)((float)hold_delay/0.05);
+		switch (mode) {
+			case e_trb_mode_normal:
+				startup_command[1] = 0xa0;
+				object->event_size = d_trb_event_size_normal;
+				break;
+			case e_trb_mode_calibration:
+				startup_command[1] = 0xa1;
+				object->event_size = d_trb_event_size_normal;
+				startup_command[4] = dac;
+				break;
+			case e_trb_mode_calibration_debug_digital:
+				startup_command[1] = 0xa3;
+				object->event_size = d_trb_event_size_debug;
+				startup_command[4] = dac;
+				startup_command[5] = channel;
+				break;
+		}
+		object->kind = startup_command[1];
+		if ((result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout)) > 0) {
+			while (p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout) > 0);
+			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
+				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
+					result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
 		}
 	}
 	object->last_error = result;
@@ -165,9 +163,13 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 
 int p_trb_stop(struct o_trb *object, time_t timeout) {
 	int result = d_false;
-	unsigned char disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00};
-	if (object->handler)
-		result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout);
+	unsigned char disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00}, setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, 0x22},
+		      startup_command[] = {0x00, 0xa0, 0x00, 0x00, 0x00, 0x00};
+	if (object->handler) {
+		if ((result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout)) > 0)
+			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
+				result = p_trb_write(object, startup_command, sizeof(startup_command), timeout);
+	}
 	object->last_error = result;
 	return result;
 }
