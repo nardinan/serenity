@@ -151,7 +151,7 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 		}
 		object->kind = startup_command[1];
 		if ((result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout)) > 0) {
-			while (p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout) > 0);
+			while ((result = p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout)) > 0);
 			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
 				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
 					result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);

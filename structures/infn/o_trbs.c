@@ -59,7 +59,8 @@ void *p_trbs_thread(void *parameters) {
 	struct s_exception *exception = NULL;
 	struct s_trbs_parameters *local_parameters = (struct s_trbs_parameters *)parameters;
 	int index;
-	while ((p_trbs_thread_continue(local_parameters->object)) && (usleep(local_parameters->sleep)==0))
+	while ((p_trbs_thread_continue(local_parameters->object)) && (usleep(local_parameters->sleep)==0)) {
+		d_object_lock(local_parameters->object->search_semaphore);
 		if ((usb_find_busses()) | (usb_find_devices())) {
 			for (bus = usb_get_busses(); bus; bus = bus->next)
 				for (device = bus->devices; device; device = device->next)
@@ -88,6 +89,8 @@ void *p_trbs_thread(void *parameters) {
 				local_parameters->object->devices[index].referenced = d_false;
 			}
 		}
+		d_object_unlock(local_parameters->object->search_semaphore);
+	}
 	pthread_exit(NULL);
 }
 
@@ -96,7 +99,7 @@ struct o_trbs *f_trbs_new(struct o_trbs *supplied) {
 	if ((result = (struct o_trbs *) f_object_new(v_trbs_kind, sizeof(struct o_trbs), (struct o_object *)supplied))) {
 		p_trbs_hooking(result);
 		result->thread_id = pthread_self(); /* is empty */
-		if ((result->semaphore = f_object_new_pure(NULL))) {
+		if ((result->semaphore = f_object_new_pure(NULL)) && (result->search_semaphore = f_object_new_pure(NULL))) {
 			if (!v_trbs_usb_init) {
 				usb_init();
 				v_trbs_usb_init = d_true;
@@ -116,6 +119,7 @@ void p_trbs_delete(struct o_object *object) {
 			pthread_join(local_object->thread_id, &result);
 		}
 		d_release(local_object->semaphore);
+		d_release(local_object->search_semaphore);
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_trbs");
 }

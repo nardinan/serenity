@@ -31,7 +31,7 @@ typedef struct s_trbs_parameters {
 } s_trbs_parameters;
 typedef struct o_trbs {
 	d_object_head;
-	struct o_object *semaphore;
+	struct o_object *semaphore, *search_semaphore;
 	struct {
 		struct usb_device *device;
 		int referenced;
