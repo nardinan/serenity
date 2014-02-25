@@ -19,6 +19,7 @@
 #define serenity_o_trb_event_h
 #include <math.h>
 #include "../o_array.h"
+#define d_trb_event_adcs 2
 #define d_trb_event_channels 384
 #define d_trb_event_channels_half 192
 #define d_trb_event_vas 6
