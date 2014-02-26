@@ -79,8 +79,8 @@ void *p_trbs_thread(void *parameters) {
 									} else
 										usb_close(handler);
 								} d_catch(exception) {
-									d_exception_dump(stdout, exception);
-									d_raise;
+									/* here we have an already acquired device */
+									usb_close(handler);
 								} d_endtry;
 							} else
 								usb_close(handler);
