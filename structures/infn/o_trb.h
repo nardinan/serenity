@@ -40,8 +40,10 @@ typedef struct o_trb {
 	struct usb_dev_handle *handler;
 	struct o_stream *stream_out;
 	struct o_object *stream_lock;
+	unsigned char led_status;
 	int write_address, read_address, buffer_fill, event_size, last_error;
 	unsigned char buffer[d_trb_buffer_size], kind;
+	int (*m_led)(struct o_trb *, time_t);
 	int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned char, unsigned char, time_t);
 	int (*m_stop)(struct o_trb *, time_t);
 	void (*m_close_stream)(struct o_trb *);
@@ -57,6 +59,7 @@ extern void p_trb_delete(struct o_object *object);
 extern int p_trb_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_trb_hash(struct o_object *object);
 extern char *p_trb_string(struct o_object *object, char *data, size_t size);
+extern int p_trb_led(struct o_trb *object, time_t timeout);
 extern int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel,
 		time_t timeout);
 extern int p_trb_stop(struct o_trb *object, time_t timeout);

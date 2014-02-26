@@ -25,6 +25,7 @@ void p_trb_hooking(struct o_trb *object) {
 	object->head.s_delegate.m_hash = p_trb_hash;
 	object->head.s_delegate.m_string = p_trb_string;
 	/* keep default clone function */
+	object->m_led = p_trb_led;
 	object->m_setup = p_trb_setup;
 	object->m_stop = p_trb_stop;
 	object->m_close_stream = p_trb_close_stream;
@@ -61,6 +62,7 @@ struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struc
 	struct o_trb *result;
 	if ((result = (struct o_trb *) f_object_new(v_trb_kind, sizeof(struct o_trb), (struct o_object *)supplied))) {
 		p_trb_hooking(result);
+		result->led_status = 0x00;
 		result->device = device;
 		result->handler = handler;
 		result->stream_lock = f_object_new_pure(NULL);
@@ -123,6 +125,15 @@ char *p_trb_string(struct o_object *object, char *data, size_t size) {
 	} else
 		d_throw(v_exception_kind, "object is not an instance of o_trb");
 	return data;
+}
+
+int p_trb_led(struct o_trb *object, time_t timeout) {
+	int result = d_false;
+	unsigned char manage_led[] = {0x00, 0xc0, 0x00, 0x00, object->led_status, 0x00};
+	if (object->handler)
+		if ((result = p_trb_write(object, manage_led, sizeof(manage_led), timeout)))
+			object->led_status = (object->led_status == 0x11)?0x00:0x11;
+	return result;
 }
 
 int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel, time_t timeout) {

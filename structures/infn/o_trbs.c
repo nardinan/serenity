@@ -67,14 +67,17 @@ void *p_trbs_thread(void *parameters) {
 					if (!p_trbs_thread_already(local_parameters->object, device))
 						if ((handler = usb_open(device))) {
 							if ((p_trb_check(device, handler))) {
-								for (index = 0; index < d_trbs_slots_size; index++)
-									if (!local_parameters->object->devices[index].device) {
-										local_parameters->object->devices[index].device = device;
-										local_parameters->object->devices[index].referenced = d_true;
-										break;
-									}
 								d_try {
-									local_parameters->handle(f_trb_new(NULL, device, handler), local_parameters->user_data);
+									if (local_parameters->handle(f_trb_new(NULL, device, handler),
+												local_parameters->user_data)) {
+										for (index = 0; index < d_trbs_slots_size; index++)
+											if (!local_parameters->object->devices[index].device) {
+												local_parameters->object->devices[index].device = device;
+												local_parameters->object->devices[index].referenced = d_true;
+												break;
+											}
+									} else
+										usb_close(handler);
 								} d_catch(exception) {
 									d_exception_dump(stdout, exception);
 									d_raise;
