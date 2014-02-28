@@ -136,13 +136,15 @@ int p_trb_led(struct o_trb *object, time_t timeout) {
 	return result;
 }
 
-int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned char dac, unsigned char channel, time_t timeout) {
+int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned short dac, unsigned char channel, time_t timeout) {
 	int result = d_false;
 	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		      enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00}, disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00},
-		      buffer[d_trb_packet_size];
+		      buffer[d_trb_packet_size], dac_h, dac_l;
 	if (object->handler) {
 		setup_command[4] = (unsigned int)((float)hold_delay/0.05);
+		dac_h = (unsigned char)(dac>>8)&0xff;
+		dac_l = (unsigned char)(dac)&0xff;
 		switch (mode) {
 			case e_trb_mode_normal:
 				startup_command[1] = 0xa0;
@@ -151,13 +153,15 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 			case e_trb_mode_calibration:
 				startup_command[1] = 0xa1;
 				object->event_size = d_trb_event_size_normal;
-				startup_command[4] = dac;
+				startup_command[4] = dac_h;
+				startup_command[5] = dac_l;
 				break;
 			case e_trb_mode_calibration_debug_digital:
 				startup_command[1] = 0xa3;
 				object->event_size = d_trb_event_size_debug;
-				startup_command[4] = dac;
-				startup_command[5] = channel;
+				startup_command[3] = channel;
+				startup_command[4] = dac_h;
+				startup_command[5] = dac_l;
 				break;
 		}
 		object->kind = startup_command[1];
