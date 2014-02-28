@@ -153,15 +153,15 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 			case e_trb_mode_calibration:
 				startup_command[1] = 0xa1;
 				object->event_size = d_trb_event_size_normal;
-				startup_command[4] = dac_h;
-				startup_command[5] = dac_l;
+				startup_command[4] = dac_l;
+				startup_command[5] = dac_h;
 				break;
 			case e_trb_mode_calibration_debug_digital:
 				startup_command[1] = 0xa3;
 				object->event_size = d_trb_event_size_debug;
 				startup_command[3] = channel;
-				startup_command[4] = dac_h;
-				startup_command[5] = dac_l;
+				startup_command[4] = dac_l;
+				startup_command[5] = dac_h;
 				break;
 		}
 		object->kind = startup_command[1];
