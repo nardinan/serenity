@@ -49,6 +49,7 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string 
 
 extern struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_string *name, const char *action, int permissions) {
 	struct o_stream *result;
+	char buffer[d_string_buffer_size];
 	if ((result = (struct o_stream *) f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {
 		p_stream_hooking(result);
 		result->name = d_retain(name, struct o_string);
@@ -68,8 +69,10 @@ extern struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_st
 		if (result->flags != -1) {
 			if ((result->descriptor = open(result->name->content, result->flags, permissions)) > -1)
 				result->s_flags.opened = d_true;
-			else
-				d_throw(v_exception_unreachable, "unable to open the file");
+			else {
+				snprintf(buffer, d_string_buffer_size, "unable to open the file %s", name->content);
+				d_throw(v_exception_unreachable, buffer);
+			}
 		} else
 			d_throw(v_exception_malformed, "malformed action format");
 	}
