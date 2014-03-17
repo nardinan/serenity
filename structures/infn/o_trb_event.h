@@ -30,11 +30,13 @@
 #define d_trb_event_size_debug 112
 #define d_trb_event_size_header 4
 #define d_trb_event_header(v) (((v)[0]==0x90)&&((v)[1]==0xeb))
+#define d_trb_event_has_flag(cod,flg) ((((cod)&e_trb_event_channel_damaged)==e_trb_event_channel_damaged)&&(((cod)&(flg))==(flg)))
 extern const char v_trb_event_kind[];
 typedef enum e_trb_event_channels {
 	e_trb_event_channel_damaged 		= 0x00000001,
-	e_trb_event_channel_damaged_sigma 	= 0x000000f0,
-	e_trb_event_channel_damaged_occupancy 	= 0x00000f00
+	e_trb_event_channel_damaged_sigma_raw 	= 0x00000002,
+	e_trb_event_channel_damaged_sigma 	= 0x00000004,
+	e_trb_event_channel_damaged_occupancy 	= 0x00000008
 } e_trb_event_channels;
 typedef struct o_trb_event {
 	d_object_head;
