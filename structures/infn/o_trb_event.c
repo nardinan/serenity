@@ -83,7 +83,7 @@ float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_mu
 		for (va = 0, channel = 0; va < d_trb_event_vas; va++, channel += d_trb_event_channels_on_va) {
 			for (local_channel = channel, common_noise[va] = 0, common_noise_va = 0, entries = 0;
 					local_channel < (channel+d_trb_event_channels_on_va); local_channel++)
-				if ((!flags) || (!d_trb_event_has_flag(flags[local_channel], e_trb_event_channel_damaged_sigma_raw))) {
+				if ((!flags) || ((!FLAGGED_sigma_raw(flags[local_channel])) && (!FLAGGED_occupancy(flags[local_channel])))) {
 					value = ((float)(events[event].values[local_channel]))-pedestal[local_channel];
 					if (fabs(value) < sigma_multiplicator*sigma_raw[local_channel]) {
 						common_noise_va += value;

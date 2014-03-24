@@ -30,13 +30,27 @@
 #define d_trb_event_size_debug 112
 #define d_trb_event_size_header 4
 #define d_trb_event_header(v) (((v)[0]==0x90)&&((v)[1]==0xeb))
-#define d_trb_event_has_flag(cod,flg) ((((cod)&e_trb_event_channel_damaged)==e_trb_event_channel_damaged)&&(((cod)&(flg))==(flg)))
+#define FLAGGED(cod,flg) ((((cod)&e_trb_event_channel_bad)==e_trb_event_channel_bad)&&(((cod)&(flg))==(flg)))
+#define FLAGGED_sigma_raw(cod)\
+ 	((FLAGGED((cod),e_trb_event_channel_bad_sigma_raw_low))||\
+	(FLAGGED((cod),e_trb_event_channel_bad_sigma_raw_high))||\
+	(FLAGGED((cod),e_trb_event_channel_bad_sigma_raw_rms)))
+#define FLAGGED_sigma(cod)\
+	((FLAGGED((cod),e_trb_event_channel_bad_sigma_low))||\
+	(FLAGGED((cod),e_trb_event_channel_bad_sigma_high))||\
+	(FLAGGED((cod),e_trb_event_channel_bad_sigma_rms)))
+#define FLAGGED_occupancy(cod)\
+	(FLAGGED((cod),e_trb_event_channel_bad_occupancy))
 extern const char v_trb_event_kind[];
 typedef enum e_trb_event_channels {
-	e_trb_event_channel_damaged 		= 0x00000001,
-	e_trb_event_channel_damaged_sigma_raw 	= 0x00000002,
-	e_trb_event_channel_damaged_sigma 	= 0x00000004,
-	e_trb_event_channel_damaged_occupancy 	= 0x00000008
+	e_trb_event_channel_bad 		= 0x00000001,
+	e_trb_event_channel_bad_sigma_raw_low 	= 0x00000002,
+	e_trb_event_channel_bad_sigma_raw_high 	= 0x00000004,
+	e_trb_event_channel_bad_sigma_raw_rms	= 0x00000008,
+	e_trb_event_channel_bad_sigma_low	= 0x00000010,
+	e_trb_event_channel_bad_sigma_high	= 0x00000020,
+	e_trb_event_channel_bad_sigma_rms	= 0x00000040,
+	e_trb_event_channel_bad_occupancy	= 0x00000080
 } e_trb_event_channels;
 typedef struct o_trb_event {
 	d_object_head;
