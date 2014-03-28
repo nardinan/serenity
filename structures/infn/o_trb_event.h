@@ -63,6 +63,8 @@ extern void p_trb_event_hooking(struct o_trb_event *object);
 extern unsigned int p_trb_event_align(unsigned char *buffer, size_t size);
 extern float *p_trb_event_pedestal(struct o_trb_event *events, size_t size, float *supplied);
 extern float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *supplied);
+extern float *p_trb_event_cn_no_pedestal(float *no_pedestal, float sigma_multiplicator, float *sigma, int *flags, float *supplied);
+extern float *p_trb_event_cn(unsigned short int *values, float sigma_multiplicator, float *pedestal, float *sigma, int *flags, float *supplied);
 extern float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, int *flags,
 		float *supplied);
 extern size_t p_trb_event_size(unsigned char key, short int code);

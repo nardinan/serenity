@@ -72,27 +72,42 @@ float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *sup
 	return result;
 }
 
+float *p_trb_event_cn_no_pedestal(float *no_pedestal, float sigma_multiplicator, float *sigma, int *flags, float *supplied) {
+	float common_noise_va;
+	int va, channel, local_channel, entries;
+	for (va = 0, channel = 0; va < d_trb_event_vas; va++, channel += d_trb_event_channels_on_va) {
+		supplied[va] = 0;
+		for (local_channel = channel, common_noise_va = 0, entries = 0; local_channel < (channel+d_trb_event_channels_on_va);
+				local_channel++)
+			if ((!flags) || ((!FLAGGED_sigma_raw(flags[local_channel])) && (!FLAGGED_occupancy(flags[local_channel])))) {
+				if (no_pedestal[local_channel] < (sigma_multiplicator*sigma[local_channel])) {
+					common_noise_va += no_pedestal[local_channel];
+					entries++;
+				}
+			}
+		if (entries)
+			supplied[va] = (common_noise_va/(float)entries);
+	}
+	return supplied;
+}
+
+float *p_trb_event_cn(unsigned short int *values, float sigma_multiplicator, float *pedestal, float *sigma, int *flags, float *supplied) {
+	float no_pedestal[d_trb_event_channels];
+	int index;
+	for (index = 0; index < d_trb_event_channels; index++)
+		no_pedestal[index] = values[index]-pedestal[index];
+	return p_trb_event_cn_no_pedestal(no_pedestal, sigma_multiplicator, sigma, flags, supplied);
+}
+
 float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, int *flags, float *supplied) {
-	float *result = supplied, common_noise[d_trb_event_vas], common_noise_va, common_noise_pure[d_trb_event_channels] = {0},
+	float *result = supplied, common_noise[d_trb_event_vas], common_noise_pure[d_trb_event_channels] = {0},
 	      common_noise_pure_square[d_trb_event_channels] = {0}, value, fraction;
-	int va, channel, local_channel, event, entries, local_entries[d_trb_event_channels] = {0};
+	int channel, event, local_entries[d_trb_event_channels] = {0};
 	if (!result)
 		if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
 			d_die(d_error_malloc);
 	for (event = 0; event < size; event++) {
-		for (va = 0, channel = 0; va < d_trb_event_vas; va++, channel += d_trb_event_channels_on_va) {
-			for (local_channel = channel, common_noise[va] = 0, common_noise_va = 0, entries = 0;
-					local_channel < (channel+d_trb_event_channels_on_va); local_channel++)
-				if ((!flags) || ((!FLAGGED_sigma_raw(flags[local_channel])) && (!FLAGGED_occupancy(flags[local_channel])))) {
-					value = ((float)(events[event].values[local_channel]))-pedestal[local_channel];
-					if (fabs(value) < sigma_multiplicator*sigma_raw[local_channel]) {
-						common_noise_va += value;
-						entries++;
-					}
-				}
-			if (entries)
-				common_noise[va] = common_noise_va/(float)entries;
-		}
+		p_trb_event_cn(events[event].values, sigma_multiplicator, pedestal, sigma_raw, flags, common_noise);
 		for (channel = 0; channel < d_trb_event_channels; channel++) {
 			value = ((float)(events[event].values[channel]))-pedestal[channel]-common_noise[(int)(channel/d_trb_event_channels_on_va)];
 			if (fabs(value) < (sigma_multiplicator*sigma_raw[channel])) {
