@@ -73,20 +73,25 @@ float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *sup
 }
 
 float *p_trb_event_cn_no_pedestal(float *no_pedestal, float sigma_multiplicator, float *sigma, int *flags, float *supplied) {
-	float common_noise_va;
-	int va, channel, local_channel, entries;
+	float elements[d_trb_event_channels_on_va];
+	int va, channel, local_channel, entries, index;
 	for (va = 0, channel = 0; va < d_trb_event_vas; va++, channel += d_trb_event_channels_on_va) {
 		supplied[va] = 0;
-		for (local_channel = channel, common_noise_va = 0, entries = 0; local_channel < (channel+d_trb_event_channels_on_va);
+		for (local_channel = channel, entries = 0; local_channel < (channel+d_trb_event_channels_on_va);
 				local_channel++)
-			if ((!flags) || ((!FLAGGED_sigma_raw(flags[local_channel])) && (!FLAGGED_occupancy(flags[local_channel])))) {
+			if ((!flags) || ((!FLAGGED_sigma_raw(flags[local_channel])) && (!FLAGGED_occupancy(flags[local_channel]))))
 				if (no_pedestal[local_channel] < (sigma_multiplicator*sigma[local_channel])) {
-					common_noise_va += no_pedestal[local_channel];
+					for (index = (entries-1); ((index >= 0) && (elements[index] > no_pedestal[local_channel])); index--)
+						elements[index+1] = elements[index];
+					elements[index+1] = no_pedestal[local_channel];
 					entries++;
 				}
-			}
-		if (entries)
-			supplied[va] = (common_noise_va/(float)entries);
+		if (entries) {
+			if ((entries%2) == 0)
+				supplied[va] = (elements[(entries/2)]+elements[(entries/2)-1])/2.0f;
+			else
+				supplied[va] = elements[(entries/2)];
+		}
 	}
 	return supplied;
 }
