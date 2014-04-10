@@ -53,7 +53,7 @@ char *f_string_format(char *buffer, size_t size, char *symbols, t_string_formatt
 }
 
 char *f_string_format_args(char *buffer, size_t size, char *symbols, t_string_formatter functions[], char *format, va_list parameters) {
-	char *target = buffer, *pointer = format, *next, *last, *tail, argument[d_string_arguent_size];
+	char *target = buffer, *pointer = format, *next, *last, *tail, argument[d_string_argument_size];
 	size_t dimension, remaining = size, lower, written;
 	while ((next = strchr(pointer, '%'))) {
 		if ((dimension = (next-pointer)) > 0)
@@ -64,7 +64,7 @@ char *f_string_format_args(char *buffer, size_t size, char *symbols, t_string_fo
 			}
 		if ((pointer = (next+1))) {
 			if ((last = p_string_format_skip(pointer, symbols))) {
-				memset(argument, '\0', d_string_arguent_size);
+				memset(argument, '\0', d_string_argument_size);
 				memcpy(argument, next, (last-next));
 				if (!(tail = strchr(symbols, *(last-1)))) {
 					switch (tolower(*(last-1))) {

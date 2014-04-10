@@ -22,7 +22,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "memory.h"
-#define d_string_arguent_size 24
+#define d_string_argument_size 24
 #define d_strlen(a) ((a)?strlen(a):0)
 #define d_strcmp(a,b) (((a)&&(b))?strcmp(a,b):(((!a)&&(b))?-1:(((a)&&(!b))?1:0)))
 #define d_space_character(a) (((a)==' ')||((a)=='\t'))
