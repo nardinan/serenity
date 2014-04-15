@@ -26,6 +26,8 @@ void p_trbs_hooking(struct o_trbs *object) {
 	/* keep default hash function */
 	object->head.s_delegate.m_string = p_trbs_string;
 	/* keep default clone function */
+	object->m_trb_setup = p_trbs_trb_setup;
+	object->m_dev_setup = p_trbs_dev_setup;
 	object->m_async_search = p_trbs_async_search;
 }
 
@@ -58,33 +60,41 @@ void *p_trbs_thread(void *parameters) {
 	struct usb_dev_handle *handler;
 	struct s_exception *exception = NULL;
 	struct s_trbs_parameters *local_parameters = (struct s_trbs_parameters *)parameters;
-	int index;
+	int index, append;
 	while ((p_trbs_thread_continue(local_parameters->object)) && (usleep(local_parameters->sleep)==0)) {
 		d_object_lock(local_parameters->object->search_semaphore);
 		if ((usb_find_busses()) | (usb_find_devices())) {
 			for (bus = usb_get_busses(); bus; bus = bus->next)
 				for (device = bus->devices; device; device = device->next)
-					if (!p_trbs_thread_already(local_parameters->object, device))
+					if (!p_trbs_thread_already(local_parameters->object, device)) {
+						append = d_false;
 						if ((handler = usb_open(device))) {
-							if ((p_trb_check(device, handler))) {
+							if (p_trb_check(device, handler)) {
 								d_try {
-									if (local_parameters->handle(f_trb_new(NULL, device, handler),
-												local_parameters->user_data)) {
-										for (index = 0; index < d_trbs_slots_size; index++)
-											if (!local_parameters->object->devices[index].device) {
-												local_parameters->object->devices[index].device = device;
-												local_parameters->object->devices[index].referenced = d_true;
-												break;
-											}
-									} else
+									if ((local_parameters->trb_handle) &&
+											(local_parameters->trb_handle(f_trb_new(NULL, device, handler),
+														      local_parameters->trb_data)))
+										append = d_true;
+									else
 										usb_close(handler);
 								} d_catch(exception) {
 									/* here we have an already acquired device */
 									usb_close(handler);
 								} d_endtry;
-							} else
+							} else if ((local_parameters->dev_handle) && (local_parameters->dev_handle(device, handler,
+											local_parameters->dev_data)))
+								append = d_true;
+							else
 								usb_close(handler);
 						}
+						if (append)
+							for (index = 0; index < d_trbs_slots_size; index++)
+								if (!local_parameters->object->devices[index].device) {
+									local_parameters->object->devices[index].device = device;
+									local_parameters->object->devices[index].referenced = d_true;
+									break;
+								}
+					}
 			for (index = 0; index < d_trbs_slots_size; index++) {
 				if (local_parameters->object->devices[index].device)
 					if (!local_parameters->object->devices[index].referenced)
@@ -139,22 +149,43 @@ char *p_trbs_string(struct o_object *object, char *data, size_t size) {
 	return data;
 }
 
-int p_trbs_async_search(struct o_trbs *object, t_trbs_handle *handle, time_t sleep, void *user_data) {
+void p_trbs_trb_setup(struct o_trbs *object, t_trbs_trb_handle *handle, void *user_data) {
+	if (!object->parameters) {
+		if ((object->parameters = (struct s_trbs_parameters *) d_malloc(sizeof(struct s_trbs_parameters))))
+			memset(object->parameters, 0, sizeof(struct s_trbs_parameters));
+		else
+			d_die(d_error_malloc);
+	}
+	if (object->parameters) {
+		object->parameters->trb_handle = handle;
+		object->parameters->trb_data = user_data;
+	}
+}
+
+void p_trbs_dev_setup(struct o_trbs *object, t_trbs_dev_handle *handle, void *user_data) {
+	if (!object->parameters) {
+		if ((object->parameters = (struct s_trbs_parameters *) d_malloc(sizeof(struct s_trbs_parameters))))
+			memset(object->parameters, 0, sizeof(struct s_trbs_parameters));
+		else
+			d_die(d_error_malloc);
+	}
+	if (object->parameters) {
+		object->parameters->dev_handle = handle;
+		object->parameters->dev_data = user_data;
+	}
+}
+
+int p_trbs_async_search(struct o_trbs *object, time_t sleep) {
 	int result = d_false;
-	struct s_trbs_parameters *parameters;
-	if (pthread_equal(object->thread_id, pthread_self())) {
-		if ((parameters = (struct s_trbs_parameters *) d_malloc(sizeof(struct s_trbs_parameters)))) {
-			parameters->object = object;
-			parameters->handle = handle;
-			parameters->sleep = sleep;
-			parameters->user_data = user_data;
+	if (object->parameters)
+		if (pthread_equal(object->thread_id, pthread_self())) {
+			object->parameters->sleep = sleep;
+			object->parameters->object = object;
 			d_object_lock(object->semaphore);
-			if ((pthread_create(&(object->thread_id), NULL, p_trbs_thread, parameters)) == 0)
+			if ((pthread_create(&(object->thread_id), NULL, p_trbs_thread, object->parameters)) == 0)
 				result = d_true;
 			else
 				object->thread_id = pthread_self();
-		} else
-			d_die(d_error_malloc);
-	}
+		}
 	return result;
 }
