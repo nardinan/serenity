@@ -19,6 +19,7 @@
 #define serenity_o_stream_h
 #include <sys/types.h>
 #include <sys/uio.h>
+#include <sys/file.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include "o_string.h"
