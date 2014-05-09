@@ -34,7 +34,24 @@ void p_stream_hooking(struct o_stream *object) {
 	object->m_blocking = p_stream_blocking;
 }
 
-extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string *name, int descriptor) {
+int p_stream_lock_file(const char *name) {
+	int result = -1, descriptor;
+	if ((descriptor = open(name, O_CREAT|O_RDWR, 0666)) >= 0) {
+		if (flock(descriptor, LOCK_EX|LOCK_NB) >= 0)
+			result = descriptor;
+		else
+			close(descriptor);
+	}
+	return result;
+}
+
+void p_stream_unlock_file(int *descriptor) {
+	flock(*descriptor, LOCK_UN);
+	close(*descriptor);
+	*descriptor = -1;
+}
+
+struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string *name, int descriptor) {
 	struct o_stream *result;
 	if ((result = (struct o_stream *) f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {
 		result->descriptor = descriptor;
@@ -47,7 +64,7 @@ extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string 
 	return result;
 }
 
-extern struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_string *name, const char *action, int permissions) {
+struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_string *name, const char *action, int permissions) {
 	struct o_stream *result;
 	char buffer[d_string_buffer_size];
 	if ((result = (struct o_stream *) f_object_new(v_stream_kind, sizeof(struct o_stream), (struct o_object *)supplied))) {

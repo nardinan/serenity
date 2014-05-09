@@ -57,6 +57,8 @@ typedef struct o_stream {
 	void (*m_blocking)(struct o_stream *, int);
 } o_stream;
 extern void p_stream_hooking(struct o_stream *object);
+extern int p_stream_lock_file(const char *name);
+extern void p_stream_unlock_file(int *descriptor);
 extern struct o_stream *f_stream_new(struct o_stream *supplied, struct o_string *name, int descriptor);
 extern struct o_stream *f_stream_new_file(struct o_stream *supplied, struct o_string *name, const char *action, int permissions);
 extern struct o_stream *f_stream_new_raw(struct o_stream *supplied, struct o_string *name, const char *raw, size_t bytes);
