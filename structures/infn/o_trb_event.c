@@ -39,6 +39,24 @@ unsigned int p_trb_event_align(unsigned char *buffer, size_t size) {
 	return result;
 }
 
+float p_trb_event_mean_f(float *values, size_t size) {
+	float result = 0;
+	int index;
+	for (index = 0; index < size; index++)
+		result += values[index];
+	result /= (float)size;
+	return result;
+}
+
+float p_trb_event_mean_i(int *values, size_t size) {
+	float result = 0;
+	int index;
+	for (index = 0; index < size; index++)
+		result += values[index];
+	result /= (float)size;
+	return result;
+}
+
 float *p_trb_event_pedestal(struct o_trb_event *events, size_t size, float *supplied) {
 	float *result = supplied;
 	int channel, event;
