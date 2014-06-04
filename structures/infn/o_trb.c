@@ -137,7 +137,7 @@ int p_trb_led(struct o_trb *object, time_t timeout) {
 }
 
 int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned short dac, unsigned char channel, time_t timeout) {
-	int result = d_false;
+	int result = d_false, discarded = 0;
 	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		      enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00}, disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00},
 		      buffer[d_trb_packet_size], dac_h, dac_l;
@@ -166,7 +166,9 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 		}
 		object->kind = startup_command[1];
 		if ((result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout)) > 0) {
-			while ((result = p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout)) > 0);
+			while ((result = p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout)) > 0)
+				discarded++;
+			printf("[discarded events: %d]\n", discarded);
 			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
 				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
 					result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
