@@ -10,6 +10,7 @@ dictionaries, dynamic array and strings (and others). This library will be insta
 folders; compile it using:
 
 $ make
+
 $ make install
 
 If you want to compile, for instance, the source tests/test11.c you have to use
