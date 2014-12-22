@@ -32,6 +32,7 @@ extern const char v_trb_kind[];
 typedef enum e_trb_mode {
 	e_trb_mode_normal,
 	e_trb_mode_calibration,
+	e_trb_mode_calibration_software,
 	e_trb_mode_calibration_debug_digital
 } e_trb_mode;
 typedef struct o_trb {
