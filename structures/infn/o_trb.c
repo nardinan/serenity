@@ -140,7 +140,7 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 	int result = d_false, discarded = 0;
 	unsigned char setup_command[] = {0x00, 0xb0, 0x00, 0x00, 0x00, trigger}, startup_command[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		      enable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x11, 0x00}, disable_trigger[] = {0x00, 0xd0, 0x00, 0x00, 0x00, 0x00},
-		      buffer[d_trb_packet_size], dac_h, dac_l;
+		      buffer[d_trb_packet_size], dac_h, dac_l, extra_package[] = {0xde, 0xad, 0xbe, 0xef, 0x00, 0x00, 0x00};
 	if (object->handler) {
 		setup_command[4] = (unsigned int)((float)hold_delay/0.05);
 		dac_h = (unsigned char)(dac>>8)&0xff;
@@ -163,16 +163,24 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 				startup_command[2] = channel;
 				startup_command[4] = dac_l;
 				startup_command[5] = dac_h;
+				/* to correctly understand the package configuration */
+				extra_package[4] = channel;
+				extra_package[5] = dac_l;
+				extra_package[6] = dac_h;
 				break;
 		}
 		object->kind = startup_command[1];
 		if ((result = p_trb_write(object, disable_trigger, sizeof(disable_trigger), timeout)) > 0) {
 			while ((result = p_trb_read(object, buffer, d_trb_packet_size, d_trb_buffer_timeout)) > 0)
 				discarded++;
-			printf("[discarded events: %d]\n", discarded);
 			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
-				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0)
+				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0) {
 					result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
+					d_object_lock(object->stream_lock);
+					if (object->stream_out)
+						object->stream_out->m_write(object->stream_out, sizeof(extra_package), extra_package);
+					d_object_unlock(object->stream_lock);
+				}
 		}
 	}
 	object->last_error = result;
