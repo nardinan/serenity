@@ -176,7 +176,7 @@ int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, e
 			if ((result = p_trb_write(object, setup_command, sizeof(setup_command), timeout)) > 0)
 				if ((result = p_trb_write(object, startup_command, sizeof(startup_command), timeout)) > 0) {
 					result = p_trb_write(object, enable_trigger, sizeof(enable_trigger), timeout);
-					if (mode == e_trb_mode_calibration_debug_digital) {
+					if ((mode == e_trb_mode_calibration_software) || (mode == e_trb_mode_calibration_debug_digital)) {
 						d_object_lock(object->stream_lock);
 						if (object->stream_out)
 							object->stream_out->m_write(object->stream_out, sizeof(extra_package), extra_package);
