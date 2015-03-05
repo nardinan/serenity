@@ -26,6 +26,7 @@ typedef struct o_dictionary {
 	d_object_head;
 	struct s_hash_table *table;
 	int (*m_load)(struct o_dictionary *, struct o_stream *);
+	int (*m_save)(struct o_dictionary *, struct o_stream *);
 	int (*m_insert)(struct o_dictionary *, struct o_object *, struct o_object *);
 	struct o_object *(*m_get)(struct o_dictionary *, struct o_object *);
 	struct o_array *(*m_keys)(struct o_dictionary *);
@@ -39,6 +40,7 @@ extern void p_dictionary_delete(struct o_object *object);
 extern char *p_dictionary_string(struct o_object *object, char *data, size_t size);
 extern struct o_object *p_dictionary_clone(struct o_object *object);
 extern int p_dictionary_load(struct o_dictionary *object, struct o_stream *stream);
+extern int p_dictionary_save(struct o_dictionary *object, struct o_stream *stream);
 extern int p_dictionary_insert(struct o_dictionary *object, struct o_object *key, struct o_object *value);
 extern struct o_object *p_dictionary_get(struct o_dictionary *object, struct o_object *key);
 extern struct o_array *p_dictionary_keys(struct o_dictionary *object);

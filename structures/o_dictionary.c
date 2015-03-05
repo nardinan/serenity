@@ -25,6 +25,7 @@ void p_dictionary_hooking(struct o_dictionary *object) {
 	object->head.s_delegate.m_string = p_dictionary_string;
 	object->head.s_delegate.m_clone = p_dictionary_clone;
 	object->m_load = p_dictionary_load;
+	object->m_save = p_dictionary_save;
 	object->m_insert = p_dictionary_insert;
 	object->m_get = p_dictionary_get;
 	object->m_keys = p_dictionary_keys;
@@ -154,10 +155,9 @@ int p_dictionary_load(struct o_dictionary *object, struct o_stream *stream) {
 		buffer = singleton;
 		if (buffer->m_length(buffer) > 0)
 			if ((values = singleton->m_split(buffer, '='))) {
-				if (values->filled >= 2) {
+				if (values->filled >= 2)
 					p_dictionary_insert(object, values->m_get(values, 0), values->m_get(values, 1));
-					result = d_true;
-				} else
+				else
 					result = d_false;
 				d_release(values);
 				if (!result)
@@ -165,6 +165,27 @@ int p_dictionary_load(struct o_dictionary *object, struct o_stream *stream) {
 			}
 	}
 	d_release(buffer);
+	return result;
+}
+
+int p_dictionary_save(struct o_dictionary *object, struct o_stream *stream) {
+	struct o_string *buffer = f_string_new(NULL, d_string_buffer_size, NULL), *current_string;
+	struct s_hash_bucket *singleton;
+	size_t index = 0, elements = (object->table->mask+1);
+	int result = d_true;
+	for (index = 0; index < elements; index++) {
+		singleton = &(object->table->table[index]);
+		if (singleton->kind == e_hash_kind_fill)
+			if ((current_string = f_string_new(buffer, d_string_buffer_size, "%s=%s\n", singleton->key, singleton->value))) {
+				if (stream->m_write_string(stream, current_string) == 0)
+					result = d_false;
+				buffer = current_string;
+				if (!result)
+					break;
+			}
+	}
+	if (buffer)
+		d_free(buffer);
 	return result;
 }
 
