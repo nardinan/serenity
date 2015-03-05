@@ -24,8 +24,8 @@
 #define d_log_time_size 64
 #define d_log_description_size 32
 #define d_log_level_default e_log_level_medium
-#define d_log(l,f,c...) p_log_write(stdout,l,__FILE__,__FUNCTION__,__LINE__,f,##c)
-#define d_err(l,f,c...) p_log_write(stderr,l,__FILE__,__FUNCTION__,__LINE__,f,##c)
+#define d_log(l,c...) p_log_write(stdout,l,__FILE__,__FUNCTION__,__LINE__,##c)
+#define d_err(l,c...) p_log_write(stderr,l,__FILE__,__FUNCTION__,__LINE__,##c)
 #define d_die(f...)\
 	do{\
 		p_log_write(stderr,e_log_level_ever,__FILE__,__FUNCTION__,__LINE__,##f);\
