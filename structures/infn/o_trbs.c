@@ -69,7 +69,7 @@ void *p_trbs_thread(void *parameters) {
 					if (!p_trbs_thread_already(local_parameters->object, device)) {
 						append = d_false;
 						if ((handler = usb_open(device))) {
-							if (p_trb_check(device, handler)) {
+								if (p_trb_check(device, handler, NULL)) {
 								d_try {
 									if ((local_parameters->trb_handle) &&
 											(local_parameters->trb_handle(f_trb_new(NULL, device, handler),

@@ -26,7 +26,7 @@
 #define d_trb_write_endpoint 0x02
 #define d_trb_read_endpoint 0x86
 #define d_trb_packet_size 512
-#define d_trb_buffer_size 2048
+#define d_trb_buffer_size 8192
 #define d_trb_buffer_timeout 150
 extern const char v_trb_kind[];
 typedef enum e_trb_mode {
@@ -39,10 +39,12 @@ typedef struct o_trb {
 	d_object_head;
 	struct usb_device *device;
 	struct usb_dev_handle *handler;
-	struct o_stream *stream_out;
+	struct o_stream *stream_out, *stream_in;
 	struct o_object *stream_lock;
 	unsigned char led_status;
-	int write_address, read_address, buffer_fill, event_size, last_error;
+	int write_address, read_address, buffer_fill, event_size, last_error, trigger_on;
+	float frequency;
+	long long time_bunk, last_bunk;
 	unsigned char buffer[d_trb_buffer_size], kind;
 	int (*m_led)(struct o_trb *, time_t);
 	int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned short, unsigned char, time_t);
@@ -54,8 +56,9 @@ typedef struct o_trb {
 extern void p_trb_hooking(struct o_trb *object);
 extern int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout);
 extern int p_trb_write(struct o_trb *object, unsigned char *data, size_t size, time_t timeout);
-extern int p_trb_check(struct usb_device *device, struct usb_dev_handle *handler);
+extern int p_trb_check(struct usb_device *device, struct usb_dev_handle *handler, struct o_stream *stream_in);
 extern struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struct usb_dev_handle *handler);
+extern struct o_trb *f_trb_new_file(struct o_trb *supplied, struct o_stream *stream, float frequency);
 extern void p_trb_delete(struct o_object *object);
 extern int p_trb_compare(struct o_object *object, struct o_object *other);
 extern t_hash_value p_trb_hash(struct o_object *object);

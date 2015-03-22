@@ -30,11 +30,11 @@ void p_trb_event_hooking(struct o_trb_event *object) {
 }
 
 unsigned int p_trb_event_align(unsigned char *buffer, size_t size) {
-	size_t index, result;
+	size_t index, result = size;
 	for (index = 1; index < size; index++)
 		if ((buffer[index] == 0x90) && ((index == (size-1)) || (buffer[index+1] == 0xeb)))
 			break;
-	if ((result = size-index))
+	if ((size > 0) && (result = size-index))
 		memmove(buffer, &(buffer[index]), result);
 	return result;
 }
