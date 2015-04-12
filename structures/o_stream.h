@@ -22,6 +22,7 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include "o_string.h"
 #include "o_pool.h"
 #define d_append_flags (O_WRONLY|O_CREAT|O_APPEND)

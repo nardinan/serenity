@@ -1,6 +1,6 @@
 objects = o_array.o o_dictionary.o o_exceptions.o o_filesystem.o o_object.o o_pool.o o_stream.o o_string.o
 cc = gcc -g
-cflags = -Wall -fPIC -Wno-variadic-macros -std=c99 -c -pedantic -Wno-gnu
+cflags = -Wall -fPIC -Wno-variadic-macros -std=c99 -c -pedantic
 lflags = -Wall
 library_links = -L../ground -lserenity_ground -lpthread
 executable = libserenity_structures.so
