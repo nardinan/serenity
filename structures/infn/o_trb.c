@@ -79,6 +79,10 @@ int p_trb_check(struct usb_device *device, struct usb_dev_handle *handler, struc
 
 struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struct usb_dev_handle *handler) {
 	struct o_trb *result;
+	struct usb_interface *interface = device->config->interface;
+	struct usb_interface_descriptor *descriptor = interface->altsetting;
+	int index;
+	unsigned char address;
 	if ((result = (struct o_trb *) f_object_new(v_trb_kind, sizeof(struct o_trb), (struct o_object *)supplied))) {
 		p_trb_hooking(result);
 		result->led_status = 0x00;
@@ -88,8 +92,14 @@ struct o_trb *f_trb_new(struct o_trb *supplied, struct usb_device *device, struc
 		if (p_trb_check(result->device, result->handler, NULL)) {
 			if (usb_set_configuration(result->handler, 1) >= 0) {
 				if (usb_claim_interface(result->handler, 0) >= 0) {
-					result->write_address = d_trb_write_endpoint;
-					result->read_address = d_trb_read_endpoint;
+					/* dinamically compute endpoints */
+					for (index = 0; index < descriptor->bNumEndpoints; ++index) {
+						address = descriptor->endpoint[index].bEndpointAddress;
+						if (address&0x80)
+							result->read_address = address;
+						else
+							result->write_address = address;
+					}
 				} else
 					d_throw(v_exception_unsupported, "unable to claim the USB interface");
 			} else
