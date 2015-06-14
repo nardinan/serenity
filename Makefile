@@ -1,9 +1,9 @@
-prefix_inc = /usr/local
+prefix_inc = /usr
 prefix_lib = /usr
 include_dir = $(prefix_inc)/include
 library_dir = $(prefix_lib)/lib
 library_name = serenity
-folders = ground structures structures/crypto structures/infn 
+folders = ground structures structures/crypto structures/infn
 
 all:
 	for current_dir in $(folders); do make -C $${current_dir}; done
