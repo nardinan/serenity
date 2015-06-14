@@ -1,0 +1,11 @@
+language: c
+
+compiler:
+        - gcc
+
+install:
+        - sudo apt-get install libusb libusb-devel
+
+script:
+        - make
+        - sudo make install
