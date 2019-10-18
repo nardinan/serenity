@@ -1,6 +1,11 @@
 objects = o_trb_event.o o_trb.o o_trbs.o
 cc = gcc -g
-cflags = -Wall -fPIC `libusb-config --cflags` -Wno-variadic-macros -std=c99 -c -pedantic
+default_cflags = -Wall -fPIC `libusb-config --cflags` -Wno-variadic-macros -std=c99 -c -pedantic
+ifdef SUPPORT_TRB_0x1313
+	cflags = $(default_cflags) -Dd_version_0x1313="enabled"
+else
+	cflags = $(default_cflags)
+endif
 lflags = -Wall
 library_links = -L../ -L../../ground -lm -lserenity_structures -lserenity_ground `libusb-config --libs` -lpthread
 executable = libserenity_infn.so
