@@ -1,5 +1,5 @@
-prefix_inc = /usr
-prefix_lib = /usr
+prefix_inc = /usr/local
+prefix_lib = /usr/local
 include_dir = $(prefix_inc)/include
 library_dir = $(prefix_lib)/lib
 library_name = serenity
