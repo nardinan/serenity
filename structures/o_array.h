@@ -23,12 +23,12 @@
 #define d_array_cast(f,a,s,p,d) (((s)=(struct o_string *)(a)->m_get((a),p))?(f)((s)->content):d)
 extern const char v_array_kind[];
 typedef struct o_array {
-	d_object_head;
-	struct o_object **content;
-	size_t size, filled, bucket;
-	size_t (*m_insert)(struct o_array *, struct o_object *, size_t);
-	int (*m_remove)(struct o_array *, size_t);
-	struct o_object *(*m_get)(struct o_array *, size_t);
+  d_object_head;
+  struct o_object **content;
+  size_t size, filled, bucket;
+  size_t (*m_insert)(struct o_array *, struct o_object *, size_t);
+  int (*m_remove)(struct o_array *, size_t);
+  struct o_object *(*m_get)(struct o_array *, size_t);
 } o_array;
 extern void p_array_hooking(struct o_array *object);
 extern struct o_array *f_array_new(struct o_array *supplied, size_t size);

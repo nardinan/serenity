@@ -20,7 +20,7 @@
 #define d_true 1
 #define d_false 0
 typedef struct s_bool {
-	unsigned int flag:1;
+  unsigned int flag:1;
 } s_bool;
 extern const struct s_bool s_true, s_false;
 #define d_is_equal(b,o) ((b).flag==(o).flag)

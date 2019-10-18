@@ -25,24 +25,24 @@ extern int v_trbs_usb_init;
 typedef int (t_trbs_trb_handle)(struct o_trb *, void *);
 typedef int (t_trbs_dev_handle)(struct usb_device *, struct usb_dev_handle *, void *);
 typedef struct s_trbs_parameters {
-	struct o_trbs *object;
-	t_trbs_trb_handle *trb_handle;
-	t_trbs_dev_handle *dev_handle;
-	void *trb_data, *dev_data;
-	time_t sleep;
+  struct o_trbs *object;
+  t_trbs_trb_handle *trb_handle;
+  t_trbs_dev_handle *dev_handle;
+  void *trb_data, *dev_data;
+  time_t sleep;
 } s_trbs_parameters;
 typedef struct o_trbs {
-	d_object_head;
-	struct o_object *semaphore, *search_semaphore;
-	struct s_trbs_parameters *parameters;
-	struct {
-		struct usb_device *device;
-		int referenced;
-	} devices[d_trbs_slots_size];
-	pthread_t thread_id;
-	void (*m_trb_setup)(struct o_trbs *, t_trbs_trb_handle *, void *);
-	void (*m_dev_setup)(struct o_trbs *, t_trbs_dev_handle *, void *);
-	int (*m_async_search)(struct o_trbs *, time_t);
+  d_object_head;
+  struct o_object *semaphore, *search_semaphore;
+  struct s_trbs_parameters *parameters;
+  struct {
+    struct usb_device *device;
+    int referenced;
+  } devices[d_trbs_slots_size];
+  pthread_t thread_id;
+  void (*m_trb_setup)(struct o_trbs *, t_trbs_trb_handle *, void *);
+  void (*m_dev_setup)(struct o_trbs *, t_trbs_dev_handle *, void *);
+  int (*m_async_search)(struct o_trbs *, time_t);
 } o_trbs;
 extern void p_trbs_hooking(struct o_trbs *object);
 extern int p_trbs_thread_continue(struct o_trbs *object);

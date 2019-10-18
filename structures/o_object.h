@@ -26,28 +26,28 @@
 #define d_clone(a,k) (k*)((struct o_object *)a)->s_delegate.m_clone((struct o_object *)a)
 #define d_object_constant(k,s,hook)\
 {\
-	d_list_node_constant,\
-	.kind = (k),\
-	.size = (s),\
-	.references = 0,\
-	.hash = 0,\
-	.mutex = 0,\
-	.s_flags = {\
-		d_true,\
-		d_false,\
-		d_false,\
-		d_false\
-	},\
-	.s_delegate = {\
-		p_##hook##_delete,\
-		p_##hook##_compare,\
-		p_##hook##_hash,\
-		p_##hook##_string,\
-		p_##hook##_clone,\
-		p_object_trylock,\
-		p_object_lock,\
-		p_object_unlock\
-	}\
+  d_list_node_constant,\
+  .kind = (k),\
+  .size = (s),\
+  .references = 0,\
+  .hash = 0,\
+  .mutex = 0,\
+  .s_flags = {\
+    d_true,\
+    d_false,\
+    d_false,\
+    d_false\
+  },\
+  .s_delegate = {\
+    p_##hook##_delete,\
+    p_##hook##_compare,\
+    p_##hook##_hash,\
+    p_##hook##_string,\
+    p_##hook##_clone,\
+    p_object_trylock,\
+    p_object_lock,\
+    p_object_unlock\
+  }\
 }
 #define d_object_kind(o,k) ((struct o_##k *)(((o)->kind==v_##k##_kind)?(o):NULL))
 #define d_object_kind_compare(a,b) ((a)->kind==(b)->kind)
@@ -55,24 +55,24 @@
 #define d_object_lock(a) ((a)->s_delegate.m_lock(a))
 #define d_object_unlock(a) ((a)->s_delegate.m_unlock(a))
 typedef struct o_object {
-	d_list_node_head;
-	const char *kind;
-	size_t size, references;
-	t_hash_value hash;
-	pthread_mutex_t mutex;
-	struct {
-		unsigned int supplied:1, hashed:1, pooled:1, mutexed:1;
-	} s_flags;
-	struct {
-		void (*m_delete)(struct o_object *);
-		int (*m_compare)(struct o_object *, struct o_object *);
-		t_hash_value (*m_hash)(struct o_object *);
-		char *(*m_string)(struct o_object *, char *, size_t);
-		struct o_object *(*m_clone)(struct o_object *);
-		int (*m_trylock)(struct o_object *);
-		void (*m_lock)(struct o_object *);
-		void (*m_unlock)(struct o_object *);
-	} s_delegate;
+  d_list_node_head;
+  const char *kind;
+  size_t size, references;
+  t_hash_value hash;
+  pthread_mutex_t mutex;
+  struct {
+    unsigned int supplied:1, hashed:1, pooled:1, mutexed:1;
+  } s_flags;
+  struct {
+    void (*m_delete)(struct o_object *);
+    int (*m_compare)(struct o_object *, struct o_object *);
+    t_hash_value (*m_hash)(struct o_object *);
+    char *(*m_string)(struct o_object *, char *, size_t);
+    struct o_object *(*m_clone)(struct o_object *);
+    int (*m_trylock)(struct o_object *);
+    void (*m_lock)(struct o_object *);
+    void (*m_unlock)(struct o_object *);
+  } s_delegate;
 } o_object;
 extern void p_object_hooking(struct o_object *object);
 extern struct o_object *f_object_new_pure(struct o_object *supplied);

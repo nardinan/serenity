@@ -23,14 +23,14 @@
 #define d_dictionary_get_string(d,k) (struct o_string *)((d)->m_get((d),(struct o_object *)(k)))
 extern const char v_dictionary_kind[];
 typedef struct o_dictionary {
-	d_object_head;
-	struct s_hash_table *table;
-	int (*m_load)(struct o_dictionary *, struct o_stream *);
-	int (*m_save)(struct o_dictionary *, struct o_stream *);
-	int (*m_insert)(struct o_dictionary *, struct o_object *, struct o_object *);
-	struct o_object *(*m_get)(struct o_dictionary *, struct o_object *);
-	struct o_array *(*m_keys)(struct o_dictionary *);
-	struct o_array *(*m_values)(struct o_dictionary *);
+  d_object_head;
+  struct s_hash_table *table;
+  int (*m_load)(struct o_dictionary *, struct o_stream *);
+  int (*m_save)(struct o_dictionary *, struct o_stream *);
+  int (*m_insert)(struct o_dictionary *, struct o_object *, struct o_object *);
+  struct o_object *(*m_get)(struct o_dictionary *, struct o_object *);
+  struct o_array *(*m_keys)(struct o_dictionary *);
+  struct o_array *(*m_values)(struct o_dictionary *);
 } o_dictionary;
 extern void p_dictionary_hooking(struct o_dictionary *object);
 extern t_hash_value p_dictionary_hash_hooker(void *key);

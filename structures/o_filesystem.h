@@ -23,15 +23,15 @@
 #define d_filesystem_name_size 16
 extern const char v_filesystem_kind[];
 typedef struct s_filesystem_header {
-	char name[d_filesystem_name_size];
-	ssize_t bytes;
+  char name[d_filesystem_name_size];
+  ssize_t bytes;
 } s_filesystem_header;
 typedef struct o_filesystem {
-	d_object_head;
-	struct o_dictionary *files;
-	int (*m_insert)(struct o_filesystem *, struct o_string *, struct o_stream *);
-	struct o_stream *(*m_get)(struct o_filesystem *, struct o_string *);
-	void (*m_store)(struct o_filesystem *, struct o_stream *);
+  d_object_head;
+  struct o_dictionary *files;
+  int (*m_insert)(struct o_filesystem *, struct o_string *, struct o_stream *);
+  struct o_stream *(*m_get)(struct o_filesystem *, struct o_string *);
+  void (*m_store)(struct o_filesystem *, struct o_stream *);
 } o_filesystem;
 extern void p_filesystem_hooking(struct o_filesystem *object);
 extern struct o_filesystem *f_filesystem_new(struct o_filesystem *supplied);

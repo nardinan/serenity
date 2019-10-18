@@ -27,15 +27,15 @@
 #define d_log(l,c...) p_log_write(stdout,l,__FILE__,__FUNCTION__,__LINE__,##c)
 #define d_err(l,c...) p_log_write(stderr,l,__FILE__,__FUNCTION__,__LINE__,##c)
 #define d_die(f...)\
-	do{\
-		p_log_write(stderr,e_log_level_ever,__FILE__,__FUNCTION__,__LINE__,##f);\
-		exit(1);\
-	}while(0);
+  do{\
+    p_log_write(stderr,e_log_level_ever,__FILE__,__FUNCTION__,__LINE__,##f);\
+    exit(1);\
+  }while(0);
 enum e_log_level {
-	e_log_level_ever = 0,
-	e_log_level_low,
-	e_log_level_medium,
-	e_log_level_high
+  e_log_level_ever = 0,
+  e_log_level_low,
+  e_log_level_medium,
+  e_log_level_high
 };
 extern enum e_log_level v_log_level;
 extern const char v_log_level_description[][d_log_description_size];

@@ -21,19 +21,19 @@
 #define d_string_buffer_size 512
 #define d_string_constant(c)\
 {\
-	.head = d_object_constant(v_string_kind,sizeof(struct o_string),string),\
-	.s_flags = {\
-		d_true\
-	},\
-	.content = (c),\
-	.size = (d_strlen(c)+1),\
-	p_string_trim,\
-	p_string_append,\
-	p_string_length,\
-	p_string_character,\
-	p_string_substring,\
-	p_string_split,\
-	p_string_truncate\
+  .head = d_object_constant(v_string_kind,sizeof(struct o_string),string),\
+  .s_flags = {\
+    d_true\
+  },\
+  .content = (c),\
+  .size = (d_strlen(c)+1),\
+  p_string_trim,\
+  p_string_append,\
+  p_string_length,\
+  p_string_character,\
+  p_string_substring,\
+  p_string_split,\
+  p_string_truncate\
 }
 #define d_string(s,c...) f_string_new(NULL,(s),##c)
 #define d_string_pure(c) f_string_new(NULL,d_strlen(c)+1,(c))
@@ -41,19 +41,19 @@
 #define d_SP(s) d_P(d_string_pure(s), struct o_string)
 extern const char v_string_kind[];
 typedef struct o_string {
-	d_object_head;
-	struct {
-		unsigned int constant:1;
-	} s_flags;
-	char *content;
-	size_t size;
-	void (*m_trim)(struct o_string *);
-	void (*m_append)(struct o_string *, struct o_string *);
-	size_t (*m_length)(struct o_string *);
-	char (*m_character)(struct o_string *, size_t);
-	struct o_string *(*m_substring)(struct o_string *, size_t, size_t);
-	struct o_array *(*m_split)(struct o_string *, char);
-	void (*m_truncate)(struct o_string *, size_t);
+  d_object_head;
+  struct {
+    unsigned int constant:1;
+  } s_flags;
+  char *content;
+  size_t size;
+  void (*m_trim)(struct o_string *);
+  void (*m_append)(struct o_string *, struct o_string *);
+  size_t (*m_length)(struct o_string *);
+  char (*m_character)(struct o_string *, size_t);
+  struct o_string *(*m_substring)(struct o_string *, size_t, size_t);
+  struct o_array *(*m_split)(struct o_string *, char);
+  void (*m_truncate)(struct o_string *, size_t);
 } o_string;
 extern void p_string_hooking(struct o_string *object);
 extern struct o_string *f_string_new(struct o_string *supplied, size_t size, const char *format, ...);

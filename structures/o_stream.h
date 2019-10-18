@@ -35,28 +35,28 @@
 #define d_printf(s,c) (s)->m_write_string((s),(c))
 extern const char v_stream_kind[];
 typedef enum e_stream_seek {
-	e_stream_seek_begin,
-	e_stream_seek_current,
-	e_stream_seek_end
+  e_stream_seek_begin,
+  e_stream_seek_current,
+  e_stream_seek_end
 } e_stream_seek;
 typedef struct o_stream {
-	d_object_head;
-	struct o_string *name;
-	int descriptor, flags;
-	struct {
-		unsigned int supplied:1;
-		unsigned int opened:1;
-		unsigned int temporary:1;
-	} s_flags;
-	ssize_t (*m_write)(struct o_stream *, size_t, void *);
-	ssize_t (*m_write_string)(struct o_stream *, struct o_string *);
-	ssize_t (*m_write_stream)(struct o_stream *, struct o_stream *);
-	ssize_t (*m_read_raw)(struct o_stream *, unsigned char *, size_t);
-	struct o_string *(*m_read_line)(struct o_stream *, struct o_string *, size_t);
-	struct o_string *(*m_read)(struct o_stream *, struct o_string *, size_t);
-	ssize_t (*m_size)(struct o_stream *);
-	off_t (*m_seek)(struct o_stream *, off_t, enum e_stream_seek);
-	void (*m_blocking)(struct o_stream *, int);
+  d_object_head;
+  struct o_string *name;
+  int descriptor, flags;
+  struct {
+    unsigned int supplied:1;
+    unsigned int opened:1;
+    unsigned int temporary:1;
+  } s_flags;
+  ssize_t (*m_write)(struct o_stream *, size_t, void *);
+  ssize_t (*m_write_string)(struct o_stream *, struct o_string *);
+  ssize_t (*m_write_stream)(struct o_stream *, struct o_stream *);
+  ssize_t (*m_read_raw)(struct o_stream *, unsigned char *, size_t);
+  struct o_string *(*m_read_line)(struct o_stream *, struct o_string *, size_t);
+  struct o_string *(*m_read)(struct o_stream *, struct o_string *, size_t);
+  ssize_t (*m_size)(struct o_stream *);
+  off_t (*m_seek)(struct o_stream *, off_t, enum e_stream_seek);
+  void (*m_blocking)(struct o_stream *, int);
 } o_stream;
 extern void p_stream_hooking(struct o_stream *object);
 extern int p_stream_lock_file(const char *name);

@@ -22,29 +22,29 @@
 #define d_idea_expanded_key_bytes 16
 #define d_idea_couple_bytes_to_uint(a) ((((unsigned int)(a)[0])<<8)|((unsigned int)(a)[1]))
 #define d_idea_couple_bytes_copy(a,b)\
-	do{\
-		(a)[0]=(b)[0];\
-		(a)[1]=(b)[1];\
-	}while(0)
+  do{\
+    (a)[0]=(b)[0];\
+    (a)[1]=(b)[1];\
+  }while(0)
 #define d_idea_couple_bytes_xor(a,b)\
-	do{\
-		(a)[0]^=(b)[0];\
-		(a)[1]^=(b)[1];\
-	}while(0)
+  do{\
+    (a)[0]^=(b)[0];\
+    (a)[1]^=(b)[1];\
+  }while(0)
 #define p_mul p_idea_inverse_multiplication
 #define p_shi p_idea_key_shift_left
 #define p_neg p_idea_negative
 #define p_cop d_idea_couple_bytes_copy
 enum e_idea_key {
-	e_idea_encrypt=0,
-	e_idea_decrypt=1
+  e_idea_encrypt=0,
+  e_idea_decrypt=1
 };
 extern const char v_idea_kind[];
 typedef struct o_idea {
-	d_object_head;
-	unsigned char expanded_key[2][d_idea_expanded_key_size];
-	struct o_string *(*m_crypt)(struct o_idea *, struct o_string *, int);
-	struct o_string *(*m_decrypt)(struct o_idea *, struct o_string *, int);
+  d_object_head;
+  unsigned char expanded_key[2][d_idea_expanded_key_size];
+  struct o_string *(*m_crypt)(struct o_idea *, struct o_string *, int);
+  struct o_string *(*m_decrypt)(struct o_idea *, struct o_string *, int);
 } o_idea;
 extern void p_idea_hooking(struct o_idea *object);
 extern void p_idea_key_shift_left(unsigned char *key, size_t length, int bits);

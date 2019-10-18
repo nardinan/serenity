@@ -30,28 +30,28 @@
 #define d_trb_buffer_timeout 150
 extern const char v_trb_kind[];
 typedef enum e_trb_mode {
-	e_trb_mode_normal,
-	e_trb_mode_calibration,
-	e_trb_mode_calibration_software,
-	e_trb_mode_calibration_debug_digital
+  e_trb_mode_normal,
+  e_trb_mode_calibration,
+  e_trb_mode_calibration_software,
+  e_trb_mode_calibration_debug_digital
 } e_trb_mode;
 typedef struct o_trb {
-	d_object_head;
-	struct usb_device *device;
-	struct usb_dev_handle *handler;
-	struct o_stream *stream_out, *stream_in;
-	struct o_object *stream_lock;
-	unsigned char led_status;
-	int write_address, read_address, buffer_fill, event_size, last_error, trigger_on;
-	float frequency;
-	long long time_bunk, last_bunk;
-	unsigned char buffer[d_trb_buffer_size], kind;
-	int (*m_led)(struct o_trb *, time_t);
-	int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned short, unsigned char, time_t);
-	int (*m_stop)(struct o_trb *, time_t);
-	void (*m_close_stream)(struct o_trb *);
-	void (*m_stream)(struct o_trb *, struct o_stream *, struct o_string *, const char *, int);
-	struct o_trb_event *(*m_event)(struct o_trb *, struct o_trb_event *, time_t);
+  d_object_head;
+  struct usb_device *device;
+  struct usb_dev_handle *handler;
+  struct o_stream *stream_out, *stream_in;
+  struct o_object *stream_lock;
+  unsigned char led_status;
+  int write_address, read_address, buffer_fill, event_size, last_error, trigger_on;
+  float frequency;
+  long long time_bunk, last_bunk;
+  unsigned char buffer[d_trb_buffer_size], kind;
+  int (*m_led)(struct o_trb *, time_t);
+  int (*m_setup)(struct o_trb *, unsigned char, float, enum e_trb_mode, unsigned short, unsigned char, time_t);
+  int (*m_stop)(struct o_trb *, time_t);
+  void (*m_close_stream)(struct o_trb *);
+  void (*m_stream)(struct o_trb *, struct o_stream *, struct o_string *, const char *, int);
+  struct o_trb_event *(*m_event)(struct o_trb *, struct o_trb_event *, time_t);
 } o_trb;
 extern void p_trb_hooking(struct o_trb *object);
 extern int p_trb_read(struct o_trb *object, unsigned char *data, size_t size, time_t timeout);
@@ -65,7 +65,7 @@ extern t_hash_value p_trb_hash(struct o_object *object);
 extern char *p_trb_string(struct o_object *object, char *data, size_t size);
 extern int p_trb_led(struct o_trb *object, time_t timeout);
 extern int p_trb_setup(struct o_trb *object, unsigned char trigger, float hold_delay, enum e_trb_mode mode, unsigned short dac, unsigned char channel,
-		time_t timeout);
+    time_t timeout);
 extern int p_trb_stop(struct o_trb *object, time_t timeout);
 extern void p_trb_close_stream(struct o_trb *object);
 extern void p_trb_stream(struct o_trb *object, struct o_stream *supplied, struct o_string *name, const char *action, int permission);

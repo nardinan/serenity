@@ -20,26 +20,26 @@
 #include "o_object.h"
 #define d_pool_begin(p)\
 {\
-	struct o_pool *__d_pool=(p);\
-	do
+  struct o_pool *__d_pool=(p);\
+  do
 #define d_pool_end\
-	while(0);\
+  while(0);\
 }
 #define d_pool_end_flush\
-	while(0);\
-	__d_pool->m_clean(__d_pool,d_true);\
-}
+  while(0);\
+  __d_pool->m_clean(__d_pool,d_true);\
+  }
 #define d_pool_end_clean\
-	while(0);\
-	__d_pool->m_clean(__d_pool,d_false);\
-}
+  while(0);\
+  __d_pool->m_clean(__d_pool,d_false);\
+  }
 #define d_P(a,k) (k*)__d_pool->m_insert(__d_pool,(struct o_object *)(a))
 extern const char v_pool_kind[];
 typedef struct o_pool {
-	d_object_head;
-	s_list *pool;
-	struct o_object *(*m_insert)(struct o_pool *, struct o_object *);
-	void (*m_clean)(struct o_pool *, int);
+  d_object_head;
+  s_list *pool;
+  struct o_object *(*m_insert)(struct o_pool *, struct o_object *);
+  void (*m_clean)(struct o_pool *, int);
 } o_pool;
 extern void p_pool_hooking(struct o_pool *object);
 extern struct o_pool *f_pool_new(struct o_pool *supplied);
