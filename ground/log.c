@@ -18,19 +18,19 @@
 #include "log.h"
 enum e_log_level v_log_level = d_log_level_default;
 const char v_log_level_description[][d_log_description_size] = {
-	"log",
-	"low",
-	"medium",
-	"high"
+  "log",
+  "low",
+  "medium",
+  "high"
 };
 void p_log_write(FILE *stream, enum e_log_level level, const char *file, const char *function, unsigned int line, const char *format, ...) {
-	va_list arguments;
-	if (level <= v_log_level) {
-		fprintf(stream, "%s - [%s::%s() (%d)] ", v_log_level_description[level], file, function, line);
-		va_start(arguments, format);
-		vfprintf(stream, format, arguments);
-		va_end(arguments);
-		fputc('\n', stream);
-		fflush(stream);
-	}
+  va_list arguments;
+  if (level <= v_log_level) {
+    fprintf(stream, "%s - [%s::%s() (%d)] ", v_log_level_description[level], file, function, line);
+    va_start(arguments, format);
+    vfprintf(stream, format, arguments);
+    va_end(arguments);
+    fputc('\n', stream);
+    fflush(stream);
+  }
 }

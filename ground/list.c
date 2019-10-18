@@ -17,57 +17,57 @@
  */
 #include "list.h"
 void f_list_init(struct s_list **list) {
-	if (!(*list = (struct s_list *) d_calloc(1, sizeof(struct s_list))))
-		d_die(d_error_malloc);
+  if (!(*list = (struct s_list *) d_calloc(1, sizeof(struct s_list))))
+    d_die(d_error_malloc);
 }
 
 void f_list_destroy(struct s_list **list) {
-	if (*list)
-		d_free(*list);
-	*list = NULL;
+  if (*list)
+    d_free(*list);
+  *list = NULL;
 }
 
 void f_list_append(struct s_list *list, struct s_list_node *node, enum e_list_insert_kind kind) {
-	switch (kind) {
-		case e_list_insert_head:
-			if (list->head)
-				list->head->back = node;
-			node->next = list->head;
-			list->head = node;
-			break;
-		case e_list_insert_tail:
-			if (list->tail)
-				list->tail->next = node;
-			node->back = list->tail;
-			list->tail = node;
-			break;
-	}
-	list->fill++;
+  switch (kind) {
+    case e_list_insert_head:
+      if (list->head)
+        list->head->back = node;
+      node->next = list->head;
+      list->head = node;
+      break;
+    case e_list_insert_tail:
+      if (list->tail)
+        list->tail->next = node;
+      node->back = list->tail;
+      list->tail = node;
+      break;
+  }
+  list->fill++;
 }
 
 void f_list_insert(struct s_list *list, struct s_list_node *node, struct s_list_node *left) {
-	if (left) {
-		if (left->next) {
-			node->next = left->next;
-			node->next->back = node;
-			node->back = left;
-			left->next = node;
-		} else
-			f_list_append(list, node, e_list_insert_tail);
-	} else
-		f_list_append(list, node, e_list_insert_head);
-	list->fill++;
+  if (left) {
+    if (left->next) {
+      node->next = left->next;
+      node->next->back = node;
+      node->back = left;
+      left->next = node;
+    } else
+      f_list_append(list, node, e_list_insert_tail);
+  } else
+    f_list_append(list, node, e_list_insert_head);
+  list->fill++;
 }
 
 struct s_list_node *f_list_delete(struct s_list *list, struct s_list_node *node) {
-	if (node->next)
-		node->next->back = node->back;
-	else
-		list->tail = node->back;
-	if (node->back)
-		node->back->next = node->next;
-	else
-		list->head = node->next;
-	list->fill--;
-	return node;
+  if (node->next)
+    node->next->back = node->back;
+  else
+    list->tail = node->back;
+  if (node->back)
+    node->back->next = node->next;
+  else
+    list->head = node->next;
+  list->fill--;
+  return node;
 }

@@ -18,59 +18,59 @@
 #include "memory.h"
 struct s_pointer *v_memory_root = NULL;
 void *p_memory_insert(void *pointer, const char *file, const char *function, unsigned int line, int inside) {
-	struct s_pointer *node;
-	int founded = d_false;
-	if (inside) {
-		node = v_memory_root;
-		while (node) {
-			if (node->pointer == pointer) {
-				founded = d_true;
-				break;
-			}
-			node = node->next;
-		}
-	}
-	if ((!founded) && (node = (struct s_pointer *) malloc(sizeof(struct s_pointer)))) {
-		memset(node, 0, sizeof(struct s_pointer));
-		node->pointer = pointer;
-		strncpy(node->file, file, d_memory_coordinate_size);
-		strncpy(node->function, function, d_memory_coordinate_size);
-		node->line = line;
-		if (v_memory_root)
-			v_memory_root->back = node;
-		node->next = v_memory_root;
-		node->back = NULL;
-		v_memory_root = node;
-	}
-	return pointer;
+  struct s_pointer *node;
+  int founded = d_false;
+  if (inside) {
+    node = v_memory_root;
+    while (node) {
+      if (node->pointer == pointer) {
+        founded = d_true;
+        break;
+      }
+      node = node->next;
+    }
+  }
+  if ((!founded) && (node = (struct s_pointer *) malloc(sizeof(struct s_pointer)))) {
+    memset(node, 0, sizeof(struct s_pointer));
+    node->pointer = pointer;
+    strncpy(node->file, file, d_memory_coordinate_size);
+    strncpy(node->function, function, d_memory_coordinate_size);
+    node->line = line;
+    if (v_memory_root)
+      v_memory_root->back = node;
+    node->next = v_memory_root;
+    node->back = NULL;
+    v_memory_root = node;
+  }
+  return pointer;
 }
 
 void p_memory_remove(void *pointer, const char *file, const char *function, unsigned int line, int suppress) {
-	int result = d_false;
-	struct s_pointer *node = v_memory_root;
-	while (node) {
-		if (node->pointer == pointer) {
-			if (node->next)
-				node->next->back = node->back;
-			if (node->back)
-				node->back->next = node->next;
-			else
-				v_memory_root = node->next;
-			free(node);
-			result = d_true;
-			break;
-		}
-		node = node->next;
-	}
-	if ((result == d_false) && (suppress == d_false))
-		d_log(e_log_level_ever, "double free on %s:%s() (%d)", file, function, line);
+  int result = d_false;
+  struct s_pointer *node = v_memory_root;
+  while (node) {
+    if (node->pointer == pointer) {
+      if (node->next)
+        node->next->back = node->back;
+      if (node->back)
+        node->back->next = node->next;
+      else
+        v_memory_root = node->next;
+      free(node);
+      result = d_true;
+      break;
+    }
+    node = node->next;
+  }
+  if ((result == d_false) && (suppress == d_false))
+    d_log(e_log_level_ever, "double free on %s:%s() (%d)", file, function, line);
 }
 
 void f_memory_flush(enum e_log_level level) {
-	struct s_pointer *node;
-	while ((node = v_memory_root)) {
-		d_log(level, "pointer %p allocated on %s::%s() (%d) is still there", node->pointer, node->file, node->function, node->line);
-		d_free(node->pointer);
-	}
+  struct s_pointer *node;
+  while ((node = v_memory_root)) {
+    d_log(level, "pointer %p allocated on %s::%s() (%d) is still there", node->pointer, node->file, node->function, node->line);
+    d_free(node->pointer);
+  }
 }
 

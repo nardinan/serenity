@@ -14,51 +14,51 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 #include <serenity/ground/ground.h>
 #include <serenity/structures/structures.h>
 int main(int argc, char *argv[]) {
-	struct o_pool *pool = f_pool_new(NULL);
-	struct o_stream *in_file = NULL, *out_file = NULL, *out_stream;
-	struct s_exception *exception = NULL;
-	struct o_dictionary *dictionary;
-	struct o_string *value;
-	d_pool_begin(pool) {
-		out_stream = d_stdout;
-		if (argc == 3) {
-			d_try {
-				out_stream->m_write_string(out_stream, d_P(d_string(512, "%s -> %s\n", argv[1], argv[2]), struct o_string));
-				in_file = f_stream_new_file(NULL, d_P(d_string_pure(argv[1]), struct o_string), "r", 0777);
-				out_stream->m_write_string(out_stream, d_P(d_string(128, "%@\n", in_file), struct o_string));
-				out_file = f_stream_new_file(NULL, d_P(d_string_pure(argv[2]), struct o_string), "w", 0777);
-				out_file->m_write_stream(out_file, in_file);
-				d_release(out_file);
-				d_release(in_file);
-			} d_catch(exception) {
-				d_exception_dump(stderr, exception);
-			} d_endtry;
-		} else
-			out_stream->m_write_string(out_stream, d_P(d_string(128, "%s <src> <dst>\n", argv[0]), struct o_string));
-		d_try {
-			if ((out_file = f_stream_new_file(NULL, d_P(d_string_pure("test_file.txt"), struct o_string), "r", 0777))) {
-				if ((dictionary = f_dictionary_new(NULL))) {
-					if ((dictionary->m_load(dictionary, out_file))) {
-						out_stream->m_write_string(out_stream, d_P(d_string(128, "%@\n", dictionary), struct o_string));
-						if ((value = (struct o_string *)dictionary->m_get(dictionary, d_P(d_string_pure("name"), struct o_object)))) {
-							printf("The customer's name is: %s\n", value->content);
-						}
-					}
-					d_release(dictionary);
-				}
-				d_release(out_file);
-			}
-		} d_catch(exception) {
-			d_exception_dump(stderr, exception);
-		} d_endtry;
-	} d_pool_end_flush;
-	d_release(out_stream);
-	d_release(pool);
-	f_memory_flush(e_log_level_ever);
-	return 0;
+  struct o_pool *pool = f_pool_new(NULL);
+  struct o_stream *in_file = NULL, *out_file = NULL, *out_stream;
+  struct s_exception *exception = NULL;
+  struct o_dictionary *dictionary;
+  struct o_string *value;
+  d_pool_begin(pool) {
+    out_stream = d_stdout;
+    if (argc == 3) {
+      d_try {
+        out_stream->m_write_string(out_stream, d_P(d_string(512, "%s -> %s\n", argv[1], argv[2]), struct o_string));
+        in_file = f_stream_new_file(NULL, d_P(d_string_pure(argv[1]), struct o_string), "r", 0777);
+        out_stream->m_write_string(out_stream, d_P(d_string(128, "%@\n", in_file), struct o_string));
+        out_file = f_stream_new_file(NULL, d_P(d_string_pure(argv[2]), struct o_string), "w", 0777);
+        out_file->m_write_stream(out_file, in_file);
+        d_release(out_file);
+        d_release(in_file);
+      } d_catch(exception) {
+        d_exception_dump(stderr, exception);
+      } d_endtry;
+    } else
+      out_stream->m_write_string(out_stream, d_P(d_string(128, "%s <src> <dst>\n", argv[0]), struct o_string));
+    d_try {
+      if ((out_file = f_stream_new_file(NULL, d_P(d_string_pure("test_file.txt"), struct o_string), "r", 0777))) {
+        if ((dictionary = f_dictionary_new(NULL))) {
+          if ((dictionary->m_load(dictionary, out_file))) {
+            out_stream->m_write_string(out_stream, d_P(d_string(128, "%@\n", dictionary), struct o_string));
+            if ((value = (struct o_string *)dictionary->m_get(dictionary, d_P(d_string_pure("name"), struct o_object)))) {
+              printf("The customer's name is: %s\n", value->content);
+            }
+          }
+          d_release(dictionary);
+        }
+        d_release(out_file);
+      }
+    } d_catch(exception) {
+      d_exception_dump(stderr, exception);
+    } d_endtry;
+  } d_pool_end_flush;
+  d_release(out_stream);
+  d_release(pool);
+  f_memory_flush(e_log_level_ever);
+  return 0;
 }
 

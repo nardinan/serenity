@@ -14,28 +14,28 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 #include <serenity/structures/structures.h>
 int main (int argc, char *argv[]) {
-	struct o_pool *pool = f_pool_new(NULL);
-	struct o_stream *out, *in;
-	struct o_string *readed = NULL;
-	d_pool_begin(pool) {
-		out = d_stdout;
-		in = d_stdin;
-		out->m_write_string(out, d_P(d_string(128, "hello! from stream %@.. and what's your name? ", out), struct o_string));
-		readed = in->m_read(in, NULL, 64);
-		if (readed) {
-			if (readed->m_character(readed, readed->m_length(readed)-1) == '\n')
-				readed->m_truncate(readed, (readed->m_length(readed)-1));
-			out->m_write_string(out, d_P(d_string(128, "hi %@!\n", readed), struct o_string));
-			d_release(readed);
-		}
-	} d_pool_end_flush;
-	pool->m_clean(pool, d_true); /* d_true remove every pointer from the pool */
-	d_release(pool);
-	d_release(out);
-	d_release(in);
-	f_memory_flush(e_log_level_ever);
-	return 0;
+  struct o_pool *pool = f_pool_new(NULL);
+  struct o_stream *out, *in;
+  struct o_string *readed = NULL;
+  d_pool_begin(pool) {
+    out = d_stdout;
+    in = d_stdin;
+    out->m_write_string(out, d_P(d_string(128, "hello! from stream %@.. and what's your name? ", out), struct o_string));
+    readed = in->m_read(in, NULL, 64);
+    if (readed) {
+      if (readed->m_character(readed, readed->m_length(readed)-1) == '\n')
+        readed->m_truncate(readed, (readed->m_length(readed)-1));
+      out->m_write_string(out, d_P(d_string(128, "hi %@!\n", readed), struct o_string));
+      d_release(readed);
+    }
+  } d_pool_end_flush;
+  pool->m_clean(pool, d_true); /* d_true remove every pointer from the pool */
+  d_release(pool);
+  d_release(out);
+  d_release(in);
+  f_memory_flush(e_log_level_ever);
+  return 0;
 }

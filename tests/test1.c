@@ -14,16 +14,16 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 #include <stdio.h>
 #include <stdlib.h>
 #include <serenity/ground/ground.h>
 int main (int argc, char *argv[]) {
-	char *test = NULL;
-	size_t size = 0;
-	test = f_string_trim(f_string_append(&test, "whut", &size));
-	test = f_string_append(&test, "nothing", &size);
-	printf("'%s' (allocated size: %lu)\n", test, size);
-	d_free(test);
-	return 0;
+  char *test = NULL;
+  size_t size = 0;
+  test = f_string_trim(f_string_append(&test, "whut", &size));
+  test = f_string_append(&test, "nothing", &size);
+  printf("'%s' (allocated size: %lu)\n", test, size);
+  d_free(test);
+  return 0;
 }

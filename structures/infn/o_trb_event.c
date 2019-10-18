@@ -21,221 +21,221 @@
 #include <stdlib.h>
 const char v_trb_event_kind[] = "trb_event";
 void p_trb_event_hooking(struct o_trb_event *object) {
-	/* keep default delete function */
-	object->head.s_delegate.m_compare = p_trb_event_compare;
-	object->head.s_delegate.m_hash = p_trb_event_hash;
-	object->head.s_delegate.m_string = p_trb_event_string;
-	/* keep default clone function */
-	object->m_load = p_trb_event_load;
+  /* keep default delete function */
+  object->head.s_delegate.m_compare = p_trb_event_compare;
+  object->head.s_delegate.m_hash = p_trb_event_hash;
+  object->head.s_delegate.m_string = p_trb_event_string;
+  /* keep default clone function */
+  object->m_load = p_trb_event_load;
 }
 
 unsigned int p_trb_event_align(unsigned char *buffer, size_t size) {
-	size_t index, result = size;
-	for (index = 1; index < size; index++)
-		if ((buffer[index] == 0x90) && ((index == (size-1)) || (buffer[index+1] == 0xeb)))
-			break;
-	if ((size > 0) && (result = size-index))
-		memmove(buffer, &(buffer[index]), result);
-	return result;
+  size_t index, result = size;
+  for (index = 1; index < size; index++)
+    if ((buffer[index] == 0x90) && ((index == (size-1)) || (buffer[index+1] == 0xeb)))
+      break;
+  if ((size > 0) && (result = size-index))
+    memmove(buffer, &(buffer[index]), result);
+  return result;
 }
 
 float p_trb_event_mean_f(float *values, size_t size) {
-	float result = 0;
-	int index;
-	for (index = 0; index < size; index++)
-		result += values[index];
-	result /= (float)size;
-	return result;
+  float result = 0;
+  int index;
+  for (index = 0; index < size; index++)
+    result += values[index];
+  result /= (float)size;
+  return result;
 }
 
 float p_trb_event_mean_i(int *values, size_t size) {
-	float result = 0;
-	int index;
-	for (index = 0; index < size; index++)
-		result += values[index];
-	result /= (float)size;
-	return result;
+  float result = 0;
+  int index;
+  for (index = 0; index < size; index++)
+    result += values[index];
+  result /= (float)size;
+  return result;
 }
 
 float *p_trb_event_pedestal(struct o_trb_event *events, size_t size, float *supplied) {
-	float *result = supplied;
-	int channel, event;
-	if (!result)
-		if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
-			d_die(d_error_malloc);
-	for (channel = 0; channel < d_trb_event_channels; channel++) {
-		result[channel] = 0;
-		for (event = 0; event < size; event++)
-			result[channel] += events[event].values[channel];
-		result[channel] = (result[channel]/(float)size);
-	}
-	return result;
+  float *result = supplied;
+  int channel, event;
+  if (!result)
+    if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
+      d_die(d_error_malloc);
+  for (channel = 0; channel < d_trb_event_channels; channel++) {
+    result[channel] = 0;
+    for (event = 0; event < size; event++)
+      result[channel] += events[event].values[channel];
+    result[channel] = (result[channel]/(float)size);
+  }
+  return result;
 }
 
 float *p_trb_event_sigma_raw(struct o_trb_event *events, size_t size, float *supplied) {
-	float *result = supplied, total, total_square, fraction = (1.0/(float)size);
-	int channel, event;
-	if (!result)
-		if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
-			d_die(d_error_malloc);
-	for (channel = 0; channel < d_trb_event_channels; channel++) {
-		for (event = 0, total = 0, total_square = 0; event < size; event++) {
-			total += events[event].values[channel];
-			total_square += events[event].values[channel]*events[event].values[channel];
-		}
-		total *= fraction;
-		total_square *= fraction;
-		result[channel] = sqrt(fabs(total_square-(total*total)));
-	}
-	return result;
+  float *result = supplied, total, total_square, fraction = (1.0/(float)size);
+  int channel, event;
+  if (!result)
+    if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
+      d_die(d_error_malloc);
+  for (channel = 0; channel < d_trb_event_channels; channel++) {
+    for (event = 0, total = 0, total_square = 0; event < size; event++) {
+      total += events[event].values[channel];
+      total_square += events[event].values[channel]*events[event].values[channel];
+    }
+    total *= fraction;
+    total_square *= fraction;
+    result[channel] = sqrt(fabs(total_square-(total*total)));
+  }
+  return result;
 }
 
 float *p_trb_event_cn_no_pedestal(float *no_pedestal, float sigma_multiplicator, float *sigma, int *flags, float *supplied) {
-	float elements[d_trb_event_channels_on_va];
-	int va, channel, local_channel, entries, index;
-	for (va = 0, channel = 0; va < d_trb_event_vas; va++, channel += d_trb_event_channels_on_va) {
-		supplied[va] = 0;
-		for (local_channel = channel, entries = 0; local_channel < (channel+d_trb_event_channels_on_va); local_channel++) {
-			//if ((!flags) || ((!FLAGGED_sigma_raw(flags[local_channel])) && (!FLAGGED_occupancy(flags[local_channel]))))
-			//	if (no_pedestal[local_channel] < (sigma_multiplicator*sigma[local_channel])) {
-			for (index = (entries-1); ((index >= 0) && (elements[index] > no_pedestal[local_channel])); index--)
-				elements[index+1] = elements[index];
-			elements[index+1] = no_pedestal[local_channel];
-			entries++;
-		}
-		//	}
-		//if (entries) {
-		//	if ((entries%2) == 0)
-		supplied[va] = (elements[(entries/2)]+elements[(entries/2)-1])/2.0f;
-		//	else
-		//		supplied[va] = elements[(entries/2)];
-		//}
-	}
-	return supplied;
+  float elements[d_trb_event_channels_on_va];
+  int va, channel, local_channel, entries, index;
+  for (va = 0, channel = 0; va < d_trb_event_vas; va++, channel += d_trb_event_channels_on_va) {
+    supplied[va] = 0;
+    for (local_channel = channel, entries = 0; local_channel < (channel+d_trb_event_channels_on_va); local_channel++) {
+      //if ((!flags) || ((!FLAGGED_sigma_raw(flags[local_channel])) && (!FLAGGED_occupancy(flags[local_channel]))))
+      //	if (no_pedestal[local_channel] < (sigma_multiplicator*sigma[local_channel])) {
+      for (index = (entries-1); ((index >= 0) && (elements[index] > no_pedestal[local_channel])); index--)
+        elements[index+1] = elements[index];
+      elements[index+1] = no_pedestal[local_channel];
+      entries++;
+    }
+    //	}
+    //if (entries) {
+    //	if ((entries%2) == 0)
+    supplied[va] = (elements[(entries/2)]+elements[(entries/2)-1])/2.0f;
+    //	else
+    //		supplied[va] = elements[(entries/2)];
+    //}
+  }
+  return supplied;
 }
 
 float *p_trb_event_cn(unsigned short int *values, float sigma_multiplicator, float *pedestal, float *sigma, int *flags, float *supplied) {
-	float no_pedestal[d_trb_event_channels];
-	int index;
-	for (index = 0; index < d_trb_event_channels; index++)
-		no_pedestal[index] = values[index]-pedestal[index];
-	return p_trb_event_cn_no_pedestal(no_pedestal, sigma_multiplicator, sigma, flags, supplied);
+  float no_pedestal[d_trb_event_channels];
+  int index;
+  for (index = 0; index < d_trb_event_channels; index++)
+    no_pedestal[index] = values[index]-pedestal[index];
+  return p_trb_event_cn_no_pedestal(no_pedestal, sigma_multiplicator, sigma, flags, supplied);
 }
 
 float *p_trb_event_sigma(struct o_trb_event *events, size_t size, float sigma_multiplicator, float *sigma_raw, float *pedestal, int *flags, float *supplied) {
-	float *result = supplied, common_noise[d_trb_event_vas], common_noise_pure[d_trb_event_channels] = {0},
-	      common_noise_pure_square[d_trb_event_channels] = {0}, value, fraction;
-	int channel, event, local_entries[d_trb_event_channels] = {0};
-	if (!result)
-		if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
-			d_die(d_error_malloc);
-	for (event = 0; event < size; event++) {
-		p_trb_event_cn(events[event].values, sigma_multiplicator, pedestal, sigma_raw, flags, common_noise);
-		for (channel = 0; channel < d_trb_event_channels; channel++) {
-			value = ((float)(events[event].values[channel]))-pedestal[channel]-common_noise[(int)(channel/d_trb_event_channels_on_va)];
-			if (fabs(value) < (sigma_multiplicator*sigma_raw[channel])) {
-				common_noise_pure[channel] += value;
-				common_noise_pure_square[channel] += value*value;
-				local_entries[channel]++;
-			}
-		}
-	}
-	for (channel = 0; channel < d_trb_event_channels; channel++)
-		if (local_entries[channel]) {
-			fraction = (1.0/(float)local_entries[channel]);
-			common_noise_pure[channel] *= fraction;
-			common_noise_pure_square[channel] *= fraction;
-			result[channel] = sqrt(fabs(common_noise_pure_square[channel]-(common_noise_pure[channel]*common_noise_pure[channel])));
-		}
-	return result;
+  float *result = supplied, common_noise[d_trb_event_vas], common_noise_pure[d_trb_event_channels] = {0},
+        common_noise_pure_square[d_trb_event_channels] = {0}, value, fraction;
+  int channel, event, local_entries[d_trb_event_channels] = {0};
+  if (!result)
+    if (!(result = (float *) d_calloc(sizeof(float)*d_trb_event_channels, 1)))
+      d_die(d_error_malloc);
+  for (event = 0; event < size; event++) {
+    p_trb_event_cn(events[event].values, sigma_multiplicator, pedestal, sigma_raw, flags, common_noise);
+    for (channel = 0; channel < d_trb_event_channels; channel++) {
+      value = ((float)(events[event].values[channel]))-pedestal[channel]-common_noise[(int)(channel/d_trb_event_channels_on_va)];
+      if (fabs(value) < (sigma_multiplicator*sigma_raw[channel])) {
+        common_noise_pure[channel] += value;
+        common_noise_pure_square[channel] += value*value;
+        local_entries[channel]++;
+      }
+    }
+  }
+  for (channel = 0; channel < d_trb_event_channels; channel++)
+    if (local_entries[channel]) {
+      fraction = (1.0/(float)local_entries[channel]);
+      common_noise_pure[channel] *= fraction;
+      common_noise_pure_square[channel] *= fraction;
+      result[channel] = sqrt(fabs(common_noise_pure_square[channel]-(common_noise_pure[channel]*common_noise_pure[channel])));
+    }
+  return result;
 }
 
 struct o_trb_event *f_trb_event_new(struct o_trb_event *supplied) {
-	struct o_trb_event *result;
-	if ((result = (struct o_trb_event *) f_object_new(v_trb_event_kind, sizeof(struct o_trb_event), (struct o_object *)supplied)))
-		p_trb_event_hooking(result);
-	return result;
+  struct o_trb_event *result;
+  if ((result = (struct o_trb_event *) f_object_new(v_trb_event_kind, sizeof(struct o_trb_event), (struct o_object *)supplied)))
+    p_trb_event_hooking(result);
+  return result;
 }
 
 int p_trb_event_compare(struct o_object *object, struct o_object *other) {
-	struct o_trb_event *local_object, *local_other;
-	int result = p_object_compare(object, other), index = 0;
-	if ((local_object = d_object_kind(object, trb_event)) && (local_other = d_object_kind(other, trb_event)))
-		if (((result = local_object->code-local_other->code) == 0) && ((result = local_object->filled-local_other->filled) == 0) &&
-				((result = local_object->kind-local_other->kind) == 0) &&
-				((result = local_object->temperature[0]-local_other->temperature[0]) == 0) &&
-				((result = local_object->temperature[1]-local_other->temperature[1]) == 0))
-			while ((index < d_trb_event_channels) && (result == 0)) {
-				result = local_object->values[index]-local_other->values[index];
-				index++;
-			}
-	return result;
+  struct o_trb_event *local_object, *local_other;
+  int result = p_object_compare(object, other), index = 0;
+  if ((local_object = d_object_kind(object, trb_event)) && (local_other = d_object_kind(other, trb_event)))
+    if (((result = local_object->code-local_other->code) == 0) && ((result = local_object->filled-local_other->filled) == 0) &&
+        ((result = local_object->kind-local_other->kind) == 0) &&
+        ((result = local_object->temperature[0]-local_other->temperature[0]) == 0) &&
+        ((result = local_object->temperature[1]-local_other->temperature[1]) == 0))
+      while ((index < d_trb_event_channels) && (result == 0)) {
+        result = local_object->values[index]-local_other->values[index];
+        index++;
+      }
+  return result;
 }
 
 t_hash_value p_trb_event_hash(struct o_object *object) {
-	struct o_trb_event *local_object;
-	t_hash_value result = 0;
-	if ((local_object = d_object_kind(object, trb_event))) {
-		if (!object->s_flags.hashed) {
-			object->hash = 5381;
-			/* djb2 hash function */
-			object->hash = ((object->hash<<5)+object->hash)+(t_hash_value)local_object->code;
-			object->hash = ((object->hash<<5)+object->hash)+(t_hash_value)local_object->kind;
-			object->s_flags.hashed = d_true;
-		}
-		result = object->hash;
-	}  else
-		d_throw(v_exception_kind, "object is not an instance of o_trb_event");
-	return result;
+  struct o_trb_event *local_object;
+  t_hash_value result = 0;
+  if ((local_object = d_object_kind(object, trb_event))) {
+    if (!object->s_flags.hashed) {
+      object->hash = 5381;
+      /* djb2 hash function */
+      object->hash = ((object->hash<<5)+object->hash)+(t_hash_value)local_object->code;
+      object->hash = ((object->hash<<5)+object->hash)+(t_hash_value)local_object->kind;
+      object->s_flags.hashed = d_true;
+    }
+    result = object->hash;
+  }  else
+    d_throw(v_exception_kind, "object is not an instance of o_trb_event");
+  return result;
 }
 
 char *p_trb_event_string(struct o_object *object, char *data, size_t size) {
-	struct o_trb_event *local_object;
-	size_t written;
-	if ((local_object = d_object_kind(object, trb_event))) {
-		written = snprintf(data, size, "<trb event 0x%x kind 0x%x>", local_object->code, local_object->kind);
-		written = ((written>size)?size:written);
-		data += written;
-	} else
-		d_throw(v_exception_kind, "object is not an instance of o_trb_event");
-	return data;
+  struct o_trb_event *local_object;
+  size_t written;
+  if ((local_object = d_object_kind(object, trb_event))) {
+    written = snprintf(data, size, "<trb event 0x%x kind 0x%x>", local_object->code, local_object->kind);
+    written = ((written>size)?size:written);
+    data += written;
+  } else
+    d_throw(v_exception_kind, "object is not an instance of o_trb_event");
+  return data;
 }
 
 unsigned char *p_trb_event_load(struct o_trb_event *object, unsigned char *raw_data, unsigned char kind, size_t size) {
-	unsigned char *result = NULL;
-	int index, channel, event_size, event_steps;
-	object->filled = d_false;
-	if (size >= d_trb_event_size_header)
-		if (d_trb_event_header(raw_data)) {
-			object->code = raw_data[2];
-			object->kind = raw_data[3];
-			switch (object->kind) {
-				case 0xa0:
-				case 0xa1:
-					event_steps = d_trb_event_channels;
-					event_size = d_trb_event_size_normal;
-					break;
-				case 0xa3:
-					event_steps = d_trb_event_samples;
-					event_size = d_trb_event_size_debug;
-					break;
-			}
-			result = (raw_data+4);
-			if ((kind == object->kind) && (size >= event_size)) {
-				memset(object->values, 0, sizeof(unsigned short int)*d_trb_event_channels);
-				for (index = 0; index < event_steps; index++, result += 2) {
-					channel = ((index%2)*d_trb_event_channels_half)+(index/2);
-					object->values[channel] = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
-				}
-				object->temperature[0] = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
-				result += 2;
-				object->temperature[1] = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
-				result += 2;
-				object->version = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
-				result += 2;
-				object->filled = d_true;
-			}
-		}
-	return result;
+  unsigned char *result = NULL;
+  int index, channel, event_size, event_steps;
+  object->filled = d_false;
+  if (size >= d_trb_event_size_header)
+    if (d_trb_event_header(raw_data)) {
+      object->code = raw_data[2];
+      object->kind = raw_data[3];
+      switch (object->kind) {
+        case 0xa0:
+        case 0xa1:
+          event_steps = d_trb_event_channels;
+          event_size = d_trb_event_size_normal;
+          break;
+        case 0xa3:
+          event_steps = d_trb_event_samples;
+          event_size = d_trb_event_size_debug;
+          break;
+      }
+      result = (raw_data+4);
+      if ((kind == object->kind) && (size >= event_size)) {
+        memset(object->values, 0, sizeof(unsigned short int)*d_trb_event_channels);
+        for (index = 0; index < event_steps; index++, result += 2) {
+          channel = ((index%2)*d_trb_event_channels_half)+(index/2);
+          object->values[channel] = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
+        }
+        object->temperature[0] = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
+        result += 2;
+        object->temperature[1] = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
+        result += 2;
+        object->version = ((unsigned short int)result[0])|((unsigned short int)result[1])<<8;
+        result += 2;
+        object->filled = d_true;
+      }
+    }
+  return result;
 }
 

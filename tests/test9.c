@@ -14,31 +14,31 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 #include <serenity/structures/structures.h>
 #include <serenity/structures/crypto/crypto.h>
 int main (int argc, char *argv[]) {
-	unsigned char key[4] = "ABCD";
-	struct o_pool *pool = f_pool_new(NULL);
-	struct o_aes *aes = f_aes_new(NULL, e_aes_block_128, key, 4);
-	struct o_string *input, *output;
-	struct o_stream *out;
-	d_pool_begin(pool) {
-		out = d_stdout;
-		out->m_write_string(out, d_P(d_string(512, "%@\n", aes), struct o_string));
-		input = d_string_pure("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. "
-				"Ut enim ad minim veniam, quis nostrud\n");
-		out->m_write_string(out, d_P(d_string(512, "size of input before m_crypt: %zd\n", input->size), struct o_string));
-		output = aes->m_crypt(aes, input, d_true);
-		out->m_write_string(out, d_P(d_string(512, "size of input after m_crypt (padded): %zd\n", input->size), struct o_string));
-		output = aes->m_decrypt(aes, input, d_true);
-		out->m_write_string(out, input);
-		pool->m_clean(pool, d_true);
-		d_release(out);
-		d_release(input);
-	} d_pool_end_flush;
-	d_release(pool);
-	d_release(aes);
-	f_memory_flush(e_log_level_ever);
-	return 0;
+  unsigned char key[4] = "ABCD";
+  struct o_pool *pool = f_pool_new(NULL);
+  struct o_aes *aes = f_aes_new(NULL, e_aes_block_128, key, 4);
+  struct o_string *input, *output;
+  struct o_stream *out;
+  d_pool_begin(pool) {
+    out = d_stdout;
+    out->m_write_string(out, d_P(d_string(512, "%@\n", aes), struct o_string));
+    input = d_string_pure("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. "
+        "Ut enim ad minim veniam, quis nostrud\n");
+    out->m_write_string(out, d_P(d_string(512, "size of input before m_crypt: %zd\n", input->size), struct o_string));
+    output = aes->m_crypt(aes, input, d_true);
+    out->m_write_string(out, d_P(d_string(512, "size of input after m_crypt (padded): %zd\n", input->size), struct o_string));
+    output = aes->m_decrypt(aes, input, d_true);
+    out->m_write_string(out, input);
+    pool->m_clean(pool, d_true);
+    d_release(out);
+    d_release(input);
+  } d_pool_end_flush;
+  d_release(pool);
+  d_release(aes);
+  f_memory_flush(e_log_level_ever);
+  return 0;
 }
